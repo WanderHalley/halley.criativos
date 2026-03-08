@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Criativo Studio v2 — Análise Multi-SRT</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Familjen+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #08090d;
+  --s1:       #0f1018;
+  --s2:       #171921;
+  --s3:       #1f2230;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.12);
+  --acc:      #e8ff47;
+  --acc2:     #b8cc2a;
+  --red:      #ff4757;
+  --blue:     #4fc3f7;
+  --green:    #69ff97;
+  --text:     #dde1f0;
+  --muted:    #5a607a;
+  --muted2:   #8890aa;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Familjen Grotesk', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── noise overlay ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999; opacity: 0.4;
+}
+
+/* ── glow blobs ── */
+.blob {
+  position: fixed; border-radius: 50%; filter: blur(120px);
+  pointer-events: none; z-index: 0;
+}
+.blob-1 { width: 500px; height: 500px; background: rgba(232,255,71,0.04); top: -100px; left: -100px; }
+.blob-2 { width: 400px; height: 400px; background: rgba(79,195,247,0.04); bottom: 0; right: -80px; }
+
+/* ── layout ── */
+.shell {
+  position: relative; z-index: 1;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 52px 24px 80px;
+}
+
+/* ── header ── */
+.hd {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 24px;
+  margin-bottom: 60px;
+}
+.hd-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--acc); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.hd-tag::before { content: ''; width: 24px; height: 1px; background: var(--acc); }
+
+h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(52px, 8vw, 90px);
+  line-height: 0.92;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+h1 em { color: var(--acc); font-style: normal; }
+
+.hd-sub {
+  margin-top: 14px;
+  font-size: 14px; line-height: 1.7;
+  color: var(--muted2);
+  max-width: 480px;
+}
+
+.pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  border: 1px solid rgba(105,255,151,0.25);
+  background: rgba(105,255,151,0.05);
+  color: var(--green);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; padding: 7px 14px; border-radius: 100px;
+}
+.pill-dot {
+  width: 6px; height: 6px; background: var(--green);
+  border-radius: 50%; animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+/* ── cards ── */
+.card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.card-top {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.step-badge {
+  width: 26px; height: 26px; border-radius: 7px;
+  background: var(--acc); color: #000;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.card-title {
+  font-family: 'Familjen Grotesk', sans-serif;
+  font-size: 15px; font-weight: 700;
+}
+.card-body { padding: 24px; }
+
+/* ── field ── */
+.flabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 9px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.flabel a { color: var(--acc); text-decoration: none; font-size: 10px; }
+.flabel a:hover { opacity: .7; }
+
+input[type=text], input[type=password], input[type=number], textarea, select {
+  width: 100%;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 11px 15px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 3px rgba(232,255,71,0.08);
+}
+select option { background: var(--s2); }
+textarea { resize: vertical; }
+
+.frow { margin-bottom: 18px; }
+.frow:last-child { margin-bottom: 0; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+@media(max-width:640px){ .grid2,.grid3{grid-template-columns:1fr;} }
+
+/* ── upload zone ── */
+.drop-zone {
+  border: 2px dashed var(--border2);
+  border-radius: 14px;
+  padding: 36px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .3s;
+  position: relative;
+  background: var(--s2);
+}
+.drop-zone.over, .drop-zone:hover {
+  border-color: var(--acc);
+  background: rgba(232,255,71,0.03);
+}
+.drop-zone input[type=file] {
+  position: absolute; inset: 0; opacity: 0;
+  cursor: pointer; width: 100%; height: 100%;
+  font-size: 0;
+}
+.drop-icon { font-size: 32px; margin-bottom: 10px; display: block; }
+.drop-main { font-weight: 700; font-size: 15px; margin-bottom: 5px; }
+.drop-sub { font-size: 12px; color: var(--muted); }
+
+/* ── file list ── */
+.file-list {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-top: 16px;
+}
+.file-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--s2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 14px;
+  animation: fadeIn .3s ease;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+.file-item-icon { font-size: 18px; flex-shrink: 0; }
+.file-item-info { flex: 1; min-width: 0; }
+.file-item-name {
+  font-size: 13px; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.file-item-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--muted); margin-top: 2px;
+}
+.file-item-status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; padding: 3px 9px; border-radius: 100px;
+  flex-shrink: 0;
+}
+.status-ok { background: rgba(105,255,151,0.1); color: var(--green); border:1px solid rgba(105,255,151,0.2); }
+.status-err { background: rgba(255,71,87,0.1); color: var(--red); border:1px solid rgba(255,71,87,0.2); }
+
+.file-remove {
+  background: none; border: none; color: var(--muted);
+  cursor: pointer; font-size: 16px; padding: 2px;
+  transition: color .2s; flex-shrink: 0;
+}
+.file-remove:hover { color: var(--red); }
+
+/* ── SRT segments preview ── */
+.seg-preview {
+  margin-top: 12px;
+  display: none;
+}
+.seg-preview-inner {
+  background: var(--s2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px;
+  max-height: 160px; overflow-y: auto;
+}
+.seg-row {
+  display: grid; grid-template-columns: 80px 1fr;
+  gap: 10px; margin-bottom: 6px; font-size: 12px;
+}
+.seg-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--muted2); padding-top: 2px;
+}
+.seg-text { color: var(--text); line-height: 1.5; }
+.seg-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; padding: 1px 6px; border-radius: 4px;
+  margin-left: 6px; vertical-align: middle;
+}
+.seg-gancho { background: rgba(255,71,87,0.15); color: var(--red); }
+.seg-corpo { background: rgba(232,255,71,0.1); color: var(--acc2); }
+.seg-cta { background: rgba(79,195,247,0.15); color: var(--blue); }
+
+/* ── param tags ── */
+.tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.param-tag {
+  padding: 6px 14px; border-radius: 100px;
+  border: 1px solid var(--border2);
+  font-size: 12px; cursor: pointer;
+  transition: all .2s;
+  background: transparent; color: var(--muted2);
+  font-family: 'Familjen Grotesk', sans-serif;
+}
+.param-tag:hover, .param-tag.on {
+  border-color: var(--acc); color: #000;
+  background: var(--acc);
+}
+
+/* ── CTA button ── */
+.btn-gen {
+  width: 100%; padding: 20px;
+  background: var(--acc); color: #000;
+  border: none; border-radius: 12px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px; letter-spacing: 0.08em;
+  cursor: pointer; transition: all .3s;
+  position: relative; overflow: hidden;
+}
+.btn-gen::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 55%);
+  opacity: 0; transition: opacity .3s;
+}
+.btn-gen:hover { transform: translateY(-3px); box-shadow: 0 16px 50px rgba(232,255,71,.3); }
+.btn-gen:hover::after { opacity: 1; }
+.btn-gen:active { transform: translateY(0); }
+.btn-gen:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ── progress ── */
+.prog-wrap { display: none; margin-top: 20px; }
+.prog-bg {
+  height: 3px; background: var(--s3);
+  border-radius: 100px; overflow: hidden; margin-bottom: 12px;
+}
+.prog-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--acc), var(--blue));
+  border-radius: 100px; transition: width .5s ease;
+}
+.prog-steps {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;
+}
+.prog-step {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; padding: 4px 10px; border-radius: 100px;
+  background: var(--s3); color: var(--muted);
+  border: 1px solid var(--border); transition: all .3s;
+}
+.prog-step.active { background: rgba(232,255,71,.1); color: var(--acc); border-color: rgba(232,255,71,.3); }
+.prog-step.done { background: rgba(105,255,151,.08); color: var(--green); border-color: rgba(105,255,151,.2); }
+.prog-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--muted2); text-align: center;
+}
+
+/* ── divider ── */
+.div { height: 1px; background: var(--border); margin: 24px 0; }
+
+/* ── patterns section ── */
+.patterns-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+  margin-bottom: 32px;
+}
+@media(max-width:640px){ .patterns-grid{grid-template-columns:1fr;} }
+
+.pattern-card {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px;
+  animation: fadeIn .4s ease forwards; opacity: 0;
+}
+.pat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: .15em;
+  text-transform: uppercase; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 6px;
+}
+.pat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.pat-gancho .pat-dot { background: var(--red); }
+.pat-corpo .pat-dot { background: var(--acc); }
+.pat-cta .pat-dot { background: var(--blue); }
+.pat-gancho .pat-label { color: var(--red); }
+.pat-corpo .pat-label { color: var(--acc2); }
+.pat-cta .pat-label { color: var(--blue); }
+.pat-text { font-size: 13px; line-height: 1.65; color: var(--muted2); font-style: italic; }
+.pat-count {
+  margin-top: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--muted);
+}
+
+/* ── results header ── */
+#results { display: none; }
+.res-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+}
+.res-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 38px; letter-spacing: .03em;
+}
+.res-title span { color: var(--acc); }
+.btn-export {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px; background: var(--s2);
+  border: 1px solid var(--border2); border-radius: 10px;
+  color: var(--text); font-size: 13px;
+  cursor: pointer; transition: all .2s;
+  font-family: 'Familjen Grotesk', sans-serif;
+}
+.btn-export:hover { border-color: var(--acc); color: var(--acc); }
+
+/* ── variation card ── */
+.var-card {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden;
+  margin-bottom: 20px;
+  animation: fadeIn .4s ease forwards; opacity: 0;
+}
+.var-top {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+.var-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.var-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--muted);
+}
+.var-name {
+  font-size: 15px; font-weight: 700;
+}
+.var-eixo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: .1em;
+  padding: 3px 10px; border-radius: 100px;
+  text-transform: uppercase;
+}
+.ex-gancho { background: rgba(255,71,87,.12); color: var(--red); border:1px solid rgba(255,71,87,.2); }
+.ex-formato { background: rgba(232,255,71,.1); color: var(--acc2); border:1px solid rgba(232,255,71,.2); }
+.ex-cta { background: rgba(79,195,247,.12); color: var(--blue); border:1px solid rgba(79,195,247,.2); }
+
+.var-testing {
+  padding: 10px 22px; border-bottom: 1px solid var(--border);
+  font-size: 12px; color: var(--muted2);
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+.var-testing strong { color: var(--text); }
+
+.words-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--muted);
+  background: var(--s3); padding: 3px 10px; border-radius: 100px;
+}
+
+/* blocks */
+.blocks { display: grid; grid-template-columns: 1fr 2fr 1fr; }
+@media(max-width:768px){ .blocks{grid-template-columns:1fr;} }
+
+.blk {
+  padding: 20px 22px;
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+.blk:last-child { border-right: none; }
+@media(max-width:768px){
+  .blk { border-right: none; border-bottom: 1px solid var(--border); }
+  .blk:last-child { border-bottom: none; }
+}
+
+.blk-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: .18em;
+  text-transform: uppercase; margin-bottom: 12px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.lb-g { color: var(--red); }
+.lb-c { color: var(--acc2); }
+.lb-t { color: var(--blue); }
+
+.blk-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; color: var(--muted); margin-bottom: 10px;
+  background: var(--s3); padding: 2px 8px; border-radius: 4px;
+  display: inline-block;
+}
+
+.blk-text { font-size: 13px; line-height: 1.75; color: var(--text); font-weight: 400; }
+
+.btn-cp {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); padding: 2px 4px;
+  transition: color .2s; font-size: 14px;
+}
+.btn-cp:hover { color: var(--text); }
+.btn-cp.ok { color: var(--green); }
+
+.btn-cp-all {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; background: transparent;
+  border: 1px solid var(--border); border-radius: 8px;
+  color: var(--muted2); font-size: 12px;
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+  font-family: 'Familjen Grotesk', sans-serif;
+}
+.btn-cp-all:hover { border-color: var(--text); color: var(--text); }
+
+/* ── analysis box ── */
+.analysis-box {
+  background: rgba(232,255,71,.03);
+  border: 1px solid rgba(232,255,71,.12);
+  border-radius: 14px; padding: 20px 24px;
+  margin-bottom: 28px; display: none;
+}
+.ana-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--acc2);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.ana-text { font-size: 13px; line-height: 1.7; color: var(--muted2); }
+
+/* ── per-srt analysis ── */
+.srt-analyses { margin-bottom: 28px; display: none; }
+.srt-ana-grid {
+  display: grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
+  gap: 12px; margin-top: 14px;
+}
+.srt-ana-card {
+  background: var(--s2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px;
+  animation: fadeIn .3s ease forwards; opacity: 0;
+}
+.srt-ana-filename {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--muted); margin-bottom: 10px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.srt-ana-segments { display: flex; flex-direction: column; gap: 8px; }
+.seg-block { font-size: 12px; line-height: 1.55; }
+.seg-block-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; text-transform: uppercase; letter-spacing: .15em;
+  margin-bottom: 4px;
+}
+
+/* ── section heading ── */
+.sec-hd {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px; letter-spacing: .06em; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 12px; color: var(--text);
+}
+.sec-hd::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── toast ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--s2); border: 1px solid var(--green);
+  color: var(--green); padding: 12px 20px;
+  border-radius: 10px; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; z-index: 99999;
+  transform: translateY(70px); opacity: 0;
+  transition: all .3s; display: flex; align-items: center; gap: 8px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.err { border-color: var(--red); color: var(--red); }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--s1); }
+::-webkit-scrollbar-thumb { background: var(--s3); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<div class="shell">
+
+  <!-- HEADER -->
+  <div class="hd">
+    <div>
+      <div class="hd-tag">Sistema de Inteligência Criativa</div>
+      <h1>CRIATIVO<br><em>STUDIO</em></h1>
+      <p class="hd-sub">Analisa múltiplos SRTs com timestamps reais para mapear gancho, corpo e CTA — e gera 10 variações calibradas por padrões de mercado validados.</p>
+    </div>
+    <div><div class="pill"><span class="pill-dot"></span>Groq · Llama 3.3 70B · Free</div></div>
+  </div>
+
+  <!-- STEP 1: API KEY -->
+  <div class="card">
+    <div class="card-top">
+      <div class="step-badge">1</div>
+      <div class="card-title">Chave de API — Groq</div>
+    </div>
+    <div class="card-body">
+      <div class="flabel">
+        API Key (gratuita)
+        <a href="https://console.groq.com" target="_blank">↗ console.groq.com — sem cartão</a>
+      </div>
+      <input type="password" id="apiKey" placeholder="gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+    </div>
+  </div>
+
+  <!-- STEP 2: UPLOAD MÚLTIPLO -->
+  <div class="card">
+    <div class="card-top">
+      <div class="step-badge">2</div>
+      <div class="card-title">Upload dos Arquivos SRT — Ilimitado</div>
+    </div>
+    <div class="card-body">
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="srtFiles" accept=".srt,.txt" multiple />
+        <span class="drop-icon">📂</span>
+        <div class="drop-main">Arraste os arquivos .srt aqui</div>
+        <div class="drop-sub">Múltiplos arquivos · segure Ctrl/Cmd para selecionar vários · .srt ou .txt</div>
+      </div>
+      <div class="file-list" id="fileList"></div>
+    </div>
+  </div>
+
+  <!-- STEP 3: PARÂMETROS -->
+  <div class="card">
+    <div class="card-top">
+      <div class="step-badge">3</div>
+      <div class="card-title">Parâmetros do Criativo</div>
+    </div>
+    <div class="card-body">
+      <div class="grid3 frow">
+        <div>
+          <div class="flabel">Duração alvo do vídeo</div>
+          <select id="duracao">
+            <option value="15">15s (~33 palavras)</option>
+            <option value="30">30s (~65 palavras)</option>
+            <option value="45">45s (~98 palavras)</option>
+            <option value="60" selected>60s (~130 palavras)</option>
+            <option value="90">90s (~195 palavras)</option>
+            <option value="120">2min (~260 palavras)</option>
+          </select>
+        </div>
+        <div>
+          <div class="flabel">Produto / Nicho</div>
+          <input type="text" id="produto" value="Biovein — varizes" placeholder="Ex: Biovein — varizes" />
+        </div>
+        <div>
+          <div class="flabel">Público-alvo</div>
+          <input type="text" id="publico" value="Mulheres 35–60 anos" placeholder="Ex: Mulheres 35–60 anos" />
+        </div>
+      </div>
+      <div class="div"></div>
+      <div class="flabel">Eixos de variação a gerar</div>
+      <div class="tag-group" id="eixoTags">
+        <button class="param-tag on" data-eixo="gancho">🎯 Gancho — 4 variações</button>
+        <button class="param-tag on" data-eixo="formato">🎬 Formato Visual — 3 variações</button>
+        <button class="param-tag on" data-eixo="cta">📣 CTA e Oferta — 3 variações</button>
+      </div>
+      <div class="div"></div>
+      <div class="flabel">Contexto da marca (persona, canal, tom)</div>
+      <textarea id="contexto" rows="2" placeholder="Ex: Persona Cris, tom acolhedor feminino, conversão via WhatsApp...">Persona da marca é Cris, tom acolhedor e feminino. Canal de conversão: WhatsApp Business "Central Saúde Natural Brasil". Página Facebook: "Pernas Leves Brasil". Produto: Biovein para varizes e circulação.</textarea>
+    </div>
+  </div>
+
+  <!-- GENERATE -->
+  <button class="btn-gen" id="btnGen" onclick="run()">⚡ ANALISAR SRTs E GERAR 10 VARIAÇÕES</button>
+
+  <div class="prog-wrap" id="progWrap">
+    <div class="prog-steps" id="progSteps">
+      <div class="prog-step" id="ps1">① Parseando SRTs</div>
+      <div class="prog-step" id="ps2">② Analisando timestamps</div>
+      <div class="prog-step" id="ps3">③ Enviando para Groq</div>
+      <div class="prog-step" id="ps4">④ Detectando padrões</div>
+      <div class="prog-step" id="ps5">⑤ Gerando 10 variações</div>
+    </div>
+    <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-label" id="progLabel">Iniciando...</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="div" style="margin:48px 0 36px;"></div>
+
+    <!-- Per-SRT breakdown -->
+    <div class="srt-analyses" id="srtAnalyses">
+      <div class="sec-hd">Análise por SRT</div>
+      <div class="srt-ana-grid" id="srtAnaGrid"></div>
+    </div>
+
+    <!-- Patterns -->
+    <div id="patternsSection" style="display:none;">
+      <div class="sec-hd">Padrões Detectados</div>
+      <div class="patterns-grid" id="patternsGrid"></div>
+    </div>
+
+    <!-- Variations -->
+    <div class="res-hd">
+      <div class="res-title">10 <span>Variações</span></div>
+      <button class="btn-export" onclick="exportAll()">📋 Exportar todas (.txt)</button>
+    </div>
+
+    <div class="analysis-box" id="anaBox">
+      <div class="ana-label">🔍 Síntese da Análise</div>
+      <div class="ana-text" id="anaText"></div>
+    </div>
+
+    <div id="varList"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">✓ Copiado!</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let srtFiles = []; // [{name, raw, parsed: {segments, gancho, corpo, cta, duration}}]
+let generated = [];
+
+// ─── UPLOAD ──────────────────────────────────────────────────────────────────
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('srtFiles');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('over');
+  handleFiles([...e.dataTransfer.files]);
+});
+fileInput.addEventListener('change', e => handleFiles([...e.target.files]));
+
+function handleFiles(files) {
+  files.forEach(file => {
+    if (srtFiles.find(f => f.name === file.name)) return; // dedup
+    const reader = new FileReader();
+    reader.onload = e => {
+      const raw = e.target.result;
+      const parsed = parseSRT(raw);
+      srtFiles.push({ name: file.name, raw, parsed });
+      renderFileList();
+    };
+    reader.readAsText(file, 'UTF-8');
+  });
+  fileInput.value = '';
+}
+
+function removeFile(name) {
+  srtFiles = srtFiles.filter(f => f.name !== name);
+  renderFileList();
+}
+
+function renderFileList() {
+  const list = document.getElementById('fileList');
+  list.innerHTML = '';
+  srtFiles.forEach(f => {
+    const segs = f.parsed.segments.length;
+    const dur = formatTime(f.parsed.duration);
+    const div = document.createElement('div');
+    div.className = 'file-item';
+    div.innerHTML = `
+      <span class="file-item-icon">📄</span>
+      <div class="file-item-info">
+        <div class="file-item-name">${esc(f.name)}</div>
+        <div class="file-item-meta">${segs} segmentos · ${dur} de duração</div>
+      </div>
+      <span class="file-item-status status-ok">✓ Parseado</span>
+      <button class="file-remove" onclick="removeFile('${esc(f.name)}')" title="Remover">×</button>
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ─── SRT PARSER com timestamps ────────────────────────────────────────────────
+function parseSRT(raw) {
+  const blocks = raw.trim().split(/\n\s*\n/);
+  const segments = [];
+
+  blocks.forEach(block => {
+    const lines = block.trim().split('\n');
+    if (lines.length < 2) return;
+
+    // find timestamp line
+    const tsLine = lines.find(l => /\d{2}:\d{2}:\d{2}[,\.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[,\.]\d{3}/.test(l));
+    if (!tsLine) return;
+
+    const tsMatch = tsLine.match(
+      /(\d{2}):(\d{2}):(\d{2})[,\.](\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2})[,\.](\d{3})/
+    );
+    if (!tsMatch) return;
+
+    const startMs = toMs(tsMatch[1], tsMatch[2], tsMatch[3], tsMatch[4]);
+    const endMs   = toMs(tsMatch[5], tsMatch[6], tsMatch[7], tsMatch[8]);
+
+    // text: lines that are not index and not timestamp
+    const text = lines
+      .filter(l => !/^\d+$/.test(l.trim()) && !/-->/.test(l))
+      .join(' ').trim();
+
+    if (!text) return;
+    segments.push({ startMs, endMs, text });
+  });
+
+  if (!segments.length) return { segments: [], gancho: [], corpo: [], cta: [], duration: 0 };
+
+  const duration = Math.max(...segments.map(s => s.endMs));
+
+  // Split zones by time proportion
+  const ganchoEnd  = Math.min(8000, duration * 0.18);  // 0–8s or 18%
+  const ctaStart   = duration * 0.78;                   // last 22%
+
+  const gancho = segments.filter(s => s.startMs < ganchoEnd);
+  const corpo  = segments.filter(s => s.startMs >= ganchoEnd && s.endMs <= ctaStart);
+  const cta    = segments.filter(s => s.startMs >= ctaStart);
+
+  return { segments, gancho, corpo, cta, duration };
+}
+
+function toMs(h, m, s, ms) {
+  return (+h)*3600000 + (+m)*60000 + (+s)*1000 + (+ms);
+}
+
+function formatTime(ms) {
+  const total = Math.round(ms / 1000);
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return m > 0 ? `${m}m${s.toString().padStart(2,'0')}s` : `${s}s`;
+}
+
+function segText(segs) {
+  return segs.map(s => s.text).join(' ').trim();
+}
+
+// ─── EIXO TAGS ───────────────────────────────────────────────────────────────
+document.querySelectorAll('.param-tag').forEach(t => {
+  t.addEventListener('click', () => t.classList.toggle('on'));
+});
+
+// ─── PROGRESS ────────────────────────────────────────────────────────────────
+function setStep(n, pct, label) {
+  ['ps1','ps2','ps3','ps4','ps5'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (i + 1 < n) el.className = 'prog-step done';
+    else if (i + 1 === n) el.className = 'prog-step active';
+    else el.className = 'prog-step';
+  });
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progLabel').textContent = label;
+}
+
+// ─── MAIN ─────────────────────────────────────────────────────────────────────
+async function run() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  if (!apiKey) { toast('⚠️ Insira a chave da API do Groq', true); return; }
+  if (!srtFiles.length) { toast('⚠️ Faça upload de pelo menos 1 arquivo .srt', true); return; }
+
+  const btn = document.getElementById('btnGen');
+  btn.disabled = true; btn.textContent = '⏳ PROCESSANDO...';
+  document.getElementById('progWrap').style.display = 'block';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('varList').innerHTML = '';
+  document.getElementById('srtAnaGrid').innerHTML = '';
+  generated = [];
+
+  try {
+    // Step 1 — parse
+    setStep(1, 10, `Parseando ${srtFiles.length} arquivo(s) SRT...`);
+    await delay(300);
+
+    // Step 2 — build per-file context
+    setStep(2, 25, 'Mapeando timestamps por segmento...');
+    await delay(300);
+
+    // Build structured context for each SRT
+    const srtContexts = srtFiles.map(f => {
+      const p = f.parsed;
+      const ganchoTxt = segText(p.gancho) || '(sem segmentos nessa faixa)';
+      const corpoTxt  = segText(p.corpo)  || '(sem segmentos nessa faixa)';
+      const ctaTxt    = segText(p.cta)    || '(sem segmentos nessa faixa)';
+      const dur = formatTime(p.duration);
+
+      return `--- CRIATIVO: ${f.name} (duração: ${dur}) ---
+[GANCHO — 0s até ~${Math.min(8, Math.round(p.duration/1000*0.18))}s]:
+${ganchoTxt}
+
+[CORPO — meio do vídeo]:
+${corpoTxt}
+
+[CTA — últimos ~22% do vídeo]:
+${ctaTxt}
+
+[TRANSCRIÇÃO COMPLETA COM TIMESTAMPS]:
+${p.segments.map(s => `[${formatTime(s.startMs)}→${formatTime(s.endMs)}] ${s.text}`).join('\n')}
+`;
+    });
+
+    // Step 3 — send to Groq
+    setStep(3, 45, `Enviando ${srtFiles.length} SRTs para Groq · Llama 3.3 70B...`);
+
+    const duracao  = document.getElementById('duracao').value;
+    const produto  = document.getElementById('produto').value;
+    const publico  = document.getElementById('publico').value;
+    const contexto = document.getElementById('contexto').value;
+    const wordTarget = Math.round((parseInt(duracao) / 60) * 130);
+
+    const systemPrompt = `Você é um especialista em copywriting para Facebook Ads no nicho de saúde e suplementos no Brasil, com especialização em análise de criativos vencedores e geração de variações baseadas em dados. Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown, sem blocos de código.`;
+
+    const userPrompt = `Você recebeu ${srtFiles.length} transcrição(ões) SRT de criativos de anúncios que estão rodando há mais de 45 dias no Facebook Ads (criativos validados pelo mercado).
+
+Cada SRT já foi segmentado automaticamente em:
+- GANCHO: primeiros 0–8 segundos (abertura que prende atenção)
+- CORPO: segmentos do meio (desenvolvimento, problema, solução, prova)
+- CTA: últimos ~22% do vídeo (chamada para ação)
+
+CRIATIVOS ANALISADOS:
+${srtContexts.join('\n\n')}
+
+PARÂMETROS DO NOVO CRIATIVO:
+- Produto: ${produto}
+- Público: ${publico}
+- Duração alvo: ${duracao} segundos (~${wordTarget} palavras no total por variação)
+- Contexto da marca: ${contexto}
+
+SUA TAREFA:
+1. "analise_geral": Descreva em 3–4 frases os padrões comuns identificados entre os criativos (tipo de gancho predominante, estrutura do corpo, tipo de CTA, ritmo de fala, elementos de prova social recorrentes).
+
+2. "padroes": Extraia o padrão dominante de cada zona:
+   - gancho_padrao: O tipo de abertura mais recorrente entre os SRTs
+   - corpo_padrao: A estrutura narrativa predominante
+   - cta_padrao: O tipo de CTA mais frequente
+
+3. "analises_por_srt": Para cada SRT, retorne:
+   - filename
+   - gancho_resumo (1 frase do gancho identificado)
+   - corpo_resumo (1 frase do desenvolvimento)
+   - cta_resumo (1 frase do CTA)
+   - duracao_estimada
+
+4. "variacoes": Gere EXATAMENTE 10 variações. Cada variação deve ter ~${wordTarget} palavras totais.
+
+EIXO 1 — GANCHO (4 variações, mudar apenas abertura, manter corpo e CTA padrão):
+- var 1: Pergunta de identificação direta com a dor
+- var 2: Afirmação chocante / problema ignorado
+- var 3: Estatística ou dado de autoridade
+- var 4: Abertura com resultado/transformação (prova social)
+
+EIXO 2 — FORMATO VISUAL (3 variações, mudar narrativa toda):
+- var 5: UGC — fala direta para câmera, tom íntimo e conversacional
+- var 6: Educativo — explica o problema científicamente antes da solução
+- var 7: Depoimento — narrado em 1ª pessoa como cliente que já usou
+
+EIXO 3 — CTA E OFERTA (3 variações, mudar apenas fechamento):
+- var 8: CTA direto para WhatsApp com urgência de tempo
+- var 9: CTA com isca digital (conteúdo gratuito)
+- var 10: CTA com escassez de estoque ou preço promocional
+
+FORMATO JSON (responda SOMENTE isso, sem nada fora):
+{
+  "analise_geral": "string",
+  "padroes": {
+    "gancho_padrao": "string",
+    "corpo_padrao": "string",
+    "cta_padrao": "string"
+  },
+  "analises_por_srt": [
+    {
+      "filename": "string",
+      "gancho_resumo": "string",
+      "corpo_resumo": "string",
+      "cta_resumo": "string",
+      "duracao_estimada": "string"
+    }
+  ],
+  "variacoes": [
+    {
+      "numero": 1,
+      "nome": "string curto",
+      "eixo": "gancho|formato|cta",
+      "elemento_testado": "string descrevendo o que muda",
+      "gancho": "texto do gancho (~${Math.round(wordTarget*0.12)} palavras)",
+      "corpo": "texto do corpo (~${Math.round(wordTarget*0.72)} palavras)",
+      "cta": "texto do CTA (~${Math.round(wordTarget*0.16)} palavras)"
+    }
+  ]
+}`;
+
+    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 6000,
+        temperature: 0.75,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ]
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json();
+      throw new Error(err.error?.message || 'Erro na API do Groq');
+    }
+
+    // Step 4 — parse patterns
+    setStep(4, 72, 'Detectando padrões comuns entre os criativos...');
+    const data = await resp.json();
+    const raw = data.choices[0].message.content;
+
+    let parsed;
+    try {
+      const clean = raw.replace(/```json|```/g,'').trim();
+      parsed = JSON.parse(clean);
+    } catch(e) {
+      throw new Error('Erro ao interpretar resposta da IA. Tente novamente.');
+    }
+
+    // Step 5 — render
+    setStep(5, 92, 'Renderizando variações...');
+    await delay(400);
+
+    generated = parsed.variacoes || [];
+
+    // Render analysis
+    if (parsed.analise_geral) {
+      document.getElementById('anaText').textContent = parsed.analise_geral;
+      document.getElementById('anaBox').style.display = 'block';
+    }
+
+    // Render per-SRT analyses
+    if (parsed.analises_por_srt?.length) {
+      renderSRTAnalyses(parsed.analises_por_srt);
+    }
+
+    // Render patterns
+    if (parsed.padroes) {
+      renderPatterns(parsed.padroes);
+    }
+
+    renderVariations(generated, parseInt(duracao));
+
+    setStep(5, 100, 'Concluído!');
+    await delay(500);
+    document.getElementById('progWrap').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch(err) {
+    document.getElementById('progWrap').style.display = 'none';
+    toast('❌ ' + err.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⚡ ANALISAR SRTs E GERAR 10 VARIAÇÕES';
+  }
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function renderSRTAnalyses(analyses) {
+  const wrap = document.getElementById('srtAnalyses');
+  const grid = document.getElementById('srtAnaGrid');
+  grid.innerHTML = '';
+  analyses.forEach((a, i) => {
+    const card = document.createElement('div');
+    card.className = 'srt-ana-card';
+    card.style.animationDelay = (i * 0.06) + 's';
+    card.innerHTML = `
+      <div class="srt-ana-filename">📄 ${esc(a.filename)} · ${esc(a.duracao_estimada)}</div>
+      <div class="srt-ana-segments">
+        <div class="seg-block">
+          <div class="seg-block-label" style="color:var(--red)">🎬 Gancho</div>
+          <div style="color:var(--muted2)">${esc(a.gancho_resumo)}</div>
+        </div>
+        <div class="seg-block">
+          <div class="seg-block-label" style="color:var(--acc2)">📝 Corpo</div>
+          <div style="color:var(--muted2)">${esc(a.corpo_resumo)}</div>
+        </div>
+        <div class="seg-block">
+          <div class="seg-block-label" style="color:var(--blue)">📣 CTA</div>
+          <div style="color:var(--muted2)">${esc(a.cta_resumo)}</div>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+  wrap.style.display = 'block';
+}
+
+function renderPatterns(p) {
+  const grid = document.getElementById('patternsGrid');
+  grid.innerHTML = '';
+  const items = [
+    { cls: 'pat-gancho', label: 'Padrão de Gancho', text: p.gancho_padrao },
+    { cls: 'pat-corpo',  label: 'Padrão de Corpo',  text: p.corpo_padrao },
+    { cls: 'pat-cta',   label: 'Padrão de CTA',    text: p.cta_padrao }
+  ];
+  items.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = `pattern-card ${item.cls}`;
+    card.style.animationDelay = (i * 0.1) + 's';
+    card.innerHTML = `
+      <div class="pat-label"><span class="pat-dot"></span>${item.label}</div>
+      <div class="pat-text">"${esc(item.text)}"</div>
+      <div class="pat-count">detectado em ${srtFiles.length}/${srtFiles.length} criativos</div>`;
+    grid.appendChild(card);
+  });
+  document.getElementById('patternsSection').style.display = 'block';
+}
+
+function renderVariations(vars, duracao) {
+  const list = document.getElementById('varList');
+  list.innerHTML = '';
+  const wordTarget = Math.round((duracao / 60) * 130);
+  const ganchoEnd = Math.min(8, Math.round(duracao * 0.18));
+  const ctaStart  = Math.round(duracao * 0.78);
+
+  vars.forEach((v, i) => {
+    const totalWords = [v.gancho, v.corpo, v.cta].join(' ').split(' ').filter(Boolean).length;
+    const eixoCls = { gancho: 'ex-gancho', formato: 'ex-formato', cta: 'ex-cta' }[v.eixo] || 'ex-gancho';
+    const eixoLabel = { gancho: 'Eixo 1 — Gancho', formato: 'Eixo 2 — Formato', cta: 'Eixo 3 — CTA' }[v.eixo] || v.eixo;
+
+    const card = document.createElement('div');
+    card.className = 'var-card';
+    card.style.animationDelay = (i * 0.06) + 's';
+    card.innerHTML = `
+      <div class="var-top">
+        <div class="var-meta">
+          <span class="var-num">VAR ${String(v.numero).padStart(2,'0')}</span>
+          <span class="var-name">${esc(v.nome)}</span>
+          <span class="var-eixo ${eixoCls}">${eixoLabel}</span>
+        </div>
+        <button class="btn-cp-all" onclick="copyVar(${i})">📋 Copiar tudo</button>
+      </div>
+      <div class="var-testing">
+        <span>🎯 Testando: <strong>${esc(v.elemento_testado)}</strong></span>
+        <span class="words-chip">~${totalWords} palavras · ${duracao}s</span>
+      </div>
+      <div class="blocks">
+        <div class="blk">
+          <div class="blk-label lb-g">🎬 Gancho <button class="btn-cp" onclick="cpBlk('blk-${i}-g',this)" title="Copiar">⎘</button></div>
+          <div class="blk-time">0s → ${ganchoEnd}s</div>
+          <div class="blk-text" id="blk-${i}-g">${esc(v.gancho)}</div>
+        </div>
+        <div class="blk">
+          <div class="blk-label lb-c">📝 Corpo <button class="btn-cp" onclick="cpBlk('blk-${i}-c',this)" title="Copiar">⎘</button></div>
+          <div class="blk-time">${ganchoEnd}s → ${ctaStart}s</div>
+          <div class="blk-text" id="blk-${i}-c">${esc(v.corpo)}</div>
+        </div>
+        <div class="blk">
+          <div class="blk-label lb-t">📣 CTA <button class="btn-cp" onclick="cpBlk('blk-${i}-t',this)" title="Copiar">⎘</button></div>
+          <div class="blk-time">${ctaStart}s → ${duracao}s</div>
+          <div class="blk-text" id="blk-${i}-t">${esc(v.cta)}</div>
+        </div>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+// ─── COPY ────────────────────────────────────────────────────────────────────
+function cpBlk(id, btn) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.innerText).then(() => {
+    btn.textContent = '✓'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = '⎘'; btn.classList.remove('ok'); }, 2000);
+    toast('Bloco copiado!');
+  });
+}
+
+function copyVar(i) {
+  const v = generated[i];
+  const txt = `VARIAÇÃO ${v.numero} — ${v.nome}\nEixo: ${v.eixo} | Testando: ${v.elemento_testado}\n\n🎬 GANCHO:\n${v.gancho}\n\n📝 CORPO:\n${v.corpo}\n\n📣 CTA:\n${v.cta}`;
+  navigator.clipboard.writeText(txt).then(() => toast('Variação copiada!'));
+}
+
+function exportAll() {
+  if (!generated.length) return;
+  const produto = document.getElementById('produto').value;
+  const duracao = document.getElementById('duracao').value;
+  const files = srtFiles.map(f => f.name).join(', ');
+  let out = `CRIATIVO STUDIO — VARIAÇÕES GERADAS\nProduto: ${produto} | Duração: ${duracao}s\nSRTs analisados: ${files}\n${'═'.repeat(64)}\n\n`;
+  const ana = document.getElementById('anaText').textContent;
+  if (ana) out += `SÍNTESE DA ANÁLISE:\n${ana}\n\n${'═'.repeat(64)}\n\n`;
+  generated.forEach(v => {
+    out += `VAR ${String(v.numero).padStart(2,'0')} — ${v.nome}\n`;
+    out += `Eixo: ${v.eixo.toUpperCase()} | Testando: ${v.elemento_testado}\n${'─'.repeat(44)}\n`;
+    out += `🎬 GANCHO:\n${v.gancho}\n\n📝 CORPO:\n${v.corpo}\n\n📣 CTA:\n${v.cta}\n\n${'═'.repeat(64)}\n\n`;
+  });
+  const blob = new Blob([out], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `variacoes-${produto.replace(/\s+/g,'-').toLowerCase()}-${duracao}s.txt`;
+  a.click(); toast('Arquivo exportado!');
+}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function esc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+function toast(msg, isErr = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isErr ? ' err' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
