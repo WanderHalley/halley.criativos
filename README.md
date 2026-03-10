@@ -1,39 +1,28 @@
-# Criativo Studio v3 — Facebook Ads
+---
+title: Criativo Studio Backend
+emoji: 🎬
+colorFrom: orange
+colorTo: red
+sdk: docker
+pinned: false
+---
 
-Sistema de análise de SRTs e geração de criativos com storyboard para Facebook Ads.
+# Criativo Studio — Backend de Renderização
 
-## Deploy no Cloudflare Pages via GitHub
+Backend Flask + FFmpeg para corte e edição automática de vídeos.
 
-### 1. Criar repositório no GitHub
-1. Acesse github.com e crie um novo repositório (ex: `criativo-studio`)
-2. Faça upload de todos os arquivos desta pasta para o repositório
+## Endpoints
 
-### 2. Conectar ao Cloudflare Pages
-1. Acesse dash.cloudflare.com
-2. Vá em **Workers & Pages → Pages → Create a project**
-3. Clique em **Connect to Git**
-4. Selecione seu repositório `criativo-studio`
-5. Em **Build settings**, configure:
-   - Framework preset: `None`
-   - Build command: *(deixar vazio)*
-   - Build output directory: `/` ou `.`
-6. Clique em **Save and Deploy**
+- `GET /health` — status do servidor
+- `POST /render` — renderiza variações de vídeo
+- `GET /download/{session}/{filename}` — baixa vídeo gerado
+- `DELETE /cleanup/{session}` — limpa arquivos temporários
 
-### 3. Pronto
-Seu sistema estará disponível em `criativo-studio.pages.dev` (ou domínio customizado).
+## Como fazer deploy
 
-## Estrutura de arquivos
-
-```
-criativo-studio/
-├── index.html       ← Aplicação principal
-├── _redirects       ← Configuração de rotas Cloudflare
-└── README.md        ← Este arquivo
-```
-
-## Como usar
-1. Acesse a URL do Cloudflare Pages
-2. Insira sua chave de API do Groq (console.groq.com/keys)
-3. Faça upload dos arquivos .srt nomeados como video1.srt, video2.srt...
-4. Configure os parâmetros e clique em Gerar
-5. Clique em qualquer criativo para ver o storyboard completo
+1. Crie um Space no Hugging Face (huggingface.co/spaces)
+2. Escolha **Docker** como SDK
+3. Faça upload dos arquivos: `app.py`, `requirements.txt`, `Dockerfile`, `README.md`
+4. O Space builda automaticamente
+5. Copie a URL do Space (ex: `https://seu-user-criativo-studio-backend.hf.space`)
+6. Cole essa URL no campo "URL do Backend" no Criativo Studio
