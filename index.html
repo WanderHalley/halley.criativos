@@ -36,7 +36,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .b1{width:600px;height:400px;background:rgba(255,107,53,0.06);top:-100px;right:-100px;}
 .b2{width:500px;height:500px;background:rgba(79,195,247,0.04);bottom:-100px;left:-100px;}
 
-.shell{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:48px 24px 80px;}
+.shell{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:48px 24px 120px;}
 
 /* ── TABS ── */
 .tabs{display:flex;gap:4px;margin-bottom:36px;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:5px;}
@@ -282,11 +282,35 @@ textarea{resize:vertical;}
 ::-webkit-scrollbar{width:6px;height:6px;}
 ::-webkit-scrollbar-track{background:var(--s1);}
 ::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px;}
+
+/* ── BARRA DE BACKUP ── */
+.backup-bar{position:fixed;bottom:0;left:0;right:0;z-index:500;background:var(--s1);border-top:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.backup-bar-left{display:flex;align-items:center;gap:10px;}
+.backup-label{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);display:flex;align-items:center;gap:6px;}
+.backup-label::before{content:'💾';font-size:13px;}
+.btn-backup{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;border:1px solid var(--border2);}
+.btn-bk-save{background:rgba(46,204,113,.08);color:var(--green);border-color:rgba(46,204,113,.25);}
+.btn-bk-save:hover{background:rgba(46,204,113,.18);}
+.btn-bk-restore{background:rgba(79,195,247,.08);color:var(--blue);border-color:rgba(79,195,247,.25);}
+.btn-bk-restore:hover{background:rgba(79,195,247,.18);}
+.backup-ts{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);display:none;}
+#restoreInput{display:none;}
 </style>
 </head>
 <body>
 <div class="blob b1"></div>
 <div class="blob b2"></div>
+
+<!-- ══ BARRA DE BACKUP ═══════════════════════════════════════════════════ -->
+<div class="backup-bar">
+  <div class="backup-bar-left">
+    <span class="backup-label">Backup Local</span>
+    <button class="btn-backup btn-bk-save" onclick="saveBackup()">⬇ Salvar Backup</button>
+    <button class="btn-backup btn-bk-restore" onclick="document.getElementById('restoreInput').click()">⬆ Restaurar Backup</button>
+    <input type="file" id="restoreInput" accept=".json" onchange="restoreBackup(event)"/>
+  </div>
+  <span class="backup-ts" id="backupTs"></span>
+</div>
 
 <!-- ══ MAIN PAGE ══════════════════════════════════════════════════════════ -->
 <div class="shell" id="mainPage">
@@ -417,6 +441,10 @@ textarea{resize:vertical;}
         <div style="margin-top:10px;display:flex;gap:10px;align-items:center;">
           <button class="btn-export" onclick="testBackend()" style="padding:9px 16px;font-size:13px;">🔗 Testar conexão</button>
           <span id="backendStatus" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted2);"></span>
+        </div>
+        <div style="margin-top:18px;">
+          <div class="flabel">Senha de Acesso</div>
+          <input type="password" id="backendPassword" placeholder="Senha configurada no Hugging Face (ACCESS_PASSWORD)"/>
         </div>
       </div>
     </div>
@@ -984,7 +1012,76 @@ function toast(msg, isErr=false) {
 // ── ESC key to close storyboard ───────────────────────────────────────────
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSB(); });
 
-// ── TABS ──────────────────────────────────────────────────────────────────
+// ── BACKUP ────────────────────────────────────────────────────────────────
+function saveBackup() {
+  const data = {
+    version:        3,
+    savedAt:        new Date().toISOString(),
+    apiKey:         document.getElementById('apiKey').value,
+    backendUrl:     document.getElementById('backendUrl').value,
+    backendPassword:document.getElementById('backendPassword').value,
+    produto:        document.getElementById('produto').value,
+    publico:        document.getElementById('publico').value,
+    duracao:        document.getElementById('duracao').value,
+    contexto:       document.getElementById('contexto').value,
+    renderResolution: document.getElementById('renderResolution').value,
+    subtitleStyle:  document.getElementById('subtitleStyle').value,
+    generated:      generated,
+    srtFileNames:   srtFiles.map(f => f.name),
+  };
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `criativo-studio-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+
+  const ts = document.getElementById('backupTs');
+  ts.style.display = 'block';
+  ts.textContent   = '✓ Backup salvo às ' + new Date().toLocaleTimeString('pt-BR');
+  toast('✓ Backup salvo!');
+}
+
+function restoreBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+
+      if (data.apiKey)          document.getElementById('apiKey').value          = data.apiKey;
+      if (data.backendUrl)      document.getElementById('backendUrl').value       = data.backendUrl;
+      if (data.backendPassword) document.getElementById('backendPassword').value  = data.backendPassword;
+      if (data.produto)         document.getElementById('produto').value          = data.produto;
+      if (data.publico)         document.getElementById('publico').value          = data.publico;
+      if (data.duracao)         document.getElementById('duracao').value          = data.duracao;
+      if (data.contexto)        document.getElementById('contexto').value         = data.contexto;
+      if (data.renderResolution) document.getElementById('renderResolution').value = data.renderResolution;
+      if (data.subtitleStyle)   document.getElementById('subtitleStyle').value    = data.subtitleStyle;
+
+      if (data.generated?.length) {
+        generated = data.generated;
+        document.getElementById('results').style.display = 'block';
+        renderVariations(generated, +data.duracao || 60);
+        toast('✓ Backup restaurado — ' + generated.length + ' criativos carregados!');
+      } else {
+        toast('✓ Configurações restauradas!');
+      }
+
+      const ts = document.getElementById('backupTs');
+      ts.style.display = 'block';
+      ts.textContent   = '✓ Restaurado de ' + (data.savedAt ? new Date(data.savedAt).toLocaleString('pt-BR') : 'backup');
+
+    } catch(err) {
+      toast('❌ Arquivo de backup inválido', true);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+
 function switchTab(name, btn) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -1132,15 +1229,17 @@ async function startRender() {
   try {
     setRS(10, 'Preparando arquivos...');
 
-    const varList   = generated.filter(v => selectedVarIds.has(v.numero));
+    const varList    = generated.filter(v => selectedVarIds.has(v.numero));
     const resolution = document.getElementById('renderResolution').value;
     const subStyle   = document.getElementById('subtitleStyle').value;
+    const password   = document.getElementById('backendPassword').value;
 
     const fd = new FormData();
-    fd.append('variations',    JSON.stringify(varList));
-    fd.append('resolution',    resolution);
+    fd.append('variations',     JSON.stringify(varList));
+    fd.append('resolution',     resolution);
     fd.append('subtitle_style', subStyle);
-    fd.append('variation_ids', JSON.stringify([...selectedVarIds]));
+    fd.append('variation_ids',  JSON.stringify([...selectedVarIds]));
+    fd.append('access_password', password);
 
     videoFiles.forEach((f, i) => fd.append(`video_${i}`, f, f.name));
 
@@ -1168,6 +1267,10 @@ async function startRender() {
 
     data.rendered.forEach(item => {
       const color = getScoreColor(item.score || 70);
+      const pwd   = document.getElementById('backendPassword').value;
+      const dlUrl = pwd
+        ? `${url}/download/${item.session}/${item.file}?access_password=${encodeURIComponent(pwd)}`
+        : `${url}/download/${item.session}/${item.file}`;
       const div = document.createElement('div');
       div.className = 'rr-item';
       div.innerHTML = `
@@ -1175,7 +1278,7 @@ async function startRender() {
           <div class="rr-name">VAR ${String(item.numero).padStart(2,'0')} — ${esc(item.nome)}</div>
           <div class="rr-meta" style="color:${color}">Score: ${item.score}% &nbsp;·&nbsp; <span style="color:var(--muted2)">${esc(item.file)}</span></div>
         </div>
-        <a class="btn-dl-video" href="${url}/download/${item.session}/${item.file}" download="${item.file}" target="_blank">
+        <a class="btn-dl-video" href="${dlUrl}" download="${item.file}" target="_blank">
           ⬇ Baixar MP4
         </a>`;
       gridEl.appendChild(div);
