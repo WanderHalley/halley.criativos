@@ -728,9 +728,9 @@ function buildPrompt(srtCtx, sourceNames, duracao, wordTarget, gEnd, ctaS, produ
   return `Você analisará ${srtCtx.length} criativo(s) SRT de anúncios Facebook Ads validados (rodando 45+ dias).
 
 FONTES DE VÍDEO DISPONÍVEIS: ${sourceNames.join(', ')}
-(Use esses nomes exatos ao referenciar qual vídeo usar em cada cena do storyboard)
+Cada fonte tem seus próprios timestamps no SRT abaixo. Use os timestamps do SRT para definir os cortes.
 
-CRIATIVOS ANALISADOS:
+CRIATIVOS ANALISADOS (com timestamps originais de cada vídeo):
 ${srtCtx.join('\n\n')}
 
 PARÂMETROS:
@@ -743,33 +743,55 @@ PARÂMETROS:
 TAREFA:
 1. "analise_geral": 3-4 frases sobre padrões identificados.
 2. "padroes": {gancho_padrao, corpo_padrao, cta_padrao}
-3. "variacoes": 10 variações com storyboard de produção.
+3. "variacoes": 10 variações com plano de corte e montagem.
 
 EIXO 1 — GANCHO (4 vars): pergunta identificação | afirmação chocante | estatística | resultado/transformação
 EIXO 2 — FORMATO (3 vars): UGC conversacional | educativo | depoimento 1ª pessoa
 EIXO 3 — CTA (3 vars): WhatsApp urgência | isca digital gratuita | escassez estoque
 
+REGRA CRÍTICA DO STORYBOARD:
+O storyboard define um plano de edição de vídeo automático. O sistema de edição vai:
+1. Abrir o arquivo video_fonte (ex: video1)
+2. Cortar esse arquivo exatamente de tempo_inicio até tempo_fim (segundos dentro desse arquivo)
+3. Repetir para cada cena na ordem
+4. Emendar todos os cortes para formar o vídeo final
+
+PORTANTO: tempo_inicio e tempo_fim são SEMPRE os segundos de entrada e saída DENTRO DO ARQUIVO video_fonte.
+NÃO são a posição no vídeo de saída. São o ponto de corte no vídeo original.
+
+EXEMPLO CORRETO:
+- Cena 1: video_fonte="video1", tempo_inicio=0, tempo_fim=8 → pega video1 do segundo 0 ao 8
+- Cena 2: video_fonte="video2", tempo_inicio=12, tempo_fim=20 → pega video2 do segundo 12 ao 20
+- Cena 3: video_fonte="video1", tempo_inicio=25, tempo_fim=35 → pega video1 do segundo 25 ao 35
+- Resultado: emenda os 3 cortes → vídeo final de ~21s
+
+Use os timestamps reais do SRT de cada vídeo para definir os cortes.
+Cada variação DEVE ter cortes diferentes, usando trechos diferentes dos vídeos fonte.
+
 PARA CADA VARIAÇÃO retorne:
 - numero, nome, eixo (gancho|formato|cta), elemento_testado
-- gancho_texto, corpo_texto, cta_texto (textos da narração)
-- score: número de 0-100 estimando chance de conversão no Facebook Ads para o nicho
+- gancho_texto, corpo_texto, cta_texto (textos completos da narração)
+- score: 0-100 estimando chance de conversão no Facebook Ads para o nicho
 - score_justificativa: 1 frase explicando o score
-- score_fatores_positivos: array de 2-3 strings curtas (ex: "gancho de pergunta validado")
-- score_fatores_negativos: array de 1-2 strings curtas (ex: "CTA longo")
-- storyboard: array de cenas, cada cena com:
+- score_fatores_positivos: array de 2-3 strings curtas
+- score_fatores_negativos: array de 1-2 strings curtas
+- storyboard: array de 4 a 8 cenas, cada cena com:
   {
     zona: "gancho"|"corpo"|"cta",
-    tempo_inicio: número em segundos,
-    tempo_fim: número em segundos,
-    video_fonte: "${sourceNames[0] || 'video1'}" (nome exato do arquivo fonte a usar),
-    fala: "texto exato da narração nessa cena",
-    instrucao_cena: "instrução para o editor: o que aparece na tela, texto overlay, transição, ângulo de câmera, b-roll sugerido"
+    tempo_inicio: SEGUNDOS DE ENTRADA NO VIDEO_FONTE (número decimal, ex: 3.5),
+    tempo_fim: SEGUNDOS DE SAÍDA NO VIDEO_FONTE (número decimal, ex: 11.0),
+    video_fonte: nome exato do arquivo sem extensão (ex: "${sourceNames[0] || 'video1'}"),
+    fala: "texto da narração nesse trecho",
+    instrucao_cena: "instrução de edição: texto overlay, transição, b-roll"
   }
 
-Distribua as cenas usando os diferentes vídeos fonte quando disponível.
-Cada variação deve ter entre 4 e 8 cenas no storyboard.
+IMPORTANTE:
+- Cada variação deve usar combinações e trechos DIFERENTES dos vídeos fonte
+- Os timestamps devem vir dos segmentos reais do SRT de cada vídeo
+- A soma das durações das cenas deve ser próxima de ${duracao}s
+- Distribua as cenas entre os diferentes vídeos fonte disponíveis
 
-Responda SOMENTE JSON:
+Responda SOMENTE JSON válido, sem texto fora do JSON:
 {"analise_geral":"...","padroes":{...},"variacoes":[...]}`;
 }
 
