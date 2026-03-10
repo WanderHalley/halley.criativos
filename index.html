@@ -1185,7 +1185,9 @@ function selectAllVars(all) {
 
 // ── BACKEND TEST ──────────────────────────────────────────────────────────
 async function testBackend() {
-  const url = document.getElementById('backendUrl').value.trim().replace(/\/$/, '');
+  const raw = document.getElementById('backendUrl').value.trim();
+  const url = raw.replace(/\/health\/?$/, '').replace(/\/$/, '');
+  document.getElementById('backendUrl').value = url;
   const el = document.getElementById('backendStatus');
   if (!url) { el.textContent = '⚠️ Cole a URL primeiro'; el.style.color = 'var(--red)'; return; }
   el.textContent = '⏳ Testando...'; el.style.color = 'var(--muted2)';
@@ -1202,7 +1204,7 @@ async function testBackend() {
 
 // ── RENDER ────────────────────────────────────────────────────────────────
 async function startRender() {
-  const url = document.getElementById('backendUrl').value.trim().replace(/\/$/, '');
+  const url = document.getElementById('backendUrl').value.trim().replace(/\/health\/?$/, '').replace(/\/$/, '');
   if (!url)             { toast('⚠️ Cole a URL do backend', true); return; }
   if (!videoFiles.length) { toast('⚠️ Faça upload dos vídeos', true); return; }
   if (!generated.length)  { toast('⚠️ Gere os criativos primeiro', true); return; }
