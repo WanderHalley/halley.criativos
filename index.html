@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Criativo Studio — Facebook Ads</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #060608;
+  --s1: #0d0d12;
+  --s2: #14141c;
+  --s3: #1c1c28;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.11);
+  --acc: #ff6b35;
+  --acc2: #ff8c5a;
+  --yellow: #ffd60a;
+  --green: #2ecc71;
+  --blue: #4fc3f7;
+  --purple: #c084fc;
+  --red: #ff4757;
+  --text: #e8e8f0;
+  --muted: #52526e;
+  --muted2: #8888a8;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+/* noise */
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.5;}
+
+/* blobs */
+.blob{position:fixed;border-radius:50%;filter:blur(140px);pointer-events:none;z-index:0;}
+.b1{width:600px;height:400px;background:rgba(255,107,53,0.06);top:-100px;right:-100px;}
+.b2{width:500px;height:500px;background:rgba(79,195,247,0.04);bottom:-100px;left:-100px;}
+
+.shell{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:48px 24px 80px;}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;margin-bottom:36px;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:5px;}
+.tab{flex:1;padding:11px 16px;border-radius:9px;border:none;background:transparent;color:var(--muted2);font-family:'Instrument Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.tab:hover{color:var(--text);}
+.tab.active{background:var(--s3);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ── RENDER PAGE ── */
+.render-status{display:none;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:22px;margin-top:16px;}
+.rs-label{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted2);margin-bottom:12px;}
+.rs-prog-bg{height:4px;background:var(--s3);border-radius:100px;overflow:hidden;margin-bottom:10px;}
+.rs-prog-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--acc),var(--yellow));border-radius:100px;transition:width .4s ease;}
+.rs-text{font-size:14px;color:var(--muted2);}
+
+.render-results{display:none;margin-top:16px;}
+.rr-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.04em;margin-bottom:16px;}
+.rr-grid{display:flex;flex-direction:column;gap:10px;}
+.rr-item{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;animation:fadeUp .3s ease;}
+.rr-info{}
+.rr-name{font-size:15px;font-weight:700;margin-bottom:3px;}
+.rr-meta{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted2);}
+.btn-dl-video{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:var(--acc);border:none;border-radius:9px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;text-decoration:none;}
+.btn-dl-video:hover{opacity:.85;transform:translateY(-1px);}
+
+.var-sel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:10px;}
+.var-sel-item{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;}
+.var-sel-item:hover{border-color:var(--acc);}
+.var-sel-item.selected{border-color:var(--acc);background:rgba(255,107,53,.06);}
+.var-sel-item input[type=checkbox]{accent-color:var(--acc);width:16px;height:16px;flex-shrink:0;}
+.var-sel-name{font-size:13px;font-weight:600;line-height:1.3;}
+.var-sel-score{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2);margin-top:2px;}
+
+.no-variations-msg{background:rgba(255,107,53,.05);border:1px solid rgba(255,107,53,.15);border-radius:10px;padding:20px;text-align:center;color:var(--muted2);font-size:14px;}
+
+/* ── HEADER ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:16px;}
+.logo{display:flex;align-items:baseline;gap:6px;}
+.logo-main{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:.06em;color:var(--text);}
+.logo-v{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--acc);background:rgba(255,107,53,.12);border:1px solid rgba(255,107,53,.25);padding:3px 9px;border-radius:4px;margin-left:4px;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.platform-badge{display:flex;align-items:center;gap:7px;background:rgba(24,119,242,.1);border:1px solid rgba(24,119,242,.25);color:#4a90d9;padding:8px 16px;border-radius:100px;font-family:'JetBrains Mono',monospace;font-size:13px;}
+.platform-dot{width:6px;height:6px;background:#4a90d9;border-radius:50%;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── CARDS ── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px;}
+.card-top{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.step-num{width:32px;height:32px;background:var(--acc);color:#fff;border-radius:7px;font-family:'JetBrains Mono',monospace;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.card-title{font-size:18px;font-weight:700;}
+.card-body{padding:22px;}
+
+/* ── FIELDS ── */
+.flabel{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.flabel a{color:var(--acc);text-decoration:none;font-size:12px;}
+input,textarea,select{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:15px;padding:13px 16px;outline:none;transition:border-color .2s,box-shadow .2s;}
+input:focus,textarea:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(255,107,53,.1);}
+select option{background:var(--s2);}
+textarea{resize:vertical;}
+.frow{margin-bottom:16px;}
+.frow:last-child{margin-bottom:0;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+@media(max-width:600px){.g2,.g3{grid-template-columns:1fr;}}
+.div{height:1px;background:var(--border);margin:20px 0;}
+
+/* ── UPLOAD ── */
+.drop{border:2px dashed var(--border2);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .3s;position:relative;background:var(--s2);}
+.drop:hover,.drop.over{border-color:var(--acc);background:rgba(255,107,53,.03);}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.drop-icon{font-size:36px;margin-bottom:10px;display:block;}
+.drop-main{font-weight:700;font-size:17px;margin-bottom:6px;}
+.drop-sub{font-size:14px;color:var(--muted2);}
+
+.file-list{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+.file-item{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fi-icon{font-size:22px;flex-shrink:0;}
+.fi-info{flex:1;min-width:0;}
+.fi-name{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fi-meta{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted2);margin-top:3px;}
+.fi-ok{font-family:'JetBrains Mono',monospace;font-size:12px;padding:4px 11px;border-radius:100px;background:rgba(46,204,113,.1);color:var(--green);border:1px solid rgba(46,204,113,.2);flex-shrink:0;}
+.fi-rm{background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;padding:2px;transition:color .2s;flex-shrink:0;}
+.fi-rm:hover{color:var(--red);}
+
+/* ── TAGS ── */
+.tag-group{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.ptag{padding:8px 18px;border-radius:100px;border:1px solid var(--border2);font-size:14px;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted2);font-family:'Instrument Sans',sans-serif;}
+.ptag:hover,.ptag.on{border-color:var(--acc);color:#000;background:var(--acc);}
+
+/* ── BTN GENERATE ── */
+.btn-gen{width:100%;padding:22px;background:var(--acc);color:#fff;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.08em;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;margin-top:4px;}
+.btn-gen::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 55%);opacity:0;transition:opacity .3s;}
+.btn-gen:hover{transform:translateY(-3px);box-shadow:0 16px 50px rgba(255,107,53,.35);}
+.btn-gen:hover::after{opacity:1;}
+.btn-gen:active{transform:translateY(0);}
+.btn-gen:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
+
+/* ── PROGRESS ── */
+.prog-wrap{display:none;margin-top:20px;}
+.prog-bg{height:3px;background:var(--s3);border-radius:100px;overflow:hidden;margin-bottom:12px;}
+.prog-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--acc),var(--yellow));border-radius:100px;transition:width .5s ease;}
+.prog-steps{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.ps{font-family:'JetBrains Mono',monospace;font-size:12px;padding:5px 12px;border-radius:100px;background:var(--s3);color:var(--muted);border:1px solid var(--border);transition:all .3s;}
+.ps.active{background:rgba(255,107,53,.1);color:var(--acc);border-color:rgba(255,107,53,.3);}
+.ps.done{background:rgba(46,204,113,.08);color:var(--green);border-color:rgba(46,204,113,.2);}
+.prog-label{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted2);text-align:center;}
+
+/* ── RESULTS ── */
+#results{display:none;}
+.res-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;padding-top:40px;border-top:1px solid var(--border);}
+.res-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:.03em;}
+.res-title span{color:var(--acc);}
+.btn-export{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;background:var(--s2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;}
+.btn-export:hover{border-color:var(--yellow);color:var(--yellow);}
+
+/* ── ANALYSIS BOX ── */
+.ana-box{background:rgba(255,107,53,.03);border:1px solid rgba(255,107,53,.12);border-radius:14px;padding:18px 22px;margin-bottom:24px;display:none;}
+.ana-label{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc2);margin-bottom:10px;}
+.ana-text{font-size:15px;color:var(--muted2);line-height:1.7;}
+
+/* ── PATTERNS ── */
+.pat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+@media(max-width:600px){.pat-grid{grid-template-columns:1fr;}}
+.pat-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px;animation:fadeUp .4s ease forwards;opacity:0;}
+.pat-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.15em;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.pat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.pat-text{font-size:14px;color:var(--muted2);line-height:1.65;font-style:italic;}
+
+/* ── VARIATION CARDS ── */
+.var-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:720px){.var-grid{grid-template-columns:1fr;}}
+
+.var-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .3s;animation:fadeUp .4s ease forwards;opacity:0;position:relative;}
+.var-card:hover{border-color:var(--acc);transform:translateY(-3px);box-shadow:0 12px 40px rgba(255,107,53,.12);}
+.var-card::before{content:'Clique para ver o roteiro →';position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(255,107,53,.15),transparent);color:var(--acc);font-size:11px;font-family:'JetBrains Mono',monospace;padding:24px 16px 10px;opacity:0;transition:opacity .3s;text-align:center;}
+.var-card:hover::before{opacity:1;}
+
+.vc-top{padding:16px 18px;border-bottom:1px solid var(--border);}
+.vc-meta{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.vc-num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.vc-name{font-size:17px;font-weight:700;}
+.vc-eixo{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;padding:4px 11px;border-radius:100px;text-transform:uppercase;}
+.ex-g{background:rgba(255,71,87,.12);color:var(--red);border:1px solid rgba(255,71,87,.2);}
+.ex-f{background:rgba(255,214,10,.1);color:var(--yellow);border:1px solid rgba(255,214,10,.2);}
+.ex-c{background:rgba(79,195,247,.12);color:var(--blue);border:1px solid rgba(79,195,247,.2);}
+
+/* ── SCORE ── */
+.score-row{display:flex;align-items:center;gap:10px;}
+.score-ring{position:relative;width:52px;height:52px;flex-shrink:0;}
+.score-ring svg{transform:rotate(-90deg);}
+.score-ring-bg{fill:none;stroke:var(--s3);stroke-width:4;}
+.score-ring-fill{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .8s ease;}
+.score-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;}
+.score-info{}
+.score-label{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-bottom:3px;}
+.score-why{font-size:13px;color:var(--muted2);line-height:1.5;}
+
+.vc-body{padding:14px 18px;}
+.vc-preview{font-size:14px;color:var(--muted2);line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+
+.vc-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.vc-words{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.vc-testing{font-size:13px;color:var(--muted2);}
+
+/* ── STORYBOARD PAGE ── */
+.sb-page{display:none;position:fixed;inset:0;background:var(--bg);z-index:1000;overflow-y:auto;}
+.sb-shell{max-width:960px;margin:0 auto;padding:32px 24px 80px;}
+
+.sb-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:12px;}
+.btn-back{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;background:var(--s1);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;}
+.btn-back:hover{border-color:var(--text);}
+
+.sb-header{margin-bottom:32px;}
+.sb-eyebrow{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.sb-eyebrow::before{content:'';width:20px;height:1px;background:var(--acc);}
+.sb-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,58px);line-height:1;letter-spacing:.02em;margin-bottom:14px;}
+.sb-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.sb-chip{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 14px;border-radius:100px;border:1px solid var(--border2);color:var(--muted2);}
+
+/* score big */
+.score-big{display:flex;align-items:center;gap:20px;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:28px;}
+.score-big-ring{position:relative;width:80px;height:80px;flex-shrink:0;}
+.score-big-ring svg{transform:rotate(-90deg);}
+.score-big-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.04em;}
+.score-big-info{}
+.score-big-label{font-family:'JetBrains Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);margin-bottom:6px;}
+.score-big-why{font-size:16px;color:var(--text);line-height:1.6;}
+.score-factors{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.sf{font-family:'JetBrains Mono',monospace;font-size:12px;padding:5px 12px;border-radius:100px;background:var(--s2);color:var(--muted2);border:1px solid var(--border);}
+.sf.pos{background:rgba(46,204,113,.08);color:var(--green);border-color:rgba(46,204,113,.2);}
+.sf.neg{background:rgba(255,71,87,.08);color:var(--red);border-color:rgba(255,71,87,.2);}
+
+/* storyboard */
+.sb-sec-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.06em;margin-bottom:16px;display:flex;align-items:center;gap:12px;color:var(--text);}
+.sb-sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.sb-scenes{display:flex;flex-direction:column;gap:0;}
+
+.scene{display:grid;grid-template-columns:100px 1fr;border:1px solid var(--border);border-radius:0;margin-bottom:-1px;overflow:hidden;transition:background .2s;}
+.scene:first-child{border-radius:12px 12px 0 0;}
+.scene:last-child{border-radius:0 0 12px 12px;margin-bottom:0;}
+.scene:hover{background:var(--s1);z-index:1;position:relative;}
+
+@media(max-width:600px){.scene{grid-template-columns:1fr;}}
+
+.scene-tc{background:var(--s2);padding:16px 12px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:6px;border-right:1px solid var(--border);}
+@media(max-width:600px){.scene-tc{flex-direction:row;border-right:none;border-bottom:1px solid var(--border);}}
+.scene-zone{font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 10px;border-radius:4px;text-transform:uppercase;letter-spacing:.1em;text-align:center;}
+.z-g{background:rgba(255,71,87,.15);color:var(--red);}
+.z-c{background:rgba(255,214,10,.1);color:var(--yellow);}
+.z-t{background:rgba(79,195,247,.15);color:var(--blue);}
+.scene-time{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);font-weight:500;text-align:center;}
+.scene-src{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--acc);background:rgba(255,107,53,.1);padding:3px 10px;border-radius:4px;text-align:center;}
+
+.scene-content{padding:18px 22px;display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:500px){.scene-content{grid-template-columns:1fr;}}
+
+.sc-block{}
+.sc-label{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted2);margin-bottom:8px;}
+.sc-text{font-size:15px;line-height:1.7;color:var(--text);}
+.sc-instruction{font-size:14px;line-height:1.65;color:var(--muted2);font-style:italic;}
+
+/* copy btn */
+.btn-cp-sb{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;background:var(--s2);border:1px solid var(--border);border-radius:7px;color:var(--muted2);font-size:13px;cursor:pointer;transition:all .2s;margin-top:10px;font-family:'Instrument Sans',sans-serif;}
+.btn-cp-sb:hover{border-color:var(--text);color:var(--text);}
+.btn-cp-sb.ok{border-color:var(--green);color:var(--green);}
+
+/* export sb */
+.sb-actions{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;}
+.btn-sb-export{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:10px;font-size:15px;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;font-weight:600;}
+.btn-sb-copy{background:var(--s2);border:1px solid var(--border2);color:var(--text);}
+.btn-sb-copy:hover{border-color:var(--acc);color:var(--acc);}
+.btn-sb-dl{background:var(--acc);border:none;color:#fff;}
+.btn-sb-dl:hover{opacity:.85;}
+
+/* toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s1);border:1px solid var(--green);color:var(--green);padding:13px 22px;border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:13px;z-index:99999;transform:translateY(70px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:8px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.err{border-color:var(--red);color:var(--red);}
+
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--s1);}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px;}
+</style>
+</head>
+<body>
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+
+<!-- ══ MAIN PAGE ══════════════════════════════════════════════════════════ -->
+<div class="shell" id="mainPage">
+
+  <div class="topbar">
+    <div class="logo">
+      <span class="logo-main">Criativo Studio</span>
+      <span class="logo-v">v3</span>
+    </div>
+    <div class="topbar-right">
+      <div class="platform-badge">
+        <span class="platform-dot"></span>Facebook Ads
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('criativos',this)">✍️ Gerar Criativos</button>
+    <button class="tab" onclick="switchTab('renderizar',this)">🎬 Renderizar Vídeos</button>
+  </div>
+
+  <!-- ══ TAB: CRIATIVOS ══ -->
+  <div class="tab-panel active" id="tab-criativos">
+
+  <!-- API KEY -->
+  <div class="card">
+    <div class="card-top"><div class="step-num">1</div><div class="card-title">Chave de API — Groq</div></div>
+    <div class="card-body">
+      <div class="flabel">API Key <a href="https://console.groq.com/keys" target="_blank">↗ Obter grátis</a></div>
+      <input type="password" id="apiKey" placeholder="gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"/>
+    </div>
+  </div>
+
+  <!-- UPLOAD SRTs -->
+  <div class="card">
+    <div class="card-top"><div class="step-num">2</div><div class="card-title">Upload dos SRTs dos Criativos Vencedores</div></div>
+    <div class="card-body">
+      <div class="drop" id="dropZone">
+        <input type="file" id="srtFiles" accept=".srt,.txt" multiple/>
+        <span class="drop-icon">📂</span>
+        <div class="drop-main">Arraste os arquivos .srt aqui</div>
+        <div class="drop-sub">Múltiplos arquivos · nomeie como video1.srt, video2.srt... para rastreamento de cenas</div>
+      </div>
+      <div class="file-list" id="fileList"></div>
+    </div>
+  </div>
+
+  <!-- PARAMS -->
+  <div class="card">
+    <div class="card-top"><div class="step-num">3</div><div class="card-title">Parâmetros do Criativo</div></div>
+    <div class="card-body">
+      <div class="g3 frow">
+        <div>
+          <div class="flabel">Duração alvo</div>
+          <select id="duracao">
+            <option value="15">15s (~33 palavras)</option>
+            <option value="30">30s (~65 palavras)</option>
+            <option value="45">45s (~98 palavras)</option>
+            <option value="60" selected>60s (~130 palavras)</option>
+            <option value="90">90s (~195 palavras)</option>
+            <option value="120">2min (~260 palavras)</option>
+          </select>
+        </div>
+        <div>
+          <div class="flabel">Produto / Nicho</div>
+          <input type="text" id="produto" value="Biovein — varizes" placeholder="Ex: Biovein — varizes"/>
+        </div>
+        <div>
+          <div class="flabel">Público-alvo</div>
+          <input type="text" id="publico" value="Mulheres 35–60 anos" placeholder="Ex: Mulheres 35–60 anos"/>
+        </div>
+      </div>
+      <div class="div"></div>
+      <div class="flabel">Eixos de variação</div>
+      <div class="tag-group">
+        <button class="ptag on" data-e="gancho">🎯 Gancho — 4 vars</button>
+        <button class="ptag on" data-e="formato">🎬 Formato — 3 vars</button>
+        <button class="ptag on" data-e="cta">📣 CTA — 3 vars</button>
+      </div>
+      <div class="div"></div>
+      <div class="flabel">Contexto da marca</div>
+      <textarea id="contexto" rows="2" placeholder="Persona, canal de conversão, tom...">Persona Cris, tom acolhedor feminino. WhatsApp Business "Central Saúde Natural Brasil". Página Facebook "Pernas Leves Brasil".</textarea>
+    </div>
+  </div>
+
+  <button class="btn-gen" id="btnGen" onclick="run()">⚡ ANALISAR E GERAR 10 CRIATIVOS</button>
+
+  <div class="prog-wrap" id="progWrap">
+    <div class="prog-steps">
+      <div class="ps" id="ps1">① Parseando SRTs</div>
+      <div class="ps" id="ps2">② Mapeando timestamps</div>
+      <div class="ps" id="ps3">③ Enviando para Groq</div>
+      <div class="ps" id="ps4">④ Calculando scores</div>
+      <div class="ps" id="ps5">⑤ Gerando storyboards</div>
+    </div>
+    <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-label" id="progLabel">Iniciando...</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="res-hd">
+      <div class="res-title">10 <span>Criativos</span> Gerados</div>
+      <button class="btn-export" onclick="exportAll()">📋 Exportar todos (.txt)</button>
+    </div>
+
+    <div class="ana-box" id="anaBox">
+      <div class="ana-label">🔍 Síntese da Análise</div>
+      <div class="ana-text" id="anaText"></div>
+    </div>
+
+    <div class="pat-grid" id="patGrid"></div>
+    <div class="var-grid" id="varGrid"></div>
+  </div>
+
+  </div><!-- /tab-criativos -->
+
+  <!-- ══ TAB: RENDERIZAR ══ -->
+  <div class="tab-panel" id="tab-renderizar">
+
+    <!-- URL DO BACKEND -->
+    <div class="card">
+      <div class="card-top"><div class="step-num">1</div><div class="card-title">URL do Backend — Hugging Face</div></div>
+      <div class="card-body">
+        <div class="flabel">Cole a URL do seu Space <a href="https://huggingface.co/spaces" target="_blank">↗ huggingface.co/spaces</a></div>
+        <input type="text" id="backendUrl" placeholder="https://seu-user-criativo-studio-backend.hf.space"/>
+        <div style="margin-top:10px;display:flex;gap:10px;align-items:center;">
+          <button class="btn-export" onclick="testBackend()" style="padding:9px 16px;font-size:13px;">🔗 Testar conexão</button>
+          <span id="backendStatus" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted2);"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPLOAD VÍDEOS -->
+    <div class="card">
+      <div class="card-top"><div class="step-num">2</div><div class="card-title">Upload dos Vídeos Fonte</div></div>
+      <div class="card-body">
+        <div class="drop" id="videoDropZone">
+          <input type="file" id="videoFiles" accept="video/*" multiple/>
+          <span class="drop-icon">🎥</span>
+          <div class="drop-main">Arraste os vídeos aqui</div>
+          <div class="drop-sub">Nomeie igual aos SRTs: video1.mp4, video2.mp4... · MP4, MOV, AVI</div>
+        </div>
+        <div class="file-list" id="videoFileList"></div>
+      </div>
+    </div>
+
+    <!-- SELECIONAR VARIAÇÕES -->
+    <div class="card">
+      <div class="card-top"><div class="step-num">3</div><div class="card-title">Selecionar Variações para Renderizar</div></div>
+      <div class="card-body">
+        <div id="varSelectArea">
+          <div class="no-variations-msg">⚠️ Gere os criativos primeiro na aba <strong>"Gerar Criativos"</strong> para selecionar as variações aqui.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFIGURAÇÕES DE SAÍDA -->
+    <div class="card">
+      <div class="card-top"><div class="step-num">4</div><div class="card-title">Configurações de Saída</div></div>
+      <div class="card-body">
+        <div class="g2 frow">
+          <div>
+            <div class="flabel">Formato do vídeo</div>
+            <select id="renderResolution">
+              <option value="vertical">1080×1920 — Vertical (Reels/Stories)</option>
+              <option value="square">1080×1080 — Quadrado</option>
+              <option value="horizontal">1920×1080 — Horizontal</option>
+              <option value="original">Manter resolução original</option>
+            </select>
+          </div>
+          <div>
+            <div class="flabel">Legendas</div>
+            <select id="subtitleStyle">
+              <option value="">Sem legenda</option>
+              <option value="tiktok">Estilo TikTok (palavra por palavra)</option>
+              <option value="white">Texto branco com sombra</option>
+              <option value="yellow">Texto amarelo com sombra</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BTN RENDER -->
+    <button class="btn-gen" id="btnRender" onclick="startRender()" style="background:var(--green);color:#000;">
+      🎬 RENDERIZAR VÍDEOS SELECIONADOS
+    </button>
+
+    <!-- STATUS -->
+    <div class="render-status" id="renderStatus">
+      <div class="rs-label">Progresso da Renderização</div>
+      <div class="rs-prog-bg"><div class="rs-prog-fill" id="rsProg"></div></div>
+      <div class="rs-text" id="rsText">Iniciando...</div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="render-results" id="renderResults">
+      <div class="rr-title">Vídeos Prontos 🎉</div>
+      <div class="rr-grid" id="rrGrid"></div>
+    </div>
+
+  </div><!-- /tab-renderizar -->
+
+</div><!-- /shell -->
+
+<!-- ══ STORYBOARD PAGE ════════════════════════════════════════════════════ -->
+<div class="sb-page" id="sbPage">
+  <div class="sb-shell">
+    <div class="sb-nav">
+      <button class="btn-back" onclick="closeSB()">← Voltar aos criativos</button>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-sb-export btn-sb-copy" onclick="copySB()">📋 Copiar roteiro</button>
+        <button class="btn-sb-export btn-sb-dl" onclick="downloadSB()">⬇ Baixar .txt</button>
+      </div>
+    </div>
+    <div id="sbContent"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────
+let srtFiles = [];
+let generated = [];
+let currentSB = null;
+
+// ── UPLOAD ────────────────────────────────────────────────────────────────
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); handleFiles([...e.dataTransfer.files]); });
+document.getElementById('srtFiles').addEventListener('change', e => { handleFiles([...e.target.files]); e.target.value=''; });
+
+function handleFiles(files) {
+  files.forEach(file => {
+    if (srtFiles.find(f => f.name === file.name)) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const raw = e.target.result;
+      const parsed = parseSRT(raw, file.name);
+      srtFiles.push({ name: file.name, raw, parsed });
+      renderFileList();
+    };
+    reader.readAsText(file, 'UTF-8');
+  });
+}
+
+function removeFile(name) {
+  srtFiles = srtFiles.filter(f => f.name !== name);
+  renderFileList();
+}
+
+function renderFileList() {
+  const list = document.getElementById('fileList');
+  list.innerHTML = '';
+  srtFiles.forEach(f => {
+    const d = document.createElement('div');
+    d.className = 'file-item';
+    d.innerHTML = `<span class="fi-icon">🎬</span>
+      <div class="fi-info">
+        <div class="fi-name">${esc(f.name)}</div>
+        <div class="fi-meta">${f.parsed.segments.length} segmentos · ${fmtMs(f.parsed.duration)}</div>
+      </div>
+      <span class="fi-ok">✓ Pronto</span>
+      <button class="fi-rm" onclick="removeFile('${esc(f.name)}')">×</button>`;
+    list.appendChild(d);
+  });
+}
+
+// ── SRT PARSER ────────────────────────────────────────────────────────────
+function parseSRT(raw, filename) {
+  const blocks = raw.trim().split(/\n\s*\n/);
+  const segments = [];
+  blocks.forEach(block => {
+    const lines = block.trim().split('\n');
+    const tsLine = lines.find(l => /\d{2}:\d{2}:\d{2}[,\.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[,\.]\d{3}/.test(l));
+    if (!tsLine) return;
+    const m = tsLine.match(/(\d{2}):(\d{2}):(\d{2})[,\.](\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2})[,\.](\d{3})/);
+    if (!m) return;
+    const startMs = toMs(m[1],m[2],m[3],m[4]);
+    const endMs   = toMs(m[5],m[6],m[7],m[8]);
+    const text = lines.filter(l => !/^\d+$/.test(l.trim()) && !/-->/.test(l)).join(' ').trim();
+    if (!text) return;
+    segments.push({ startMs, endMs, text, source: filename.replace(/\.[^.]+$/, '') });
+  });
+  const duration = segments.length ? Math.max(...segments.map(s => s.endMs)) : 0;
+  const gEnd = Math.min(8000, duration * 0.18);
+  const ctaS = duration * 0.78;
+  const gancho = segments.filter(s => s.startMs < gEnd);
+  const corpo  = segments.filter(s => s.startMs >= gEnd && s.endMs <= ctaS);
+  const cta    = segments.filter(s => s.startMs >= ctaS);
+  return { segments, gancho, corpo, cta, duration };
+}
+
+function toMs(h,m,s,ms){ return (+h)*3600000+(+m)*60000+(+s)*1000+(+ms); }
+function fmtMs(ms){ const t=Math.round(ms/1000),min=Math.floor(t/60),sec=t%60; return min>0?`${min}m${String(sec).padStart(2,'0')}s`:`${sec}s`; }
+function fmtS(s){ const min=Math.floor(s/60),sec=Math.round(s%60); return min>0?`${min}m${String(sec).padStart(2,'0')}s`:`${sec}s`; }
+function segTxt(segs){ return segs.map(s=>s.text).join(' ').trim(); }
+
+// ── TAGS ──────────────────────────────────────────────────────────────────
+document.querySelectorAll('.ptag').forEach(t => t.addEventListener('click', () => t.classList.toggle('on')));
+
+// ── PROGRESS ──────────────────────────────────────────────────────────────
+function setStep(n, pct, label) {
+  ['ps1','ps2','ps3','ps4','ps5'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.className = 'ps' + (i+1 < n ? ' done' : i+1 === n ? ' active' : '');
+  });
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progLabel').textContent = label;
+}
+
+// ── MAIN ──────────────────────────────────────────────────────────────────
+async function run() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  if (!apiKey) { toast('⚠️ Insira a chave da API do Groq', true); return; }
+  if (!srtFiles.length) { toast('⚠️ Faça upload de pelo menos 1 arquivo .srt', true); return; }
+
+  const btn = document.getElementById('btnGen');
+  btn.disabled = true; btn.textContent = '⏳ PROCESSANDO...';
+  document.getElementById('progWrap').style.display = 'block';
+  document.getElementById('results').style.display = 'none';
+  generated = [];
+
+  try {
+    setStep(1, 10, `Parseando ${srtFiles.length} arquivo(s)...`);
+    await delay(300);
+    setStep(2, 25, 'Mapeando timestamps e zonas...');
+    await delay(300);
+
+    const duracao   = document.getElementById('duracao').value;
+    const produto   = document.getElementById('produto').value;
+    const publico   = document.getElementById('publico').value;
+    const contexto  = document.getElementById('contexto').value;
+    const wordTarget = Math.round((+duracao / 60) * 130);
+    const gEnd = Math.min(8, Math.round(+duracao * 0.18));
+    const ctaS = Math.round(+duracao * 0.78);
+
+    // Build SRT contexts
+    const srtCtx = srtFiles.map(f => {
+      const p = f.parsed;
+      const srcName = f.name.replace(/\.[^.]+$/, '');
+      const segLines = p.segments.map(s =>
+        `[${fmtMs(s.startMs)}→${fmtMs(s.endMs)}][${srcName}] ${s.text}`
+      ).join('\n');
+      return `=== ${f.name} (${fmtMs(p.duration)}) ===
+[GANCHO 0s→${fmtMs(Math.min(8000, p.duration*0.18))}]: ${segTxt(p.gancho)||'(vazio)'}
+[CORPO]: ${segTxt(p.corpo)||'(vazio)'}
+[CTA]: ${segTxt(p.cta)||'(vazio)'}
+[SEGMENTOS COMPLETOS]:
+${segLines}`;
+    });
+
+    const sourceNames = srtFiles.map(f => f.name.replace(/\.[^.]+$/, ''));
+
+    setStep(3, 45, 'Enviando para Groq · Llama 3.3 70B...');
+
+    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 8000,
+        temperature: 0.75,
+        messages: [
+          { role: 'system', content: 'Especialista em copywriting e direção de vídeo para Facebook Ads Brasil. Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown.' },
+          { role: 'user', content: buildPrompt(srtCtx, sourceNames, duracao, wordTarget, gEnd, ctaS, produto, publico, contexto) }
+        ]
+      })
+    });
+
+    setStep(4, 70, 'Calculando scores de acerto...');
+    if (!resp.ok) { const e = await resp.json(); throw new Error(e.error?.message || 'Erro na API'); }
+    const data = await resp.json();
+    const raw = data.choices[0].message.content;
+
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch(e) { throw new Error('Erro ao interpretar resposta. Tente novamente.'); }
+
+    setStep(5, 92, 'Renderizando storyboards...');
+    await delay(400);
+    generated = parsed.variacoes || [];
+
+    if (parsed.analise_geral) {
+      document.getElementById('anaText').textContent = parsed.analise_geral;
+      document.getElementById('anaBox').style.display = 'block';
+    }
+    if (parsed.padroes) renderPatterns(parsed.padroes);
+    renderVariations(generated, +duracao);
+
+    setStep(5, 100, 'Concluído!');
+    await delay(500);
+    document.getElementById('progWrap').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+
+  } catch(err) {
+    document.getElementById('progWrap').style.display = 'none';
+    toast('❌ ' + err.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⚡ ANALISAR E GERAR 10 CRIATIVOS';
+  }
+}
+
+function buildPrompt(srtCtx, sourceNames, duracao, wordTarget, gEnd, ctaS, produto, publico, contexto) {
+  return `Você analisará ${srtCtx.length} criativo(s) SRT de anúncios Facebook Ads validados (rodando 45+ dias).
+
+FONTES DE VÍDEO DISPONÍVEIS: ${sourceNames.join(', ')}
+(Use esses nomes exatos ao referenciar qual vídeo usar em cada cena do storyboard)
+
+CRIATIVOS ANALISADOS:
+${srtCtx.join('\n\n')}
+
+PARÂMETROS:
+- Produto: ${produto}
+- Público: ${publico}
+- Duração alvo: ${duracao}s (~${wordTarget} palavras)
+- Gancho: 0s→${gEnd}s | Corpo: ${gEnd}s→${ctaS}s | CTA: ${ctaS}s→${duracao}s
+- Contexto: ${contexto}
+
+TAREFA:
+1. "analise_geral": 3-4 frases sobre padrões identificados.
+2. "padroes": {gancho_padrao, corpo_padrao, cta_padrao}
+3. "variacoes": 10 variações com storyboard de produção.
+
+EIXO 1 — GANCHO (4 vars): pergunta identificação | afirmação chocante | estatística | resultado/transformação
+EIXO 2 — FORMATO (3 vars): UGC conversacional | educativo | depoimento 1ª pessoa
+EIXO 3 — CTA (3 vars): WhatsApp urgência | isca digital gratuita | escassez estoque
+
+PARA CADA VARIAÇÃO retorne:
+- numero, nome, eixo (gancho|formato|cta), elemento_testado
+- gancho_texto, corpo_texto, cta_texto (textos da narração)
+- score: número de 0-100 estimando chance de conversão no Facebook Ads para o nicho
+- score_justificativa: 1 frase explicando o score
+- score_fatores_positivos: array de 2-3 strings curtas (ex: "gancho de pergunta validado")
+- score_fatores_negativos: array de 1-2 strings curtas (ex: "CTA longo")
+- storyboard: array de cenas, cada cena com:
+  {
+    zona: "gancho"|"corpo"|"cta",
+    tempo_inicio: número em segundos,
+    tempo_fim: número em segundos,
+    video_fonte: "${sourceNames[0] || 'video1'}" (nome exato do arquivo fonte a usar),
+    fala: "texto exato da narração nessa cena",
+    instrucao_cena: "instrução para o editor: o que aparece na tela, texto overlay, transição, ângulo de câmera, b-roll sugerido"
+  }
+
+Distribua as cenas usando os diferentes vídeos fonte quando disponível.
+Cada variação deve ter entre 4 e 8 cenas no storyboard.
+
+Responda SOMENTE JSON:
+{"analise_geral":"...","padroes":{...},"variacoes":[...]}`;
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+function renderPatterns(p) {
+  const grid = document.getElementById('patGrid');
+  grid.innerHTML = '';
+  [
+    { lbl: 'Padrão de Gancho', txt: p.gancho_padrao, col: 'var(--red)' },
+    { lbl: 'Padrão de Corpo',  txt: p.corpo_padrao,  col: 'var(--yellow)' },
+    { lbl: 'Padrão de CTA',    txt: p.cta_padrao,    col: 'var(--blue)' }
+  ].forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'pat-card';
+    card.style.animationDelay = (i*0.1)+'s';
+    card.innerHTML = `<div class="pat-lbl"><span class="pat-dot" style="background:${item.col}"></span><span style="color:${item.col}">${item.lbl}</span></div><div class="pat-text">"${esc(item.txt)}"</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function getScoreColor(s) {
+  if (s >= 80) return '#2ecc71';
+  if (s >= 65) return '#ffd60a';
+  return '#ff4757';
+}
+
+function renderVariations(vars, duracao) {
+  const grid = document.getElementById('varGrid');
+  grid.innerHTML = '';
+  const wt = Math.round((duracao/60)*130);
+
+  vars.forEach((v, i) => {
+    const tw = [v.gancho_texto, v.corpo_texto, v.cta_texto].join(' ').split(' ').filter(Boolean).length;
+    const sc = v.score || 70;
+    const color = getScoreColor(sc);
+    const r = 22, circ = 2*Math.PI*r;
+    const offset = circ - (sc/100)*circ;
+    const eixoCls = {gancho:'ex-g',formato:'ex-f',cta:'ex-c'}[v.eixo]||'ex-g';
+    const eixoLbl = {gancho:'Eixo 1 — Gancho',formato:'Eixo 2 — Formato',cta:'Eixo 3 — CTA'}[v.eixo]||v.eixo;
+
+    const card = document.createElement('div');
+    card.className = 'var-card';
+    card.style.animationDelay = (i*0.05)+'s';
+    card.setAttribute('data-idx', i);
+    card.addEventListener('click', () => openSB(i));
+
+    card.innerHTML = `
+      <div class="vc-top">
+        <div class="vc-meta">
+          <span class="vc-num">VAR ${String(v.numero).padStart(2,'0')}</span>
+          <span class="vc-name">${esc(v.nome)}</span>
+          <span class="vc-eixo ${eixoCls}">${eixoLbl}</span>
+        </div>
+        <div class="score-row">
+          <div class="score-ring">
+            <svg width="52" height="52" viewBox="0 0 52 52">
+              <circle class="score-ring-bg" cx="26" cy="26" r="${r}"/>
+              <circle class="score-ring-fill" cx="26" cy="26" r="${r}"
+                stroke="${color}"
+                stroke-dasharray="${circ}"
+                stroke-dashoffset="${offset}"/>
+            </svg>
+            <div class="score-num" style="color:${color}">${sc}%</div>
+          </div>
+          <div class="score-info">
+            <div class="score-label">Score de Acerto</div>
+            <div class="score-why">${esc(v.score_justificativa||'')}</div>
+          </div>
+        </div>
+      </div>
+      <div class="vc-body">
+        <div class="vc-preview">${esc(v.gancho_texto||'')} ${esc(v.corpo_texto||'').substring(0,120)}...</div>
+      </div>
+      <div class="vc-footer">
+        <span class="vc-words">~${tw} palavras · ${duracao}s · ${(v.storyboard||[]).length} cenas</span>
+        <span class="vc-testing">🎯 ${esc(v.elemento_testado||'')}</span>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ── STORYBOARD ────────────────────────────────────────────────────────────
+function openSB(idx) {
+  const v = generated[idx];
+  if (!v) return;
+  currentSB = v;
+
+  const sc = v.score || 70;
+  const color = getScoreColor(sc);
+  const r = 34, circ = 2*Math.PI*r;
+  const offset = circ - (sc/100)*circ;
+
+  const eixoLbl = {gancho:'Eixo 1 — Gancho',formato:'Eixo 2 — Formato',cta:'Eixo 3 — CTA'}[v.eixo]||v.eixo;
+  const duracao = document.getElementById('duracao').value;
+  const produto = document.getElementById('produto').value;
+
+  const posFatores = (v.score_fatores_positivos||[]).map(f=>`<span class="sf pos">✓ ${esc(f)}</span>`).join('');
+  const negFatores = (v.score_fatores_negativos||[]).map(f=>`<span class="sf neg">− ${esc(f)}</span>`).join('');
+
+  const scenesHtml = (v.storyboard||[]).map((cena, ci) => {
+    const zoneCls = {gancho:'z-g',corpo:'z-c',cta:'z-t'}[cena.zona]||'z-g';
+    const zoneLbl = {gancho:'🎬 Gancho',corpo:'📝 Corpo',cta:'📣 CTA'}[cena.zona]||cena.zona;
+    return `<div class="scene">
+      <div class="scene-tc">
+        <div class="scene-zone ${zoneCls}">${zoneLbl}</div>
+        <div class="scene-time">${fmtS(cena.tempo_inicio)} → ${fmtS(cena.tempo_fim)}</div>
+        <div class="scene-src">${esc(cena.video_fonte||'')}</div>
+      </div>
+      <div class="scene-content">
+        <div class="sc-block">
+          <div class="sc-label">🎙 Fala / Narração</div>
+          <div class="sc-text" id="sb-fala-${ci}">${esc(cena.fala||'')}</div>
+          <button class="btn-cp-sb" onclick="cpSBblock('sb-fala-${ci}',this)">⎘ Copiar fala</button>
+        </div>
+        <div class="sc-block">
+          <div class="sc-label">🎥 Instrução de Cena</div>
+          <div class="sc-instruction" id="sb-inst-${ci}">${esc(cena.instrucao_cena||'')}</div>
+          <button class="btn-cp-sb" onclick="cpSBblock('sb-inst-${ci}',this)">⎘ Copiar instrução</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('sbContent').innerHTML = `
+    <div class="sb-header">
+      <div class="sb-eyebrow">Roteiro de Produção — Facebook Ads</div>
+      <div class="sb-title">VAR ${String(v.numero).padStart(2,'0')} — ${esc(v.nome)}</div>
+      <div class="sb-meta">
+        <span class="sb-chip">${eixoLbl}</span>
+        <span class="sb-chip">🎯 ${esc(v.elemento_testado||'')}</span>
+        <span class="sb-chip">⏱ ${duracao}s</span>
+        <span class="sb-chip">📦 ${esc(produto)}</span>
+      </div>
+    </div>
+
+    <div class="score-big">
+      <div class="score-big-ring">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle fill="none" stroke="var(--s3)" stroke-width="5" cx="40" cy="40" r="${r}"/>
+          <circle fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round"
+            cx="40" cy="40" r="${r}"
+            stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
+        </svg>
+        <div class="score-big-num" style="color:${color}">${sc}%</div>
+      </div>
+      <div class="score-big-info">
+        <div class="score-big-label">Score de Acerto Estimado — Facebook Ads</div>
+        <div class="score-big-why">${esc(v.score_justificativa||'')}</div>
+        <div class="score-factors">${posFatores}${negFatores}</div>
+      </div>
+    </div>
+
+    <div class="sb-sec-title">Storyboard de Produção</div>
+    <div class="sb-scenes">${scenesHtml}</div>
+  `;
+
+  document.getElementById('sbPage').style.display = 'block';
+  document.getElementById('sbPage').scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSB() {
+  document.getElementById('sbPage').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function cpSBblock(id, btn) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.innerText).then(() => {
+    btn.textContent = '✓ Copiado'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = '⎘ Copiar'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+function getSBText() {
+  const v = currentSB; if (!v) return '';
+  const duracao = document.getElementById('duracao').value;
+  const produto = document.getElementById('produto').value;
+  let out = `ROTEIRO DE PRODUÇÃO — FACEBOOK ADS\n`;
+  out += `VAR ${String(v.numero).padStart(2,'0')} — ${v.nome}\n`;
+  out += `Produto: ${produto} | Duração: ${duracao}s | Score: ${v.score}%\n`;
+  out += `Testando: ${v.elemento_testado}\n${'═'.repeat(60)}\n\n`;
+  out += `SCORE DE ACERTO: ${v.score}%\n${v.score_justificativa}\n`;
+  if (v.score_fatores_positivos?.length) out += `+ ${v.score_fatores_positivos.join(' | ')}\n`;
+  if (v.score_fatores_negativos?.length) out += `- ${v.score_fatores_negativos.join(' | ')}\n`;
+  out += `\n${'═'.repeat(60)}\nSTORYBOARD\n${'═'.repeat(60)}\n\n`;
+  (v.storyboard||[]).forEach((cena, i) => {
+    out += `CENA ${i+1} — ${(cena.zona||'').toUpperCase()}\n`;
+    out += `Tempo: ${fmtS(cena.tempo_inicio)} → ${fmtS(cena.tempo_fim)}\n`;
+    out += `Vídeo fonte: ${cena.video_fonte}\n`;
+    out += `Fala: ${cena.fala}\n`;
+    out += `Instrução: ${cena.instrucao_cena}\n\n`;
+  });
+  return out;
+}
+
+function copySB() {
+  navigator.clipboard.writeText(getSBText()).then(() => toast('Roteiro copiado!'));
+}
+
+function downloadSB() {
+  const v = currentSB; if (!v) return;
+  const blob = new Blob([getSBText()], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `storyboard-var${v.numero}-${(v.nome||'').replace(/\s+/g,'-').toLowerCase()}.txt`;
+  a.click();
+  toast('Storyboard baixado!');
+}
+
+function exportAll() {
+  if (!generated.length) return;
+  const produto = document.getElementById('produto').value;
+  const duracao = document.getElementById('duracao').value;
+  let out = `CRIATIVO STUDIO v3 — TODOS OS CRIATIVOS\nProduto: ${produto} | Duração: ${duracao}s\n${'═'.repeat(60)}\n\n`;
+  generated.forEach(v => {
+    out += `VAR ${String(v.numero).padStart(2,'0')} — ${v.nome} | Score: ${v.score}%\n`;
+    out += `Eixo: ${v.eixo} | Testando: ${v.elemento_testado}\n${'─'.repeat(40)}\n`;
+    out += `🎬 GANCHO:\n${v.gancho_texto}\n\n📝 CORPO:\n${v.corpo_texto}\n\n📣 CTA:\n${v.cta_texto}\n\n${'═'.repeat(60)}\n\n`;
+  });
+  const blob = new Blob([out], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `criativos-${produto.replace(/\s+/g,'-').toLowerCase()}-${duracao}s.txt`;
+  a.click();
+  toast('Exportado!');
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function toast(msg, isErr=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isErr?' err':'');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── ESC key to close storyboard ───────────────────────────────────────────
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSB(); });
+
+// ── TABS ──────────────────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'renderizar') refreshVarSelect();
+}
+
+// ── VIDEO UPLOAD ──────────────────────────────────────────────────────────
+let videoFiles = [];
+
+const vdz = document.getElementById('videoDropZone');
+vdz.addEventListener('dragover', e => { e.preventDefault(); vdz.classList.add('over'); });
+vdz.addEventListener('dragleave', () => vdz.classList.remove('over'));
+vdz.addEventListener('drop', e => { e.preventDefault(); vdz.classList.remove('over'); handleVideoFiles([...e.dataTransfer.files]); });
+document.getElementById('videoFiles').addEventListener('change', e => { handleVideoFiles([...e.target.files]); e.target.value=''; });
+
+function handleVideoFiles(files) {
+  files.forEach(f => {
+    if (!videoFiles.find(v => v.name === f.name)) videoFiles.push(f);
+  });
+  renderVideoList();
+}
+
+function removeVideo(name) {
+  videoFiles = videoFiles.filter(f => f.name !== name);
+  renderVideoList();
+}
+
+function renderVideoList() {
+  const list = document.getElementById('videoFileList');
+  list.innerHTML = '';
+  videoFiles.forEach(f => {
+    const size = (f.size / 1024 / 1024).toFixed(1);
+    const d = document.createElement('div');
+    d.className = 'file-item';
+    d.innerHTML = `<span class="fi-icon">🎥</span>
+      <div class="fi-info">
+        <div class="fi-name">${esc(f.name)}</div>
+        <div class="fi-meta">${size} MB</div>
+      </div>
+      <span class="fi-ok">✓ Pronto</span>
+      <button class="fi-rm" onclick="removeVideo('${esc(f.name)}')">×</button>`;
+    list.appendChild(d);
+  });
+}
+
+// ── VARIATION SELECT ──────────────────────────────────────────────────────
+let selectedVarIds = new Set();
+
+function refreshVarSelect() {
+  const area = document.getElementById('varSelectArea');
+  if (!generated.length) {
+    area.innerHTML = '<div class="no-variations-msg">⚠️ Gere os criativos primeiro na aba <strong>"Gerar Criativos"</strong> para selecionar as variações aqui.</div>';
+    return;
+  }
+  if (selectedVarIds.size === 0) generated.forEach(v => selectedVarIds.add(v.numero));
+
+  const sc = getScoreColor;
+  area.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+      <span style="font-size:14px;color:var(--muted2);">Selecione quais variações renderizar:</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-export" onclick="selectAllVars(true)" style="padding:7px 14px;font-size:12px;">✓ Todas</button>
+        <button class="btn-export" onclick="selectAllVars(false)" style="padding:7px 14px;font-size:12px;">✗ Nenhuma</button>
+      </div>
+    </div>
+    <div class="var-sel-grid" id="varSelGrid"></div>`;
+
+  const grid = document.getElementById('varSelGrid');
+  generated.forEach(v => {
+    const checked = selectedVarIds.has(v.numero);
+    const color = getScoreColor(v.score || 70);
+    const item = document.createElement('div');
+    item.className = 'var-sel-item' + (checked ? ' selected' : '');
+    item.id = `vsi-${v.numero}`;
+    item.onclick = () => toggleVar(v.numero);
+    item.innerHTML = `
+      <input type="checkbox" ${checked ? 'checked' : ''} id="vsc-${v.numero}" onclick="event.stopPropagation();toggleVar(${v.numero})"/>
+      <div>
+        <div class="var-sel-name">VAR ${String(v.numero).padStart(2,'0')} — ${esc(v.nome)}</div>
+        <div class="var-sel-score" style="color:${color}">Score: ${v.score}%</div>
+      </div>`;
+    grid.appendChild(item);
+  });
+}
+
+function toggleVar(num) {
+  if (selectedVarIds.has(num)) selectedVarIds.delete(num);
+  else selectedVarIds.add(num);
+  const item = document.getElementById(`vsi-${num}`);
+  const cb   = document.getElementById(`vsc-${num}`);
+  if (item) item.classList.toggle('selected', selectedVarIds.has(num));
+  if (cb)   cb.checked = selectedVarIds.has(num);
+}
+
+function selectAllVars(all) {
+  selectedVarIds = new Set(all ? generated.map(v => v.numero) : []);
+  refreshVarSelect();
+}
+
+// ── BACKEND TEST ──────────────────────────────────────────────────────────
+async function testBackend() {
+  const url = document.getElementById('backendUrl').value.trim().replace(/\/$/, '');
+  const el = document.getElementById('backendStatus');
+  if (!url) { el.textContent = '⚠️ Cole a URL primeiro'; el.style.color = 'var(--red)'; return; }
+  el.textContent = '⏳ Testando...'; el.style.color = 'var(--muted2)';
+  try {
+    const r = await fetch(`${url}/health`, { signal: AbortSignal.timeout(8000) });
+    const d = await r.json();
+    el.textContent = '✓ Conectado — ' + (d.service || 'OK');
+    el.style.color = 'var(--green)';
+  } catch(e) {
+    el.textContent = '✗ Sem resposta — verifique a URL e se o Space está online';
+    el.style.color = 'var(--red)';
+  }
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+async function startRender() {
+  const url = document.getElementById('backendUrl').value.trim().replace(/\/$/, '');
+  if (!url)             { toast('⚠️ Cole a URL do backend', true); return; }
+  if (!videoFiles.length) { toast('⚠️ Faça upload dos vídeos', true); return; }
+  if (!generated.length)  { toast('⚠️ Gere os criativos primeiro', true); return; }
+  if (!selectedVarIds.size){ toast('⚠️ Selecione ao menos 1 variação', true); return; }
+
+  const btn = document.getElementById('btnRender');
+  btn.disabled = true; btn.textContent = '⏳ RENDERIZANDO...';
+
+  const statusEl  = document.getElementById('renderStatus');
+  const progEl    = document.getElementById('rsProg');
+  const textEl    = document.getElementById('rsText');
+  const resultsEl = document.getElementById('renderResults');
+  const gridEl    = document.getElementById('rrGrid');
+
+  statusEl.style.display  = 'block';
+  resultsEl.style.display = 'none';
+  gridEl.innerHTML = '';
+
+  const setRS = (pct, txt) => {
+    progEl.style.width = pct + '%';
+    textEl.textContent = txt;
+  };
+
+  try {
+    setRS(10, 'Preparando arquivos...');
+
+    const varList   = generated.filter(v => selectedVarIds.has(v.numero));
+    const resolution = document.getElementById('renderResolution').value;
+    const subStyle   = document.getElementById('subtitleStyle').value;
+
+    const fd = new FormData();
+    fd.append('variations',    JSON.stringify(varList));
+    fd.append('resolution',    resolution);
+    fd.append('subtitle_style', subStyle);
+    fd.append('variation_ids', JSON.stringify([...selectedVarIds]));
+
+    videoFiles.forEach((f, i) => fd.append(`video_${i}`, f, f.name));
+
+    setRS(25, `Enviando ${videoFiles.length} vídeo(s) para o servidor...`);
+
+    const resp = await fetch(`${url}/render`, { method: 'POST', body: fd });
+
+    setRS(70, 'Processando cortes e legendas com FFmpeg...');
+
+    if (!resp.ok) {
+      const e = await resp.json();
+      throw new Error(e.error || 'Erro no servidor');
+    }
+
+    const data = await resp.json();
+    setRS(95, 'Preparando downloads...');
+
+    if (data.errors?.length) {
+      data.errors.forEach(e => toast(`❌ VAR ${e.numero}: ${e.error}`, true));
+    }
+
+    if (!data.rendered?.length) throw new Error('Nenhum vídeo foi gerado.');
+
+    setRS(100, `✓ ${data.rendered.length} vídeo(s) prontos!`);
+
+    data.rendered.forEach(item => {
+      const color = getScoreColor(item.score || 70);
+      const div = document.createElement('div');
+      div.className = 'rr-item';
+      div.innerHTML = `
+        <div class="rr-info">
+          <div class="rr-name">VAR ${String(item.numero).padStart(2,'0')} — ${esc(item.nome)}</div>
+          <div class="rr-meta" style="color:${color}">Score: ${item.score}% &nbsp;·&nbsp; <span style="color:var(--muted2)">${esc(item.file)}</span></div>
+        </div>
+        <a class="btn-dl-video" href="${url}/download/${item.session}/${item.file}" download="${item.file}" target="_blank">
+          ⬇ Baixar MP4
+        </a>`;
+      gridEl.appendChild(div);
+    });
+
+    resultsEl.style.display = 'block';
+    resultsEl.scrollIntoView({ behavior: 'smooth' });
+
+  } catch(err) {
+    setRS(0, '');
+    statusEl.style.display = 'none';
+    toast('❌ ' + err.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🎬 RENDERIZAR VÍDEOS SELECIONADOS';
+  }
+}
+</script>
+</body>
+</html>
