@@ -2339,7 +2339,7 @@ async function runEdit(){
       const pwd=backPwd;
       const dlUrl=pwd
         ?`${backUrl}/download/${item.session}/${item.file}?access_password=${encodeURIComponent(pwd)}`
-        :`${backUrl}/download/${item.session}/${item.file}`;
+        :`${backUrl}/download/${item.session}/${item.file}`; 
 
       // relatório dos cortes
       const cortesHTML=(varInfo.cortes||varInfo.storyboard||[]).map((c,ci)=>{
