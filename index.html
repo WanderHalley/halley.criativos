@@ -1,1272 +1,2186 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Criativo Studio Pro — Facebook Ads</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Halley Criativo Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Unbounded:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#07080f;
-  --s1:#0e0f1a;
-  --s2:#141522;
-  --s3:#1a1b2e;
-  --s4:#20213a;
-  --border:rgba(255,255,255,0.05);
-  --border2:rgba(255,255,255,0.09);
-  --border3:rgba(255,255,255,0.14);
-  --acc:#e8622a;
-  --acc2:#f07840;
-  --acc-glow:rgba(232,98,42,0.15);
-  --gold:#f5c842;
-  --gold2:#ffd860;
-  --green:#00d68f;
-  --green2:#00f5a8;
-  --blue:#4d9fff;
-  --blue2:#74b3ff;
-  --red:#ff4d6d;
-  --purple:#a78bfa;
-  --text:#eeeef5;
-  --text2:#c8c8dc;
-  --muted:#4a4a6a;
-  --muted2:#7070a0;
-  --muted3:#9090b8;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;font-size:16px;}
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:'Inter',sans-serif;
-  min-height:100vh;
-  overflow-x:hidden;
-  line-height:1.6;
+/* ═══════════════════════════════════════════════════════
+   HALLEY CRIATIVO STUDIO — DESIGN SYSTEM
+   Tema: Editorial Dark/White · Acento Laranja Queimado
+═══════════════════════════════════════════════════════ */
+
+:root {
+  /* DARK THEME */
+  --bg:         #0a0a0a;
+  --bg2:        #111111;
+  --bg3:        #181818;
+  --bg4:        #202020;
+  --line:       rgba(255,255,255,0.07);
+  --line2:      rgba(255,255,255,0.12);
+  --line3:      rgba(255,255,255,0.18);
+  --txt:        #f0f0f0;
+  --txt2:       #a0a0a0;
+  --txt3:       #606060;
+  --acc:        #ff6a1a;
+  --acc2:       #ff8940;
+  --acc-dim:    rgba(255,106,26,0.12);
+  --acc-glow:   rgba(255,106,26,0.25);
+  --green:      #00e5a0;
+  --green-dim:  rgba(0,229,160,0.1);
+  --red:        #ff4466;
+  --red-dim:    rgba(255,68,102,0.1);
+  --blue:       #4da6ff;
+  --blue-dim:   rgba(77,166,255,0.1);
+  --gold:       #ffcc44;
+  --gold-dim:   rgba(255,204,68,0.1);
+  --shadow:     0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.3);
+  --shadow-lg:  0 8px 40px rgba(0,0,0,0.5);
+  --r:          12px;
+  --r2:         18px;
+  --r3:         24px;
 }
 
-/* ── BACKGROUND ── */
-.bg-grid{
-  position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:
-    linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);
-  background-size:48px 48px;
-}
-.bg-orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;}
-.orb1{width:700px;height:500px;background:rgba(232,98,42,0.07);top:-200px;right:-150px;}
-.orb2{width:600px;height:600px;background:rgba(77,159,255,0.04);bottom:-200px;left:-150px;}
-.orb3{width:400px;height:400px;background:rgba(167,139,250,0.04);top:40%;left:40%;}
-
-/* ── LAYOUT ── */
-.shell{position:relative;z-index:1;max-width:1140px;margin:0 auto;padding:0 24px 140px;}
-
-/* ── TOPBAR ── */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:20px 0 32px;
-  border-bottom:1px solid var(--border);
-  margin-bottom:40px;
-  flex-wrap:wrap;gap:16px;
-}
-.logo{display:flex;align-items:center;gap:12px;}
-.logo-icon{
-  width:42px;height:42px;
-  background:linear-gradient(135deg,var(--acc),var(--gold));
-  border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;
-  box-shadow:0 4px 20px rgba(232,98,42,0.3);
-}
-.logo-text{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.02em;}
-.logo-text span{color:var(--acc);}
-.logo-badge{
-  font-family:'JetBrains Mono',monospace;font-size:10px;
-  background:rgba(232,98,42,.12);border:1px solid rgba(232,98,42,.25);
-  color:var(--acc);padding:3px 8px;border-radius:4px;
-}
-.topbar-right{display:flex;align-items:center;gap:10px;}
-.status-pill{
-  display:flex;align-items:center;gap:7px;
-  background:rgba(0,214,143,.06);border:1px solid rgba(0,214,143,.15);
-  color:var(--green);padding:8px 16px;border-radius:100px;
-  font-family:'JetBrains Mono',monospace;font-size:12px;
-}
-.status-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,214,143,.4)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(0,214,143,0)}}
-
-/* ── TABS ── */
-.tabs{
-  display:flex;gap:2px;margin-bottom:40px;
-  background:var(--s1);border:1px solid var(--border);
-  border-radius:14px;padding:5px;
-}
-.tab{
-  flex:1;padding:13px 20px;border-radius:10px;border:none;
-  background:transparent;color:var(--muted2);
-  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;
-  cursor:pointer;transition:all .25s;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  letter-spacing:-.01em;
-}
-.tab:hover{color:var(--text2);background:var(--s2);}
-.tab.active{
-  background:linear-gradient(135deg,var(--s3),var(--s4));
-  color:var(--text);
-  box-shadow:0 2px 12px rgba(0,0,0,.4);
-  border:1px solid var(--border2);
-}
-.tab-panel{display:none;}
-.tab-panel.active{display:block;}
-
-/* ── SECTION LABEL ── */
-.sec-label{
-  font-family:'Syne',sans-serif;font-size:11px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.2em;
-  color:var(--muted2);margin-bottom:6px;
+[data-theme="light"] {
+  --bg:         #fafafa;
+  --bg2:        #f0f0f0;
+  --bg3:        #e8e8e8;
+  --bg4:        #dedede;
+  --line:       rgba(0,0,0,0.07);
+  --line2:      rgba(0,0,0,0.12);
+  --line3:      rgba(0,0,0,0.18);
+  --txt:        #0a0a0a;
+  --txt2:       #555555;
+  --txt3:       #999999;
+  --acc:        #e85800;
+  --acc2:       #ff6f20;
+  --acc-dim:    rgba(232,88,0,0.1);
+  --acc-glow:   rgba(232,88,0,0.2);
+  --shadow:     0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-lg:  0 8px 40px rgba(0,0,0,0.12);
 }
 
-/* ── CARDS ── */
-.card{
-  background:var(--s1);
-  border:1px solid var(--border);
-  border-radius:20px;overflow:hidden;
-  margin-bottom:16px;
-  transition:border-color .2s;
-}
-.card:hover{border-color:var(--border2);}
-.card-header{
-  padding:20px 26px;
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:14px;
-  background:linear-gradient(180deg,var(--s2) 0%,transparent 100%);
-}
-.step-badge{
-  width:34px;height:34px;
-  background:linear-gradient(135deg,var(--acc),var(--acc2));
-  color:#fff;border-radius:10px;
-  font-family:'Syne',sans-serif;font-size:14px;font-weight:800;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;box-shadow:0 4px 12px rgba(232,98,42,.3);
-}
-.card-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;letter-spacing:-.02em;}
-.card-subtitle{font-size:12px;color:var(--muted2);margin-top:1px;}
-.card-body{padding:24px 26px;}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
-/* ── FIELDS ── */
-.flabel{
-  font-family:'JetBrains Mono',monospace;font-size:11px;
-  letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);
-  margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;
+body {
+  background: var(--bg);
+  color: var(--txt);
+  font-family: 'Familjen Grotesk', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background .3s, color .3s;
 }
-.flabel a{color:var(--acc);text-decoration:none;font-size:11px;}
-.flabel a:hover{text-decoration:underline;}
-input,textarea,select{
-  width:100%;
-  background:var(--s2);
-  border:1px solid var(--border2);
-  border-radius:12px;
-  color:var(--text);
-  font-family:'Inter',sans-serif;
-  font-size:14px;
-  padding:13px 16px;
-  outline:none;
-  transition:border-color .2s,box-shadow .2s;
-}
-input:focus,textarea:focus,select:focus{
-  border-color:var(--acc);
-  box-shadow:0 0 0 3px rgba(232,98,42,.12);
-}
-input::placeholder,textarea::placeholder{color:var(--muted);}
-select option{background:var(--s2);}
-textarea{resize:vertical;}
-.frow{margin-bottom:18px;}
-.frow:last-child{margin-bottom:0;}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
-@media(max-width:640px){.g2,.g3{grid-template-columns:1fr;}}
-.divider{height:1px;background:var(--border);margin:22px 0;}
 
-/* ── UPLOAD ── */
-.drop{
-  border:2px dashed var(--border2);border-radius:16px;
-  padding:40px 24px;text-align:center;cursor:pointer;
-  transition:all .3s;position:relative;background:var(--s2);
+/* ── TEXTURE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: .6;
 }
-.drop:hover,.drop.over{
-  border-color:var(--acc);
-  background:rgba(232,98,42,.04);
-  box-shadow:0 0 0 4px rgba(232,98,42,.06);
-}
-.drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.drop-icon{font-size:40px;margin-bottom:12px;display:block;}
-.drop-main{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:6px;color:var(--text);}
-.drop-sub{font-size:13px;color:var(--muted2);}
 
-.file-list{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
-.file-item{
-  display:flex;align-items:center;gap:12px;
-  background:var(--s2);border:1px solid var(--border);
-  border-radius:12px;padding:14px 18px;
-  animation:slideUp .3s ease;
+/* ── ACCENT LINE TOP ── */
+body::after {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 999;
+  background: linear-gradient(90deg, transparent, var(--acc), var(--acc2), var(--acc), transparent);
 }
-@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.fi-icon{font-size:22px;flex-shrink:0;}
-.fi-info{flex:1;min-width:0;}
-.fi-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em;}
-.fi-meta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2);margin-top:3px;}
-.fi-ok{
-  font-family:'JetBrains Mono',monospace;font-size:11px;
-  padding:4px 12px;border-radius:100px;
-  background:rgba(0,214,143,.08);color:var(--green);
-  border:1px solid rgba(0,214,143,.2);flex-shrink:0;
-}
-.fi-rm{
-  background:none;border:none;color:var(--muted);
-  cursor:pointer;font-size:18px;padding:4px;
-  transition:color .2s;flex-shrink:0;line-height:1;
-}
-.fi-rm:hover{color:var(--red);}
 
-/* ── TAGS ── */
-.tag-group{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
-.ptag{
-  padding:9px 18px;border-radius:100px;
-  border:1px solid var(--border2);font-size:13px;
-  cursor:pointer;transition:all .2s;
-  background:transparent;color:var(--muted2);
-  font-family:'Inter',sans-serif;font-weight:500;
-}
-.ptag:hover{border-color:var(--acc2);color:var(--text);}
-.ptag.on{border-color:var(--acc);color:#fff;background:var(--acc);}
+/* ═══ LAYOUT ═══ */
+.wrap { position: relative; z-index: 1; max-width: 1160px; margin: 0 auto; padding: 0 28px 140px; }
 
-/* ── BTN GENERATE ── */
-.btn-gen{
-  width:100%;padding:22px;
-  background:linear-gradient(135deg,var(--acc) 0%,#c0431a 100%);
-  color:#fff;border:none;border-radius:14px;
-  font-family:'Syne',sans-serif;font-size:20px;font-weight:800;
-  letter-spacing:.04em;cursor:pointer;transition:all .3s;
-  position:relative;overflow:hidden;margin-top:6px;
-  box-shadow:0 8px 32px rgba(232,98,42,.25);
+/* ═══ TOPBAR ═══ */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 28px 0 32px; flex-wrap: wrap; gap: 16px;
 }
-.btn-gen::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,.12) 0%,transparent 60%);
-  opacity:0;transition:opacity .3s;
-}
-.btn-gen:hover{transform:translateY(-2px);box-shadow:0 16px 48px rgba(232,98,42,.4);}
-.btn-gen:hover::before{opacity:1;}
-.btn-gen:active{transform:translateY(0);}
-.btn-gen:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
 
-/* ── PROGRESS ── */
-.prog-wrap{display:none;margin-top:24px;}
-.prog-bg{height:3px;background:var(--s3);border-radius:100px;overflow:hidden;margin-bottom:16px;}
-.prog-fill{
-  height:100%;width:0%;
-  background:linear-gradient(90deg,var(--acc),var(--gold));
-  border-radius:100px;transition:width .5s ease;
-  box-shadow:0 0 10px rgba(232,98,42,.5);
+.brand {
+  display: flex; flex-direction: column; gap: 2px;
 }
-.prog-steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
-.ps{
-  font-family:'JetBrains Mono',monospace;font-size:11px;
-  padding:5px 12px;border-radius:100px;
-  background:var(--s3);color:var(--muted);
-  border:1px solid var(--border);transition:all .3s;
+.brand-name {
+  font-family: 'Unbounded', sans-serif;
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 900;
+  letter-spacing: -.03em;
+  line-height: 1;
+  color: var(--txt);
 }
-.ps.active{background:rgba(232,98,42,.1);color:var(--acc);border-color:rgba(232,98,42,.3);}
-.ps.done{background:rgba(0,214,143,.08);color:var(--green);border-color:rgba(0,214,143,.2);}
-.prog-label{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted2);text-align:center;}
+.brand-name span { color: var(--acc); }
+.brand-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: .25em; text-transform: uppercase;
+  color: var(--txt3);
+}
 
-/* ── RESULTS ── */
-#results{display:none;}
-.res-hd{
-  display:flex;align-items:flex-end;justify-content:space-between;
-  margin-bottom:32px;padding-top:48px;
-  border-top:1px solid var(--border);
-  flex-wrap:wrap;gap:16px;
-}
-.res-title-block{}
-.res-eyebrow{
-  font-family:'JetBrains Mono',monospace;font-size:11px;
-  letter-spacing:.2em;text-transform:uppercase;
-  color:var(--acc);margin-bottom:8px;
-}
-.res-title{
-  font-family:'Syne',sans-serif;font-size:44px;font-weight:800;
-  letter-spacing:-.03em;line-height:1;
-}
-.res-title em{color:var(--acc);font-style:normal;}
-.btn-export{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:12px 20px;background:var(--s2);
-  border:1px solid var(--border2);border-radius:12px;
-  color:var(--text2);font-size:13px;font-weight:500;
-  cursor:pointer;transition:all .2s;
-  font-family:'Inter',sans-serif;white-space:nowrap;
-}
-.btn-export:hover{border-color:var(--gold);color:var(--gold);}
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
 
-/* ── ANALYSIS BOX ── */
-.ana-box{
-  background:linear-gradient(135deg,rgba(232,98,42,.05),rgba(245,200,66,.03));
-  border:1px solid rgba(232,98,42,.15);
-  border-radius:16px;padding:22px 26px;margin-bottom:28px;display:none;
+/* theme toggle */
+.theme-toggle {
+  width: 52px; height: 28px;
+  background: var(--bg3); border: 1px solid var(--line2);
+  border-radius: 100px; cursor: pointer; position: relative;
+  transition: all .3s; display: flex; align-items: center; padding: 3px;
 }
-.ana-label{
-  font-family:'JetBrains Mono',monospace;font-size:10px;
-  letter-spacing:.2em;text-transform:uppercase;color:var(--acc2);margin-bottom:12px;
-  display:flex;align-items:center;gap:8px;
+.theme-toggle::after {
+  content: ''; width: 20px; height: 20px;
+  background: var(--acc); border-radius: 50%;
+  transition: transform .3s;
 }
-.ana-label::before{content:'';width:16px;height:1px;background:var(--acc2);}
-.ana-text{font-size:14px;color:var(--text2);line-height:1.75;}
+[data-theme="light"] .theme-toggle::after { transform: translateX(24px); }
+.theme-toggle-icon {
+  position: absolute; font-size: 11px;
+  transition: opacity .3s;
+}
+.ti-dark { right: 6px; opacity: 1; }
+.ti-light { left: 6px; opacity: 0; }
+[data-theme="light"] .ti-dark { opacity: 0; }
+[data-theme="light"] .ti-light { opacity: 1; }
 
-/* ── PATTERNS ── */
-.pat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px;}
-@media(max-width:640px){.pat-grid{grid-template-columns:1fr;}}
-.pat-card{
-  background:var(--s1);border:1px solid var(--border);
-  border-radius:14px;padding:20px;
-  animation:slideUp .4s ease forwards;opacity:0;
+.pill-badge {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  padding: 7px 14px; border-radius: 100px;
+  background: var(--acc-dim); border: 1px solid var(--acc-glow);
+  color: var(--acc); letter-spacing: .05em;
+  display: flex; align-items: center; gap: 6px;
 }
-.pat-lbl{
-  font-family:'JetBrains Mono',monospace;font-size:10px;
-  text-transform:uppercase;letter-spacing:.15em;
-  margin-bottom:10px;display:flex;align-items:center;gap:7px;font-weight:500;
-}
-.pat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.pat-text{font-size:13px;color:var(--muted2);line-height:1.65;font-style:italic;}
+.pulse { width: 6px; height: 6px; background: var(--acc); border-radius: 50%; animation: blink 1.8s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-/* ── VARIATION CARDS ── */
-.var-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-@media(max-width:760px){.var-grid{grid-template-columns:1fr;}}
+/* ═══ TABS ═══ */
+.tabs-bar {
+  display: flex; margin-bottom: 44px;
+  border-bottom: 1px solid var(--line);
+  gap: 0;
+}
+.tab-btn {
+  padding: 14px 28px;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  color: var(--txt3); font-family: 'Unbounded', sans-serif;
+  font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+  cursor: pointer; transition: all .2s; margin-bottom: -1px;
+  display: flex; align-items: center; gap: 8px;
+}
+.tab-btn:hover { color: var(--txt2); }
+.tab-btn.active { color: var(--acc); border-bottom-color: var(--acc); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeIn .3s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
 
-.var-card{
-  background:var(--s1);border:1px solid var(--border);
-  border-radius:18px;overflow:hidden;cursor:pointer;
-  transition:all .3s;animation:slideUp .4s ease forwards;opacity:0;
-  position:relative;
+/* ═══ SECTION HEADERS ═══ */
+.sec {
+  display: flex; align-items: flex-start; gap: 18px;
+  margin-bottom: 20px;
 }
-.var-card::after{
-  content:'Ver Roteiro Completo →';
-  position:absolute;bottom:0;left:0;right:0;
-  background:linear-gradient(0deg,rgba(232,98,42,.18),transparent);
-  color:var(--acc2);font-size:11px;font-family:'JetBrains Mono',monospace;
-  padding:32px 18px 12px;opacity:0;transition:opacity .3s;text-align:center;
-  letter-spacing:.05em;
+.sec-num {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: .1em;
+  color: var(--acc); background: var(--acc-dim);
+  border: 1px solid var(--acc-glow);
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 2px;
 }
-.var-card:hover{
-  border-color:rgba(232,98,42,.35);
-  transform:translateY(-4px);
-  box-shadow:0 20px 60px rgba(0,0,0,.4),0 0 0 1px rgba(232,98,42,.1);
+.sec-info {}
+.sec-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 15px; font-weight: 700; letter-spacing: -.01em;
+  color: var(--txt); margin-bottom: 3px;
 }
-.var-card:hover::after{opacity:1;}
+.sec-desc { font-size: 13px; color: var(--txt2); line-height: 1.5; }
 
-.vc-top{padding:18px 20px;border-bottom:1px solid var(--border);}
-.vc-row1{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
-.vc-num{
-  font-family:'JetBrains Mono',monospace;font-size:10px;
-  color:var(--muted2);background:var(--s3);
-  padding:3px 8px;border-radius:4px;
+/* ═══ BLOCKS ═══ */
+.block {
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: var(--r2);
+  margin-bottom: 18px;
+  overflow: hidden;
+  transition: border-color .2s;
 }
-.vc-name{
-  font-family:'Syne',sans-serif;font-size:16px;font-weight:700;
-  letter-spacing:-.02em;flex:1;
-}
-.vc-eixo{
-  font-family:'JetBrains Mono',monospace;font-size:10px;
-  letter-spacing:.08em;padding:4px 12px;border-radius:100px;
-  text-transform:uppercase;font-weight:500;flex-shrink:0;
-}
-.ex-g{background:rgba(255,77,109,.1);color:var(--red);border:1px solid rgba(255,77,109,.2);}
-.ex-f{background:rgba(245,200,66,.08);color:var(--gold);border:1px solid rgba(245,200,66,.2);}
-.ex-c{background:rgba(77,159,255,.1);color:var(--blue);border:1px solid rgba(77,159,255,.2);}
+.block:hover { border-color: var(--line2); }
+.block-body { padding: 26px 28px; }
+.block-body + .block-body { border-top: 1px solid var(--line); }
 
-/* ── SCORE ── */
-.score-row{display:flex;align-items:center;gap:12px;}
-.score-ring{position:relative;width:56px;height:56px;flex-shrink:0;}
-.score-ring svg{transform:rotate(-90deg);}
-.score-ring-bg{fill:none;stroke:var(--s3);stroke-width:4;}
-.score-ring-fill{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .8s ease;}
-.score-num{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;font-size:13px;font-weight:800;
+/* ═══ FIELDS ═══ */
+.flabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--txt3); margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: space-between;
 }
-.score-info{flex:1;}
-.score-label{
-  font-family:'JetBrains Mono',monospace;font-size:9px;
-  text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-bottom:4px;
-}
-.score-why{font-size:12px;color:var(--muted2);line-height:1.5;}
+.flabel a { color: var(--acc); text-decoration: none; font-size: 10px; }
+.flabel a:hover { text-decoration: underline; }
 
-.vc-body{padding:16px 20px;}
-.vc-preview{
-  font-size:13px;color:var(--muted2);line-height:1.7;
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+input, textarea, select {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--line2);
+  border-radius: var(--r);
+  color: var(--txt);
+  font-family: 'Familjen Grotesk', sans-serif;
+  font-size: 14px; font-weight: 500;
+  padding: 13px 16px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+  -webkit-appearance: none;
 }
-.vc-footer{
-  padding:12px 20px;border-top:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  background:var(--s2);
+input:focus, textarea:focus, select:focus {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 3px var(--acc-dim);
+  background: var(--bg4);
 }
-.vc-words{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
-.vc-testing{font-size:12px;color:var(--muted2);font-style:italic;}
+input::placeholder, textarea::placeholder { color: var(--txt3); font-weight: 400; }
+select option { background: var(--bg3); }
+textarea { resize: vertical; line-height: 1.6; }
 
-/* ── STORYBOARD PAGE ── */
-.sb-page{
-  display:none;position:fixed;inset:0;
-  background:var(--bg);z-index:1000;overflow-y:auto;
-}
-.sb-shell{max-width:980px;margin:0 auto;padding:36px 28px 100px;}
+.frow { margin-bottom: 20px; }
+.frow:last-child { margin-bottom: 0; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+@media(max-width:640px){ .g2,.g3 { grid-template-columns: 1fr; } }
 
-.sb-nav{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:40px;flex-wrap:wrap;gap:12px;
-}
-.btn-back{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:11px 20px;background:var(--s1);
-  border:1px solid var(--border2);border-radius:12px;
-  color:var(--text2);font-size:14px;font-weight:500;
-  cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;
-}
-.btn-back:hover{border-color:var(--border3);color:var(--text);}
+.hr { height: 1px; background: var(--line); margin: 22px 0; }
 
-.sb-header{margin-bottom:36px;}
-.sb-eyebrow{
-  font-family:'JetBrains Mono',monospace;font-size:11px;
-  letter-spacing:.2em;text-transform:uppercase;
-  color:var(--acc);margin-bottom:12px;
-  display:flex;align-items:center;gap:10px;
+/* ═══ CHOICE PILLS ═══ */
+.choice-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.choice-pill {
+  padding: 10px 20px;
+  background: var(--bg3); border: 1px solid var(--line2);
+  border-radius: 100px; cursor: pointer;
+  font-family: 'Familjen Grotesk', sans-serif;
+  font-size: 13px; font-weight: 600; color: var(--txt2);
+  transition: all .2s; user-select: none;
 }
-.sb-eyebrow::before{content:'';width:24px;height:1px;background:var(--acc);}
-.sb-title{
-  font-family:'Syne',sans-serif;
-  font-size:clamp(32px,5vw,56px);font-weight:800;
-  line-height:1;letter-spacing:-.03em;margin-bottom:16px;
+.choice-pill:hover { border-color: var(--line3); color: var(--txt); }
+.choice-pill.active {
+  background: var(--acc); border-color: var(--acc);
+  color: #fff;
+  box-shadow: 0 4px 16px var(--acc-glow);
 }
-.sb-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.sb-chip{
-  display:inline-flex;align-items:center;gap:6px;
-  font-family:'JetBrains Mono',monospace;font-size:11px;
-  padding:6px 14px;border-radius:100px;
-  border:1px solid var(--border2);color:var(--muted2);
+
+/* ═══ TOGGLE SWITCH ═══ */
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; border-bottom: 1px solid var(--line);
+}
+.toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
+.toggle-label { font-size: 14px; font-weight: 600; color: var(--txt); }
+.toggle-desc { font-size: 12px; color: var(--txt3); margin-top: 2px; }
+.sw {
+  width: 44px; height: 24px; background: var(--bg4); border: 1px solid var(--line2);
+  border-radius: 100px; cursor: pointer; position: relative; flex-shrink: 0;
+  transition: background .2s;
+}
+.sw::after {
+  content: ''; position: absolute;
+  width: 16px; height: 16px; top: 3px; left: 3px;
+  background: var(--txt3); border-radius: 50%; transition: all .2s;
+}
+.sw.on { background: var(--acc); border-color: var(--acc); }
+.sw.on::after { transform: translateX(20px); background: #fff; }
+
+/* ═══ DROPZONE ═══ */
+.drop {
+  border: 1.5px dashed var(--line2); border-radius: var(--r2);
+  padding: 44px 28px; text-align: center; cursor: pointer;
+  transition: all .3s; position: relative; background: var(--bg3);
+}
+.drop:hover, .drop.over {
+  border-color: var(--acc);
+  background: var(--acc-dim);
+}
+.drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.drop-icon { font-size: 36px; display: block; margin-bottom: 14px; }
+.drop-title { font-family: 'Unbounded', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: -.01em; margin-bottom: 6px; }
+.drop-hint { font-size: 12px; color: var(--txt3); }
+
+.file-list { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.file-item {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--bg3); border: 1px solid var(--line);
+  border-radius: var(--r); padding: 14px 18px;
+  animation: slideUp .3s ease;
+}
+@keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+.fi-ico { font-size: 20px; flex-shrink: 0; }
+.fi-info { flex: 1; min-width: 0; }
+.fi-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fi-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--txt3); margin-top: 3px; }
+.fi-ok {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  padding: 4px 12px; border-radius: 100px;
+  background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,229,160,.2);
+  flex-shrink: 0;
+}
+.fi-rm {
+  background: none; border: none; color: var(--txt3);
+  cursor: pointer; font-size: 18px; line-height: 1;
+  transition: color .2s; padding: 2px 6px; flex-shrink: 0;
+}
+.fi-rm:hover { color: var(--red); }
+
+/* ═══ NUMBER STEPPER ═══ */
+.stepper {
+  display: flex; align-items: center; gap: 0;
+  background: var(--bg3); border: 1px solid var(--line2);
+  border-radius: var(--r); overflow: hidden; width: fit-content;
+}
+.stepper-btn {
+  width: 44px; height: 46px;
+  background: none; border: none;
+  color: var(--txt2); font-size: 20px; cursor: pointer;
+  transition: all .2s; display: flex; align-items: center; justify-content: center;
+}
+.stepper-btn:hover { background: var(--bg4); color: var(--acc); }
+.stepper-val {
+  width: 52px; text-align: center;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 18px; font-weight: 700; color: var(--txt);
+  border-left: 1px solid var(--line); border-right: 1px solid var(--line);
+  padding: 0; line-height: 46px; background: none;
+}
+
+/* ═══ BIG BUTTON ═══ */
+.btn-primary {
+  width: 100%; padding: 22px;
+  background: var(--acc);
+  color: #fff; border: none; border-radius: var(--r2);
+  font-family: 'Unbounded', sans-serif;
+  font-size: 14px; font-weight: 800; letter-spacing: .06em;
+  cursor: pointer; transition: all .3s; position: relative; overflow: hidden;
+  box-shadow: 0 8px 32px var(--acc-glow);
+  margin-top: 8px;
+}
+.btn-primary::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,.12) 0%, transparent 60%);
+  opacity: 0; transition: opacity .2s;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 48px var(--acc-glow); }
+.btn-primary:hover::before { opacity: 1; }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { opacity: .35; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-primary.green {
+  background: var(--green);
+  box-shadow: 0 8px 32px rgba(0,229,160,.2);
+  color: #000;
+}
+.btn-primary.green:hover { box-shadow: 0 16px 48px rgba(0,229,160,.3); }
+
+.btn-sec {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 20px; background: var(--bg3);
+  border: 1px solid var(--line2); border-radius: var(--r);
+  color: var(--txt2); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+  font-family: 'Familjen Grotesk', sans-serif;
+}
+.btn-sec:hover { border-color: var(--line3); color: var(--txt); }
+.btn-sec.acc { border-color: var(--acc-glow); color: var(--acc); background: var(--acc-dim); }
+.btn-sec.acc:hover { background: rgba(255,106,26,.2); }
+
+/* ═══ PROGRESS ═══ */
+.prog-wrap { display: none; margin-top: 22px; }
+.prog-track { height: 2px; background: var(--bg4); border-radius: 100px; margin-bottom: 18px; overflow: hidden; }
+.prog-fill {
+  height: 100%; width: 0%; border-radius: 100px;
+  background: linear-gradient(90deg, var(--acc), var(--gold));
+  transition: width .6s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 0 12px var(--acc-glow);
+}
+.prog-steps { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.ps {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  padding: 5px 12px; border-radius: 100px;
+  background: var(--bg3); color: var(--txt3); border: 1px solid var(--line);
+  transition: all .3s;
+}
+.ps.active { background: var(--acc-dim); color: var(--acc); border-color: var(--acc-glow); }
+.ps.done { background: var(--green-dim); color: var(--green); border-color: rgba(0,229,160,.2); }
+.prog-msg { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--txt3); text-align: center; }
+
+/* ═══ RESULTS — ABA 1 ═══ */
+#results1 { display: none; margin-top: 48px; }
+
+.res-banner {
+  padding: 44px 0 32px;
+  border-top: 1px solid var(--line);
+  display: flex; align-items: flex-end; justify-content: space-between;
+  flex-wrap: wrap; gap: 20px; margin-bottom: 36px;
+}
+.res-kicker {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: .25em; text-transform: uppercase;
+  color: var(--acc); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.res-kicker::before { content: ''; width: 20px; height: 1px; background: var(--acc); }
+.res-headline {
+  font-family: 'Unbounded', sans-serif;
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 900; letter-spacing: -.04em; line-height: .95;
+}
+.res-headline em { color: var(--acc); font-style: normal; }
+
+/* analysis block */
+.ana-block {
+  display: none;
+  background: var(--bg2); border: 1px solid var(--line);
+  border-left: 3px solid var(--acc);
+  border-radius: var(--r2); padding: 24px 28px; margin-bottom: 24px;
+}
+.ana-kicker {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--acc);
+  margin-bottom: 12px;
+}
+.ana-body { font-size: 14px; line-height: 1.8; color: var(--txt2); }
+
+/* patterns */
+.pat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 32px; }
+@media(max-width:640px){ .pat-row { grid-template-columns: 1fr; } }
+.pat-card {
+  background: var(--bg2); border: 1px solid var(--line);
+  border-radius: var(--r); padding: 20px;
+  animation: slideUp .4s ease both;
+}
+.pat-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  letter-spacing: .2em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 100px;
+  display: inline-block; margin-bottom: 10px;
+}
+.tag-g { background: var(--red-dim); color: var(--red); }
+.tag-c { background: var(--gold-dim); color: var(--gold); }
+.tag-cta { background: var(--blue-dim); color: var(--blue); }
+.pat-text { font-size: 13px; color: var(--txt2); line-height: 1.65; font-style: italic; }
+
+/* variation cards */
+.var-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media(max-width:760px){ .var-grid { grid-template-columns: 1fr; } }
+
+.var-card {
+  background: var(--bg2); border: 1px solid var(--line);
+  border-radius: var(--r2); overflow: hidden; cursor: pointer;
+  transition: all .25s; animation: slideUp .4s ease both;
+  position: relative;
+}
+.var-card:hover {
+  border-color: var(--acc-glow);
+  transform: translateY(-3px);
+  box-shadow: 0 20px 60px rgba(0,0,0,.3), 0 0 0 1px var(--acc-dim);
+}
+
+.vc-head { padding: 20px 22px; }
+.vc-top { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.vc-index {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  background: var(--bg4); color: var(--txt3);
+  padding: 3px 8px; border-radius: 4px;
+}
+.vc-name {
+  font-family: 'Unbounded', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: -.02em; flex: 1; line-height: 1.2;
+}
+.vc-type {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 100px; flex-shrink: 0;
+}
+.type-vid { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(77,166,255,.2); }
+.type-img { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(255,204,68,.2); }
+.vc-eixo {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 100px; flex-shrink: 0;
+}
+.ex-g { background: var(--red-dim); color: var(--red); }
+.ex-f { background: var(--gold-dim); color: var(--gold); }
+.ex-c { background: var(--blue-dim); color: var(--blue); }
+
+/* score ring */
+.score-row { display: flex; align-items: center; gap: 14px; }
+.score-ring { position: relative; width: 58px; height: 58px; flex-shrink: 0; }
+.score-ring svg { transform: rotate(-90deg); }
+.srb { fill: none; stroke: var(--bg4); stroke-width: 4; }
+.srf { fill: none; stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset .9s ease; }
+.score-num {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: 'Unbounded', sans-serif; font-size: 13px; font-weight: 800;
+}
+.score-details { flex: 1; }
+.score-lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  letter-spacing: .15em; text-transform: uppercase; color: var(--txt3); margin-bottom: 5px;
+}
+.score-why { font-size: 12px; color: var(--txt2); line-height: 1.5; }
+
+.vc-preview {
+  padding: 0 22px 16px;
+  font-size: 13px; color: var(--txt2); line-height: 1.7;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.vc-foot {
+  padding: 12px 22px;
+  border-top: 1px solid var(--line);
+  background: var(--bg3);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.vc-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--txt3); }
+.vc-cta-hint { font-size: 11px; color: var(--acc); font-weight: 600; opacity: 0; transition: opacity .2s; }
+.var-card:hover .vc-cta-hint { opacity: 1; }
+
+/* ═══ DETAIL PAGE ═══ */
+.detail-page {
+  display: none; position: fixed; inset: 0;
+  background: var(--bg); z-index: 1000; overflow-y: auto;
+}
+.detail-wrap { max-width: 1000px; margin: 0 auto; padding: 36px 28px 100px; }
+
+.detail-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 44px; flex-wrap: wrap; gap: 12px;
+}
+
+.detail-hero { margin-bottom: 44px; }
+.detail-eyebrow {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: .25em; text-transform: uppercase; color: var(--acc);
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+}
+.detail-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--acc); }
+.detail-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 900; letter-spacing: -.04em; line-height: 1; margin-bottom: 18px;
+}
+.detail-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  padding: 6px 14px; border-radius: 100px;
+  background: var(--bg3); border: 1px solid var(--line2);
+  color: var(--txt2);
 }
 
 /* score big */
-.score-big{
-  display:flex;align-items:center;gap:24px;
-  background:linear-gradient(135deg,var(--s1),var(--s2));
-  border:1px solid var(--border2);border-radius:18px;
-  padding:24px 28px;margin-bottom:32px;
+.score-hero {
+  background: var(--bg2); border: 1px solid var(--line);
+  border-radius: var(--r2); padding: 28px 32px;
+  display: flex; align-items: center; gap: 28px;
+  margin-bottom: 36px; flex-wrap: wrap;
 }
-.score-big-ring{position:relative;width:90px;height:90px;flex-shrink:0;}
-.score-big-ring svg{transform:rotate(-90deg);}
-.score-big-num{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.02em;
+.score-hero-ring { position: relative; width: 96px; height: 96px; flex-shrink: 0; }
+.score-hero-ring svg { transform: rotate(-90deg); }
+.score-hero-num {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: 'Unbounded', sans-serif; font-size: 30px; font-weight: 900; letter-spacing: -.03em;
 }
-.score-big-info{flex:1;}
-.score-big-label{
-  font-family:'JetBrains Mono',monospace;font-size:10px;
-  text-transform:uppercase;letter-spacing:.2em;color:var(--muted);margin-bottom:8px;
+.score-hero-info { flex: 1; }
+.score-hero-lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--txt3); margin-bottom: 8px;
 }
-.score-big-why{font-size:15px;color:var(--text);line-height:1.6;margin-bottom:12px;font-weight:500;}
-.score-factors{display:flex;flex-wrap:wrap;gap:8px;}
-.sf{
-  font-family:'JetBrains Mono',monospace;font-size:11px;
-  padding:5px 12px;border-radius:100px;
-  background:var(--s3);color:var(--muted2);border:1px solid var(--border);
+.score-hero-why { font-size: 15px; font-weight: 600; color: var(--txt); margin-bottom: 14px; line-height: 1.5; }
+.factors { display: flex; flex-wrap: wrap; gap: 8px; }
+.factor {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  padding: 5px 12px; border-radius: 100px;
+  background: var(--bg3); color: var(--txt3); border: 1px solid var(--line);
 }
-.sf.pos{background:rgba(0,214,143,.08);color:var(--green);border-color:rgba(0,214,143,.2);}
-.sf.neg{background:rgba(255,77,109,.08);color:var(--red);border-color:rgba(255,77,109,.2);}
+.factor.pos { background: var(--green-dim); color: var(--green); border-color: rgba(0,229,160,.2); }
+.factor.neg { background: var(--red-dim); color: var(--red); border-color: rgba(255,68,102,.2); }
 
-/* storyboard */
-.sb-sec-title{
-  font-family:'Syne',sans-serif;font-size:22px;font-weight:700;
-  letter-spacing:-.02em;margin-bottom:18px;
-  display:flex;align-items:center;gap:14px;
+/* script block */
+.script-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 36px; }
+@media(max-width:640px){ .script-grid { grid-template-columns: 1fr; } }
+.script-card {
+  background: var(--bg2); border: 1px solid var(--line);
+  border-radius: var(--r); padding: 20px;
 }
-.sb-sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.script-zone {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  letter-spacing: .2em; text-transform: uppercase;
+  margin-bottom: 10px; display: flex; align-items: center; gap: 7px;
+}
+.script-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.script-text { font-size: 13px; line-height: 1.75; color: var(--txt2); }
 
-.sb-scenes{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+/* scene blocks */
+.scene-list { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--r2); overflow: hidden; margin-bottom: 24px; }
+.scene {
+  display: grid; grid-template-columns: 100px 1fr;
+  border-bottom: 1px solid var(--line); transition: background .15s;
+}
+.scene:last-child { border-bottom: none; }
+.scene:hover { background: rgba(255,255,255,.015); }
+@media(max-width:580px){ .scene { grid-template-columns: 1fr; } }
 
-.scene{
-  display:grid;grid-template-columns:110px 1fr;
-  border-bottom:1px solid var(--border);
-  transition:background .2s;
+.scene-left {
+  background: var(--bg3); padding: 18px 14px;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-start; gap: 8px;
+  border-right: 1px solid var(--line);
 }
-.scene:last-child{border-bottom:none;}
-.scene:hover{background:rgba(255,255,255,.015);}
-@media(max-width:600px){.scene{grid-template-columns:1fr;}}
-
-.scene-tc{
-  background:var(--s2);padding:18px 14px;
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
-  gap:8px;border-right:1px solid var(--border);
+@media(max-width:580px){ .scene-left { flex-direction: row; border-right: none; border-bottom: 1px solid var(--line); } }
+.scene-zone-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 4px 8px; border-radius: 4px; font-weight: 600;
 }
-@media(max-width:600px){.scene-tc{flex-direction:row;border-right:none;border-bottom:1px solid var(--border);}}
-.scene-zone{
-  font-family:'JetBrains Mono',monospace;font-size:10px;
-  padding:4px 10px;border-radius:5px;
-  text-transform:uppercase;letter-spacing:.1em;text-align:center;font-weight:500;
+.sz-g { background: var(--red-dim); color: var(--red); }
+.sz-c { background: var(--gold-dim); color: var(--gold); }
+.sz-t { background: var(--blue-dim); color: var(--blue); }
+.scene-n {
+  font-family: 'Unbounded', sans-serif; font-size: 18px; font-weight: 900;
+  color: var(--txt3); line-height: 1;
 }
-.z-g{background:rgba(255,77,109,.15);color:var(--red);}
-.z-c{background:rgba(245,200,66,.1);color:var(--gold);}
-.z-t{background:rgba(77,159,255,.15);color:var(--blue);}
-.scene-time{
-  font-family:'JetBrains Mono',monospace;font-size:12px;
-  color:var(--text);font-weight:500;text-align:center;line-height:1.4;
+.scene-src {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  padding: 3px 8px; border-radius: 4px; text-align: center;
+  background: var(--acc-dim); color: var(--acc); white-space: nowrap;
 }
-.scene-src{
-  font-family:'JetBrains Mono',monospace;font-size:10px;
-  color:var(--acc);background:rgba(232,98,42,.1);
-  padding:3px 10px;border-radius:5px;text-align:center;
-}
-
-.scene-content{padding:18px 24px;display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-@media(max-width:500px){.scene-content{grid-template-columns:1fr;}}
-
-.sc-block{}
-.sc-label{
-  font-family:'JetBrains Mono',monospace;font-size:10px;
-  text-transform:uppercase;letter-spacing:.15em;color:var(--muted2);margin-bottom:8px;
-}
-.sc-text{font-size:14px;line-height:1.7;color:var(--text);font-weight:400;}
-.sc-instruction{font-size:13px;line-height:1.65;color:var(--muted2);font-style:italic;}
-
-.btn-cp-sb{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:7px 14px;background:var(--s2);
-  border:1px solid var(--border);border-radius:8px;
-  color:var(--muted2);font-size:12px;cursor:pointer;
-  transition:all .2s;margin-top:10px;font-family:'Inter',sans-serif;font-weight:500;
-}
-.btn-cp-sb:hover{border-color:var(--border3);color:var(--text);}
-.btn-cp-sb.ok{border-color:var(--green);color:var(--green);}
-
-.btn-sb-export{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:13px 22px;border-radius:12px;
-  font-size:14px;cursor:pointer;transition:all .2s;
-  font-family:'Inter',sans-serif;font-weight:600;
-}
-.btn-sb-copy{background:var(--s2);border:1px solid var(--border2);color:var(--text2);}
-.btn-sb-copy:hover{border-color:var(--acc);color:var(--acc);}
-.btn-sb-dl{background:var(--acc);border:none;color:#fff;box-shadow:0 4px 16px rgba(232,98,42,.3);}
-.btn-sb-dl:hover{opacity:.88;transform:translateY(-1px);}
-
-/* ── RENDER TAB ── */
-.render-status{
-  display:none;background:var(--s1);border:1px solid var(--border);
-  border-radius:16px;padding:24px;margin-top:18px;
-}
-.rs-label{
-  font-family:'JetBrains Mono',monospace;font-size:11px;
-  text-transform:uppercase;letter-spacing:.15em;color:var(--muted2);margin-bottom:14px;
-}
-.rs-prog-bg{height:4px;background:var(--s3);border-radius:100px;overflow:hidden;margin-bottom:12px;}
-.rs-prog-fill{
-  height:100%;width:0%;
-  background:linear-gradient(90deg,var(--green),var(--green2));
-  border-radius:100px;transition:width .4s ease;
-}
-.rs-text{font-size:14px;color:var(--muted2);}
-
-.render-results{display:none;margin-top:18px;}
-.rr-title{
-  font-family:'Syne',sans-serif;font-size:24px;font-weight:700;
-  letter-spacing:-.02em;margin-bottom:18px;
-}
-.rr-grid{display:flex;flex-direction:column;gap:12px;}
-.rr-item{
-  background:var(--s1);border:1px solid var(--border);border-radius:14px;
-  padding:18px 22px;display:flex;align-items:center;
-  justify-content:space-between;gap:16px;flex-wrap:wrap;
-  animation:slideUp .3s ease;
-}
-.rr-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:-.01em;}
-.rr-meta{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted2);}
-.btn-dl-video{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:11px 22px;
-  background:linear-gradient(135deg,var(--green),#00b87d);
-  border:none;border-radius:10px;color:#000;
-  font-size:13px;font-weight:700;cursor:pointer;
-  transition:all .2s;font-family:'Inter',sans-serif;
-  text-decoration:none;box-shadow:0 4px 16px rgba(0,214,143,.25);
-}
-.btn-dl-video:hover{opacity:.9;transform:translateY(-1px);}
-
-.var-sel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:12px;}
-.var-sel-item{
-  background:var(--s2);border:1px solid var(--border);
-  border-radius:12px;padding:14px 16px;cursor:pointer;
-  transition:all .2s;display:flex;align-items:center;gap:10px;
-}
-.var-sel-item:hover{border-color:var(--border2);}
-.var-sel-item.selected{border-color:rgba(232,98,42,.4);background:rgba(232,98,42,.05);}
-.var-sel-item input[type=checkbox]{accent-color:var(--acc);width:16px;height:16px;flex-shrink:0;}
-.var-sel-name{font-size:13px;font-weight:600;line-height:1.3;letter-spacing:-.01em;}
-.var-sel-score{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2);margin-top:3px;}
-
-.no-variations-msg{
-  background:rgba(232,98,42,.04);border:1px solid rgba(232,98,42,.12);
-  border-radius:12px;padding:24px;text-align:center;
-  color:var(--muted2);font-size:14px;line-height:1.6;
+.scene-ts {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--txt3); text-align: center; line-height: 1.5;
 }
 
-/* ── BACKUP BAR ── */
-.backup-bar{
-  position:fixed;bottom:0;left:0;right:0;z-index:500;
-  background:rgba(14,15,26,.95);
-  backdrop-filter:blur(20px);
-  border-top:1px solid var(--border);
-  padding:12px 28px;
-  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+.scene-right { padding: 18px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media(max-width:480px){ .scene-right { grid-template-columns: 1fr; } }
+.sc-lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  letter-spacing: .15em; text-transform: uppercase; color: var(--txt3); margin-bottom: 8px;
 }
-.backup-bar-left{display:flex;align-items:center;gap:10px;}
-.backup-label{
-  font-family:'JetBrains Mono',monospace;font-size:11px;
-  text-transform:uppercase;letter-spacing:.15em;color:var(--muted);
-  display:flex;align-items:center;gap:6px;
-}
-.backup-label::before{content:'💾';}
-.btn-backup{
-  display:inline-flex;align-items:center;gap:7px;
-  padding:8px 16px;border-radius:9px;
-  font-size:13px;font-weight:600;cursor:pointer;
-  transition:all .2s;font-family:'Inter',sans-serif;
-  border:1px solid var(--border2);
-}
-.btn-bk-save{background:rgba(0,214,143,.06);color:var(--green);border-color:rgba(0,214,143,.2);}
-.btn-bk-save:hover{background:rgba(0,214,143,.15);}
-.btn-bk-restore{background:rgba(77,159,255,.06);color:var(--blue);border-color:rgba(77,159,255,.2);}
-.btn-bk-restore:hover{background:rgba(77,159,255,.15);}
-.backup-ts{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);display:none;}
-#restoreInput{display:none;}
+.sc-narr { font-size: 13px; line-height: 1.75; color: var(--txt); }
+.sc-instr { font-size: 12px; line-height: 1.65; color: var(--txt2); font-style: italic; }
 
-/* ── TOAST ── */
-.toast{
-  position:fixed;bottom:72px;right:24px;
-  background:var(--s1);border:1px solid var(--green);color:var(--green);
-  padding:13px 22px;border-radius:12px;
-  font-family:'JetBrains Mono',monospace;font-size:12px;
-  z-index:99999;transform:translateY(70px);opacity:0;
-  transition:all .3s;display:flex;align-items:center;gap:8px;
-  box-shadow:0 8px 32px rgba(0,0,0,.4);
+/* prompt box */
+.prompt-box {
+  background: var(--bg3); border: 1px solid var(--line2);
+  border-radius: var(--r); padding: 18px 20px; margin-top: 10px;
+  position: relative;
 }
-.toast.show{transform:translateY(0);opacity:1;}
-.toast.err{border-color:var(--red);color:var(--red);}
+.prompt-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--acc);
+  margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+.prompt-label::before { content: ''; width: 12px; height: 1px; background: var(--acc); }
+.prompt-text {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--txt2); line-height: 1.8; white-space: pre-wrap;
+}
+.btn-copy-prompt {
+  position: absolute; top: 12px; right: 12px;
+  padding: 5px 12px; border-radius: 6px;
+  background: var(--bg4); border: 1px solid var(--line2);
+  color: var(--txt3); font-size: 11px; cursor: pointer;
+  transition: all .2s; font-family: 'JetBrains Mono', monospace;
+}
+.btn-copy-prompt:hover { color: var(--acc); border-color: var(--acc-glow); }
+.btn-copy-prompt.ok { color: var(--green); border-color: rgba(0,229,160,.3); }
 
-::-webkit-scrollbar{width:5px;height:5px;}
-::-webkit-scrollbar-track{background:var(--s1);}
-::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px;}
+/* action row */
+.action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+.btn-dl {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 24px; border-radius: var(--r);
+  font-family: 'Familjen Grotesk', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all .2s; text-decoration: none;
+}
+.btn-dl-primary { background: var(--acc); color: #fff; border: none; box-shadow: 0 4px 16px var(--acc-glow); }
+.btn-dl-primary:hover { opacity: .88; transform: translateY(-1px); }
+.btn-dl-sec { background: var(--bg3); border: 1px solid var(--line2); color: var(--txt2); }
+.btn-dl-sec:hover { border-color: var(--line3); color: var(--txt); }
+
+/* ═══ RESULTS — ABA 2 ═══ */
+.render-status {
+  display: none; background: var(--bg2); border: 1px solid var(--line);
+  border-radius: var(--r2); padding: 24px 28px; margin-top: 18px;
+}
+.rs-kicker { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--txt3); margin-bottom: 14px; }
+.rs-track { height: 3px; background: var(--bg4); border-radius: 100px; overflow: hidden; margin-bottom: 12px; }
+.rs-fill { height: 100%; width: 0%; background: linear-gradient(90deg,var(--green),var(--blue)); border-radius: 100px; transition: width .4s ease; }
+.rs-msg { font-size: 13px; color: var(--txt2); }
+
+.render-out { display: none; margin-top: 20px; }
+.rout-title { font-family: 'Unbounded', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -.03em; margin-bottom: 18px; }
+
+.rout-item {
+  background: var(--bg2); border: 1px solid var(--line); border-radius: var(--r2);
+  padding: 22px 26px; margin-bottom: 14px;
+  animation: slideUp .3s ease;
+}
+.rout-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.rout-name { font-family: 'Unbounded', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: -.02em; }
+.rout-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--txt3); margin-top: 4px; }
+.btn-dl-video {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 11px 22px; background: var(--green); border: none;
+  border-radius: var(--r); color: #000;
+  font-family: 'Familjen Grotesk', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; text-decoration: none; transition: all .2s;
+  box-shadow: 0 4px 14px rgba(0,229,160,.25);
+}
+.btn-dl-video:hover { opacity: .88; transform: translateY(-1px); }
+
+.rout-report {
+  background: var(--bg3); border: 1px solid var(--line);
+  border-radius: var(--r); padding: 18px 20px;
+}
+.rout-report-title {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--txt3);
+  margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
+}
+.cut-list { display: flex; flex-direction: column; gap: 10px; }
+.cut-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 14px; background: var(--bg2); border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.cut-zone {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 4px; flex-shrink: 0; margin-top: 1px;
+}
+.cut-body { flex: 1; }
+.cut-ts { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--acc); margin-bottom: 5px; }
+.cut-fala { font-size: 12px; color: var(--txt); line-height: 1.6; margin-bottom: 5px; }
+.cut-why { font-size: 11px; color: var(--txt3); font-style: italic; }
+
+/* var select */
+.var-sel-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap: 10px; margin-top: 12px; }
+.var-sel-item {
+  background: var(--bg3); border: 1px solid var(--line);
+  border-radius: var(--r); padding: 14px 16px;
+  cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; gap: 10px;
+}
+.var-sel-item:hover { border-color: var(--line2); }
+.var-sel-item.on { border-color: var(--acc-glow); background: var(--acc-dim); }
+.var-sel-item input[type=checkbox] { accent-color: var(--acc); width: 15px; height: 15px; flex-shrink: 0; }
+.vsi-name { font-size: 13px; font-weight: 600; line-height: 1.3; }
+.vsi-score { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--txt3); margin-top: 2px; }
+
+/* ═══ BACKUP BAR ═══ */
+.backup-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 500;
+  background: rgba(10,10,10,.92); backdrop-filter: blur(24px);
+  border-top: 1px solid var(--line);
+  padding: 12px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+[data-theme="light"] .backup-bar { background: rgba(250,250,250,.92); }
+.bk-left { display: flex; align-items: center; gap: 10px; }
+.bk-lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--txt3);
+}
+.btn-bk {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 8px; cursor: pointer;
+  font-family: 'Familjen Grotesk', sans-serif; font-size: 12px; font-weight: 600;
+  transition: all .2s; border: 1px solid var(--line2);
+}
+.btn-bk-save { background: var(--green-dim); color: var(--green); border-color: rgba(0,229,160,.2); }
+.btn-bk-save:hover { background: rgba(0,229,160,.18); }
+.btn-bk-load { background: var(--blue-dim); color: var(--blue); border-color: rgba(77,166,255,.2); }
+.btn-bk-load:hover { background: rgba(77,166,255,.18); }
+.bk-ts { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--txt3); display: none; }
+#restoreInput { display: none; }
+
+/* ═══ TOAST ═══ */
+.toast {
+  position: fixed; bottom: 68px; right: 24px;
+  background: var(--bg2); border: 1px solid var(--green);
+  color: var(--green); padding: 13px 22px; border-radius: var(--r);
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  z-index: 9999; transform: translateY(60px); opacity: 0;
+  transition: all .3s; box-shadow: var(--shadow-lg);
+  display: flex; align-items: center; gap: 8px; pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.err { border-color: var(--red); color: var(--red); }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
 </style>
 </head>
 <body>
-<div class="bg-grid"></div>
-<div class="bg-orb orb1"></div>
-<div class="bg-orb orb2"></div>
-<div class="bg-orb orb3"></div>
-
-<!-- BACKUP BAR -->
-<div class="backup-bar">
-  <div class="backup-bar-left">
-    <span class="backup-label">Backup Local</span>
-    <button class="btn-backup btn-bk-save" onclick="saveBackup()">⬇ Salvar</button>
-    <button class="btn-backup btn-bk-restore" onclick="document.getElementById('restoreInput').click()">⬆ Restaurar</button>
-    <input type="file" id="restoreInput" accept=".json" onchange="restoreBackup(event)"/>
-  </div>
-  <span class="backup-ts" id="backupTs"></span>
-</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- STORYBOARD PAGE -->
-<div class="sb-page" id="sbPage">
-  <div class="sb-shell">
-    <div class="sb-nav">
-      <button class="btn-back" onclick="closeSB()">← Voltar aos Criativos</button>
-      <div style="display:flex;gap:10px;" id="sbActions"></div>
+<!-- BACKUP BAR -->
+<div class="backup-bar">
+  <div class="bk-left">
+    <span class="bk-lbl">Backup</span>
+    <button class="btn-bk btn-bk-save" onclick="saveBackup()">⬇ Salvar</button>
+    <button class="btn-bk btn-bk-load" onclick="document.getElementById('restoreInput').click()">⬆ Restaurar</button>
+    <input type="file" id="restoreInput" accept=".json" onchange="restoreBackup(event)"/>
+  </div>
+  <span class="bk-ts" id="bkTs"></span>
+</div>
+
+<!-- DETAIL PAGE ABA 1 -->
+<div class="detail-page" id="detailPage">
+  <div class="detail-wrap">
+    <div class="detail-nav">
+      <button class="btn-sec" onclick="closeDetail()">← Voltar</button>
+      <div style="display:flex;gap:8px;" id="detailActions"></div>
     </div>
-    <div id="sbContent"></div>
+    <div id="detailContent"></div>
   </div>
 </div>
 
 <!-- MAIN -->
-<div class="shell" id="mainPage">
+<div class="wrap" id="mainWrap">
+
+  <!-- TOPBAR -->
   <div class="topbar">
-    <div class="logo">
-      <div class="logo-icon">🎬</div>
-      <div>
-        <div class="logo-text">Criativo<span>Studio</span></div>
-      </div>
-      <span class="logo-badge">PRO v3</span>
+    <div class="brand">
+      <div class="brand-name">HALLEY <span>CRIATIVO</span> STUDIO</div>
+      <div class="brand-sub">Geração · Edição · Performance</div>
     </div>
-    <div class="topbar-right">
-      <div class="status-pill">
-        <span class="status-dot"></span>
-        Powered by Groq · LLaMA 3.3
+    <div class="topbar-actions">
+      <div class="pill-badge">
+        <span class="pulse"></span>
+        Groq · LLaMA 3.3 70B
       </div>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alternar tema">
+        <span class="theme-toggle-icon ti-dark">🌙</span>
+        <span class="theme-toggle-icon ti-light">☀️</span>
+      </button>
     </div>
   </div>
 
   <!-- TABS -->
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('gen',this)">
-      <span>⚡</span> Gerar Criativos
+  <div class="tabs-bar">
+    <button class="tab-btn active" onclick="switchTab('t1',this)">
+      ✦ Gerar Criativos
     </button>
-    <button class="tab" onclick="switchTab('render',this)">
-      <span>🎞</span> Renderizar Vídeos
+    <button class="tab-btn" onclick="switchTab('t2',this)">
+      ✂ Editar Vídeos
     </button>
   </div>
 
-  <!-- ══ ABA GERAR ══ -->
-  <div class="tab-panel active" id="tab-gen">
+  <!-- ══════════════════════════════════════════
+       ABA 1 — GERADOR DE CRIATIVOS
+  ══════════════════════════════════════════ -->
+  <div class="tab-panel active" id="tab-t1">
 
-    <!-- STEP 1: API -->
-    <div class="card">
-      <div class="card-header">
-        <div class="step-badge">1</div>
-        <div>
-          <div class="card-title">Configuração da API</div>
-          <div class="card-subtitle">Chave Groq para geração inteligente de criativos</div>
-        </div>
+    <!-- CONFIG API -->
+    <div class="sec">
+      <div class="sec-num">01</div>
+      <div class="sec-info">
+        <div class="sec-title">API & Configuração</div>
+        <div class="sec-desc">Chave Groq para análise e geração com IA sênior em marketing</div>
       </div>
-      <div class="card-body">
+    </div>
+    <div class="block" style="margin-bottom:32px;">
+      <div class="block-body">
         <div class="frow">
-          <div class="flabel">
-            Groq API Key
-            <a href="https://console.groq.com" target="_blank">Obter chave →</a>
-          </div>
-          <input type="password" id="apiKey" placeholder="gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"/>
+          <div class="flabel">Groq API Key <a href="https://console.groq.com" target="_blank">Obter →</a></div>
+          <input type="password" id="apiKey" placeholder="gsk_xxxxxxxxxxxxxxxxxxxx"/>
         </div>
       </div>
     </div>
 
-    <!-- STEP 2: SRTs -->
-    <div class="card">
-      <div class="card-header">
-        <div class="step-badge">2</div>
-        <div>
-          <div class="card-title">Criativos Vencedores (SRT)</div>
-          <div class="card-subtitle">Faça upload dos SRTs dos anúncios que estão rodando bem — a IA analisa e extrai o que funciona</div>
-        </div>
+    <!-- UPLOAD SRTs -->
+    <div class="sec">
+      <div class="sec-num">02</div>
+      <div class="sec-info">
+        <div class="sec-title">Criativos de Referência (SRT)</div>
+        <div class="sec-desc">Upload dos SRTs de anúncios vencedores — a IA extrai os padrões que convertem</div>
       </div>
-      <div class="card-body">
-        <div class="drop" id="dropZone">
-          <input type="file" id="srtInput" accept=".srt" multiple onchange="handleFiles(this.files)"/>
+    </div>
+    <div class="block" style="margin-bottom:32px;">
+      <div class="block-body">
+        <div class="drop" id="dropSrt">
+          <input type="file" id="srtInput" accept=".srt" multiple onchange="handleSRTs(this.files)"/>
           <span class="drop-icon">📂</span>
-          <div class="drop-main">Arraste os arquivos .SRT aqui</div>
-          <div class="drop-sub">ou clique para selecionar · múltiplos arquivos aceitos</div>
+          <div class="drop-title">Arraste os arquivos .SRT aqui</div>
+          <div class="drop-hint">Múltiplos arquivos · Anúncios rodando 45+ dias</div>
         </div>
-        <div class="file-list" id="fileList"></div>
+        <div class="file-list" id="srtList"></div>
       </div>
     </div>
 
-    <!-- STEP 3: PRODUTO -->
-    <div class="card">
-      <div class="card-header">
-        <div class="step-badge">3</div>
-        <div>
-          <div class="card-title">Produto & Público</div>
-          <div class="card-subtitle">Contexto para a IA gerar criativos de alta conversão</div>
-        </div>
+    <!-- PRODUTO & PÚBLICO -->
+    <div class="sec">
+      <div class="sec-num">03</div>
+      <div class="sec-info">
+        <div class="sec-title">Produto & Público</div>
+        <div class="sec-desc">Contexto para criativos de alta conversão</div>
       </div>
-      <div class="card-body">
+    </div>
+    <div class="block" style="margin-bottom:32px;">
+      <div class="block-body">
         <div class="g2">
           <div class="frow">
             <div class="flabel">Produto / Oferta</div>
-            <input type="text" id="produto" placeholder="Ex: Biovein — suplemento para varizes"/>
+            <input type="text" id="g1produto" placeholder="Ex: Biovein — suplemento para varizes"/>
           </div>
           <div class="frow">
             <div class="flabel">Público-alvo</div>
-            <input type="text" id="publico" placeholder="Ex: Mulheres 35-60 com varizes e dor nas pernas"/>
+            <input type="text" id="g1publico" placeholder="Ex: Mulheres 35-60 com dor nas pernas"/>
           </div>
         </div>
         <div class="g2">
           <div class="frow">
-            <div class="flabel">Duração alvo (segundos)</div>
-            <input type="number" id="duracao" value="60" min="15" max="180"/>
+            <div class="flabel">Contexto / Campanha</div>
+            <input type="text" id="g1contexto" placeholder="Ex: Campanha fria, lançamento, remarketing..."/>
           </div>
           <div class="frow">
-            <div class="flabel">Contexto adicional</div>
-            <input type="text" id="contexto" placeholder="Ex: campanha fria, produto novo no mercado"/>
+            <div class="flabel">Duração alvo (segundos)</div>
+            <input type="number" id="g1duracao" value="60" min="15" max="180"/>
           </div>
-        </div>
-        <div class="divider"></div>
-        <div class="sec-label">Eixos de Teste Prioritários</div>
-        <div class="tag-group">
-          <span class="ptag on" data-tag="gancho">🎯 Gancho Emocional</span>
-          <span class="ptag on" data-tag="dor">😣 Dor & Problema</span>
-          <span class="ptag on" data-tag="prova">⭐ Prova Social</span>
-          <span class="ptag on" data-tag="autoridade">🏆 Autoridade</span>
-          <span class="ptag on" data-tag="urgencia">⏰ Urgência</span>
-          <span class="ptag" data-tag="curiosidade">🔍 Curiosidade</span>
-          <span class="ptag" data-tag="resultado">✨ Resultado Visual</span>
-          <span class="ptag" data-tag="medo">⚠️ Medo da Perda</span>
         </div>
       </div>
     </div>
 
-    <!-- GENERATE -->
-    <button class="btn-gen" id="btnGen" onclick="run()">
-      ⚡ ANALISAR E GERAR 10 CRIATIVOS
+    <!-- TIPO & VARIAÇÕES -->
+    <div class="sec">
+      <div class="sec-num">04</div>
+      <div class="sec-info">
+        <div class="sec-title">Tipo de Criativo & Variações</div>
+        <div class="sec-desc">Escolha vídeo ou imagem e quantas variações gerar</div>
+      </div>
+    </div>
+    <div class="block" style="margin-bottom:32px;">
+      <div class="block-body">
+
+        <!-- tipo -->
+        <div class="frow">
+          <div class="flabel">Tipo de Criativo</div>
+          <div class="choice-group" id="tipoGroup">
+            <span class="choice-pill active" data-val="video" onclick="selectTipo('video',this)">🎬 Vídeo</span>
+            <span class="choice-pill" data-val="imagem" onclick="selectTipo('imagem',this)">🖼 Imagem</span>
+          </div>
+        </div>
+
+        <!-- formato imagem (só aparece se imagem) -->
+        <div id="imgFormatos" style="display:none;">
+          <div class="hr"></div>
+          <div class="frow">
+            <div class="flabel">Formato da Imagem</div>
+            <div class="choice-group" id="formatoGroup">
+              <span class="choice-pill active" data-val="todos" onclick="selectFormato('todos',this)">Todos</span>
+              <span class="choice-pill" data-val="feed" onclick="selectFormato('feed',this)">Feed 1:1</span>
+              <span class="choice-pill" data-val="story" onclick="selectFormato('story',this)">Story 9:16</span>
+              <span class="choice-pill" data-val="banner" onclick="selectFormato('banner',this)">Banner 16:9</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- variações -->
+        <div class="frow">
+          <div class="flabel">Número de Variações</div>
+          <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:4px;">
+            <div class="stepper">
+              <button class="stepper-btn" onclick="changeVar(-1)">−</button>
+              <div class="stepper-val" id="varCount">5</div>
+              <button class="stepper-btn" onclick="changeVar(1)">+</button>
+            </div>
+            <span style="font-size:13px;color:var(--txt2);">variações serão geradas</span>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- eixos -->
+        <div class="frow" style="margin-bottom:0;">
+          <div class="flabel">Eixos de Persuasão Prioritários</div>
+          <div class="choice-group" id="eixosGroup" style="margin-top:10px;">
+            <span class="choice-pill active" data-tag="gancho">🎯 Gancho Emocional</span>
+            <span class="choice-pill active" data-tag="dor">😣 Dor & Problema</span>
+            <span class="choice-pill active" data-tag="prova">⭐ Prova Social</span>
+            <span class="choice-pill active" data-tag="autoridade">🏆 Autoridade</span>
+            <span class="choice-pill active" data-tag="urgencia">⏰ Urgência</span>
+            <span class="choice-pill" data-tag="curiosidade">🔍 Curiosidade</span>
+            <span class="choice-pill" data-tag="resultado">✨ Resultado Visual</span>
+            <span class="choice-pill" data-tag="medo">⚠️ Medo da Perda</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- GERAR -->
+    <button class="btn-primary" id="btnGen" onclick="runGen()">
+      ⚡ GERAR CRIATIVOS COM IA
     </button>
 
     <!-- PROGRESS -->
-    <div class="prog-wrap" id="progWrap">
-      <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-wrap" id="prog1">
+      <div class="prog-track"><div class="prog-fill" id="pf1"></div></div>
       <div class="prog-steps">
-        <span class="ps" id="ps1">① Lendo SRTs</span>
-        <span class="ps" id="ps2">② Analisando</span>
-        <span class="ps" id="ps3">③ Gerando</span>
-        <span class="ps" id="ps4">④ Processando</span>
-        <span class="ps" id="ps5">⑤ Finalizando</span>
+        <span class="ps" id="p1s1">① Lendo SRTs</span>
+        <span class="ps" id="p1s2">② Analisando</span>
+        <span class="ps" id="p1s3">③ Gerando</span>
+        <span class="ps" id="p1s4">④ Processando</span>
+        <span class="ps" id="p1s5">⑤ Finalizando</span>
       </div>
-      <div class="prog-label" id="progLabel">Preparando...</div>
+      <div class="prog-msg" id="pm1">Preparando...</div>
     </div>
 
-    <!-- RESULTS -->
-    <div id="results">
-      <div class="res-hd">
-        <div class="res-title-block">
-          <div class="res-eyebrow">// ANÁLISE CONCLUÍDA</div>
-          <div class="res-title">10 Criativos<br><em>Gerados</em></div>
-        </div>
-        <button class="btn-export" onclick="exportAll()">⬇ Exportar Todos (.txt)</button>
-      </div>
-
-      <div class="ana-box" id="anaBox">
-        <div class="ana-label">Análise dos Criativos Fonte</div>
-        <div class="ana-text" id="anaText"></div>
-      </div>
-
-      <div class="pat-grid" id="patGrid"></div>
-
-      <div class="var-grid" id="varGrid"></div>
-    </div>
-
-  </div><!-- /tab-gen -->
-
-  <!-- ══ ABA RENDERIZAR ══ -->
-  <div class="tab-panel" id="tab-render">
-
-    <!-- STEP 1: BACKEND -->
-    <div class="card">
-      <div class="card-header">
-        <div class="step-badge">1</div>
+    <!-- RESULTS ABA 1 -->
+    <div id="results1">
+      <div class="res-banner">
         <div>
-          <div class="card-title">Conexão com Backend</div>
-          <div class="card-subtitle">Servidor Hugging Face com FFmpeg para renderização</div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="frow">
-          <div class="flabel">URL do Servidor</div>
-          <input type="url" id="backendUrl" placeholder="https://wanderhalleylee-criativo-studio-backend.hf.space"/>
-        </div>
-        <div style="margin-top:10px;display:flex;gap:10px;align-items:center;">
-          <button class="btn-export" onclick="testBackend()" style="padding:10px 18px;font-size:13px;">🔗 Testar Conexão</button>
-          <span id="backendStatus" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted2);"></span>
-        </div>
-        <div class="divider"></div>
-        <div class="frow">
-          <div class="flabel">Senha de Acesso</div>
-          <input type="password" id="backendPassword" placeholder="ACCESS_PASSWORD configurado no Hugging Face"/>
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 2: VIDEOS -->
-    <div class="card">
-      <div class="card-header">
-        <div class="step-badge">2</div>
-        <div>
-          <div class="card-title">Vídeos Fonte</div>
-          <div class="card-subtitle">Os mesmos vídeos dos quais os SRTs foram extraídos</div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="drop" id="videoDropZone">
-          <input type="file" id="videoInput" accept="video/*" multiple onchange="handleVideoFiles(this.files)"/>
-          <span class="drop-icon">🎥</span>
-          <div class="drop-main">Arraste os vídeos fonte aqui</div>
-          <div class="drop-sub">video1.mp4, video2.mp4... · múltiplos aceitos</div>
-        </div>
-        <div class="file-list" id="videoFileList"></div>
-      </div>
-    </div>
-
-    <!-- STEP 3: VARIAÇÕES -->
-    <div class="card">
-      <div class="card-header">
-        <div class="step-badge">3</div>
-        <div>
-          <div class="card-title">Selecionar Variações</div>
-          <div class="card-subtitle">Escolha quais criativos renderizar</div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div id="varSelectArea">
-          <div class="no-variations-msg">
-            Nenhum criativo gerado ainda.<br>
-            Vá para a aba <strong>Gerar Criativos</strong> primeiro.
+          <div class="res-kicker">// Análise Concluída</div>
+          <div class="res-headline" id="resHeadline">
+            <em id="resCount">0</em> Criativos<br>Gerados
           </div>
         </div>
+        <button class="btn-sec" onclick="exportAll1()">⬇ Exportar Todos (.txt)</button>
+      </div>
+
+      <div class="ana-block" id="anaBlock">
+        <div class="ana-kicker">// Análise dos Criativos Fonte</div>
+        <div class="ana-body" id="anaBody"></div>
+      </div>
+
+      <div class="pat-row" id="patRow"></div>
+      <div class="var-grid" id="varGrid1"></div>
+    </div>
+
+  </div><!-- /tab-t1 -->
+
+  <!-- ══════════════════════════════════════════
+       ABA 2 — EDITOR DE VÍDEOS
+  ══════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-t2">
+
+    <!-- CONFIG API -->
+    <div class="sec">
+      <div class="sec-num">01</div>
+      <div class="sec-info">
+        <div class="sec-title">API & Backend</div>
+        <div class="sec-desc">Groq para análise persuasiva + Hugging Face para renderização</div>
+      </div>
+    </div>
+    <div class="block" style="margin-bottom:32px;">
+      <div class="block-body">
+        <div class="g2">
+          <div class="frow">
+            <div class="flabel">Groq API Key</div>
+            <input type="password" id="e2apiKey" placeholder="gsk_xxxxxxxxxxxxxxxxxxxx"/>
+          </div>
+          <div class="frow">
+            <div class="flabel">URL do Backend (Hugging Face)</div>
+            <input type="url" id="backendUrl" placeholder="https://seu-usuario-backend.hf.space"/>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap;">
+          <button class="btn-sec" onclick="testBackend()">🔗 Testar Conexão</button>
+          <span id="backendStatus" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--txt3);"></span>
+        </div>
+        <div class="hr"></div>
+        <div class="frow" style="margin-bottom:0;">
+          <div class="flabel">Senha de Acesso (ACCESS_PASSWORD)</div>
+          <input type="password" id="backendPwd" placeholder="Senha configurada no Hugging Face Secrets"/>
+        </div>
       </div>
     </div>
 
-    <!-- STEP 4: SAÍDA -->
-    <div class="card">
-      <div class="card-header">
-        <div class="step-badge">4</div>
-        <div>
-          <div class="card-title">Configurações de Saída</div>
-          <div class="card-subtitle">Formato e legenda dos vídeos renderizados</div>
-        </div>
+    <!-- UPLOAD VÍDEOS + SRTs -->
+    <div class="sec">
+      <div class="sec-num">02</div>
+      <div class="sec-info">
+        <div class="sec-title">Vídeos + Legendas (SRT)</div>
+        <div class="sec-desc">Envie os pares vídeo+SRT com o mesmo nome. Ex: aula.mp4 e aula.srt</div>
       </div>
-      <div class="card-body">
+    </div>
+    <div class="block" style="margin-bottom:32px;">
+      <div class="block-body">
+        <div class="g2">
+          <div>
+            <div class="flabel" style="margin-bottom:12px;">Vídeos (.mp4)</div>
+            <div class="drop" id="dropVid">
+              <input type="file" id="vidInput" accept="video/*" multiple onchange="handleVids(this.files)"/>
+              <span class="drop-icon">🎥</span>
+              <div class="drop-title">Arraste os vídeos</div>
+              <div class="drop-hint">1 ou mais arquivos</div>
+            </div>
+            <div class="file-list" id="vidList"></div>
+          </div>
+          <div>
+            <div class="flabel" style="margin-bottom:12px;">Legendas (.srt) — mesmo nome do vídeo</div>
+            <div class="drop" id="dropEdSrt">
+              <input type="file" id="edSrtInput" accept=".srt" multiple onchange="handleEdSRTs(this.files)"/>
+              <span class="drop-icon">📝</span>
+              <div class="drop-title">Arraste as legendas</div>
+              <div class="drop-hint">Nome igual ao vídeo</div>
+            </div>
+            <div class="file-list" id="edSrtList"></div>
+          </div>
+        </div>
+
+        <!-- status de pareamento -->
+        <div id="pairStatus" style="display:none;margin-top:16px;"></div>
+      </div>
+    </div>
+
+    <!-- CONFIGURAÇÕES DO CORTE -->
+    <div class="sec">
+      <div class="sec-num">03</div>
+      <div class="sec-info">
+        <div class="sec-title">Configurações do Criativo</div>
+        <div class="sec-desc">Duração, variações e modo de corte</div>
+      </div>
+    </div>
+    <div class="block" style="margin-bottom:32px;">
+      <div class="block-body">
+
+        <!-- duração -->
+        <div class="frow">
+          <div class="flabel">Duração Alvo</div>
+          <div class="choice-group" id="duracaoGroup">
+            <span class="choice-pill" data-val="30" onclick="selectDur(this)">30s</span>
+            <span class="choice-pill active" data-val="45" onclick="selectDur(this)">45s</span>
+            <span class="choice-pill" data-val="60" onclick="selectDur(this)">60s</span>
+            <span class="choice-pill" data-val="90" onclick="selectDur(this)">90s</span>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- variações -->
+        <div class="frow">
+          <div class="flabel">Número de Variações de Corte</div>
+          <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:4px;">
+            <div class="stepper">
+              <button class="stepper-btn" onclick="changeVarE(-1)">−</button>
+              <div class="stepper-val" id="varCountE">3</div>
+              <button class="stepper-btn" onclick="changeVarE(1)">+</button>
+            </div>
+            <span style="font-size:13px;color:var(--txt2);">versões de corte serão geradas</span>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- modo de corte -->
+        <div class="frow">
+          <div class="flabel">Modo de Corte</div>
+          <div class="choice-group" id="modoGroup">
+            <span class="choice-pill active" data-val="individual" onclick="selectModo(this)">✂ Um vídeo por vez</span>
+            <span class="choice-pill" data-val="mix" onclick="selectModo(this)">🔀 Misturar vídeos</span>
+          </div>
+          <div id="modoDesc" style="font-size:12px;color:var(--txt3);margin-top:10px;line-height:1.6;">
+            Cada variação é cortada de um único vídeo. Ideal para criar versões diferentes do mesmo conteúdo.
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- produto para a IA -->
         <div class="g2">
           <div class="frow">
-            <div class="flabel">Formato do Vídeo</div>
-            <select id="renderResolution">
+            <div class="flabel">Produto / Contexto (para a IA)</div>
+            <input type="text" id="e2produto" placeholder="Ex: Biovein — suplemento para varizes"/>
+          </div>
+          <div class="frow">
+            <div class="flabel">Público-alvo</div>
+            <input type="text" id="e2publico" placeholder="Ex: Mulheres 35-60 com varizes"/>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- saída -->
+        <div class="g2">
+          <div class="frow">
+            <div class="flabel">Formato de Saída</div>
+            <select id="renderRes">
               <option value="vertical">1080×1920 — Vertical (Reels/Stories)</option>
               <option value="square">1080×1080 — Quadrado (Feed)</option>
-              <option value="horizontal">1920×1080 — Horizontal (YouTube)</option>
+              <option value="horizontal">1920×1080 — Horizontal</option>
               <option value="original">Original (sem redimensionar)</option>
             </select>
           </div>
           <div class="frow">
-            <div class="flabel">Legendas</div>
+            <div class="flabel">Legendas no Vídeo</div>
             <select id="subtitleStyle">
               <option value="">Sem Legenda</option>
-              <option value="tiktok">Estilo TikTok (palavra por palavra)</option>
+              <option value="tiktok">Estilo TikTok (palavra a palavra)</option>
               <option value="white">Texto Branco com Sombra</option>
               <option value="yellow">Texto Amarelo com Sombra</option>
             </select>
           </div>
         </div>
+
       </div>
     </div>
 
-    <!-- RENDER BTN -->
-    <button class="btn-gen" id="btnRender" onclick="startRender()" style="background:linear-gradient(135deg,var(--green),#009e6a);box-shadow:0 8px 32px rgba(0,214,143,.2);">
-      🎞 RENDERIZAR VÍDEOS SELECIONADOS
+    <!-- EDITAR -->
+    <button class="btn-primary green" id="btnEdit" onclick="runEdit()">
+      ✂ ANALISAR E CORTAR VÍDEOS
     </button>
 
+    <!-- PROGRESS -->
+    <div class="prog-wrap" id="prog2">
+      <div class="prog-track"><div class="prog-fill" id="pf2"></div></div>
+      <div class="prog-steps">
+        <span class="ps" id="p2s1">① Lendo Legendas</span>
+        <span class="ps" id="p2s2">② Analisando Persuasão</span>
+        <span class="ps" id="p2s3">③ Selecionando Cortes</span>
+        <span class="ps" id="p2s4">④ Renderizando</span>
+        <span class="ps" id="p2s5">⑤ Finalizando</span>
+      </div>
+      <div class="prog-msg" id="pm2">Preparando...</div>
+    </div>
+
+    <!-- RENDER STATUS -->
     <div class="render-status" id="renderStatus">
-      <div class="rs-label">Progresso da Renderização</div>
-      <div class="rs-prog-bg"><div class="rs-prog-fill" id="rsProg"></div></div>
-      <div class="rs-text" id="rsText">Iniciando...</div>
+      <div class="rs-kicker">// Renderização em Progresso</div>
+      <div class="rs-track"><div class="rs-fill" id="rsFill"></div></div>
+      <div class="rs-msg" id="rsMsg">Enviando para o servidor...</div>
     </div>
 
-    <div class="render-results" id="renderResults">
-      <div class="rr-title">✓ Vídeos Prontos</div>
-      <div class="rr-grid" id="rrGrid"></div>
+    <!-- RENDER OUTPUT -->
+    <div class="render-out" id="renderOut">
+      <div class="rout-title">✓ Vídeos Prontos para Download</div>
+      <div id="routGrid"></div>
     </div>
 
-  </div><!-- /tab-render -->
+  </div><!-- /tab-t2 -->
 
-</div><!-- /shell -->
+</div><!-- /wrap -->
 <script>
-// ── STATE ──────────────────────────────────────────────────────────────────
-let srtFiles  = [];
-let videoFiles = [];
-let generated = [];
-let selectedVarIds = new Set();
+// ═══════════════════════════════════════════════════════
+//  HALLEY CRIATIVO STUDIO — JS CORE + ABA 1
+// ═══════════════════════════════════════════════════════
 
-// ── TOAST ──────────────────────────────────────────────────────────────────
-function toast(msg, isErr=false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className   = 'toast' + (isErr?' err':'') + ' show';
-  setTimeout(() => t.className = 'toast' + (isErr?' err':''), 3200);
+// ── STATE ──────────────────────────────────────────────
+const S = {
+  srtFiles:   [],   // aba 1 — SRTs de referência
+  generated:  [],   // aba 1 — criativos gerados
+  tipoVal:    'video',
+  formatoVal: 'todos',
+  varCount:   5,
+  varCountE:  3,
+  duracaoE:   45,
+  modoCorte:  'individual',
+  vidFiles:   [],   // aba 2 — vídeos
+  edSrts:     {},   // aba 2 — { stem: { raw, parsed } }
+};
+
+// ── UTILS ──────────────────────────────────────────────
+const esc  = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const delay= ms => new Promise(r=>setTimeout(r,ms));
+function toast(msg, err=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(err?' err':'')+' show';
+  setTimeout(()=>t.className='toast'+(err?' err':''),3400);
 }
+function toMs(h,m,s,ms){return(+h)*3600000+(+m)*60000+(+s)*1000+(+ms);}
+function fmtMs(ms){const t=Math.round(ms/1000),min=Math.floor(t/60),sec=t%60;return min>0?`${min}m${String(sec).padStart(2,'0')}s`:`${sec}s`;}
+function segTxt(segs){return segs.map(s=>s.text).join(' ').trim();}
+function scoreColor(s){return s>=82?'var(--green)':s>=65?'var(--gold)':s>=48?'var(--blue)':'var(--red)';}
 
-// ── TABS ──────────────────────────────────────────────────────────────────
-function switchTab(id, btn) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
+// ── THEME ──────────────────────────────────────────────
+function toggleTheme(){
+  const h=document.documentElement;
+  h.setAttribute('data-theme', h.getAttribute('data-theme')==='dark'?'light':'dark');
+  localStorage.setItem('hcs-theme', h.getAttribute('data-theme'));
+}
+(function(){
+  const t=localStorage.getItem('hcs-theme')||'dark';
+  document.documentElement.setAttribute('data-theme',t);
+})();
+
+// ── TABS ───────────────────────────────────────────────
+function switchTab(id, btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
   btn.classList.add('active');
-  if (id === 'render') refreshVarSelect();
 }
 
-// ── DRAG & DROP ───────────────────────────────────────────────────────────
-['dragover','dragleave','drop'].forEach(ev => {
-  document.addEventListener(ev, e => {
-    if (e.target.closest('#dropZone')) {
-      e.preventDefault();
-      if (ev === 'dragover') e.target.closest('#dropZone').classList.add('over');
-      if (ev === 'dragleave') e.target.closest('#dropZone').classList.remove('over');
-      if (ev === 'drop') {
-        e.target.closest('#dropZone').classList.remove('over');
-        handleFiles(e.dataTransfer.files);
-      }
-    }
-    if (e.target.closest('#videoDropZone')) {
-      e.preventDefault();
-      if (ev === 'dragover') e.target.closest('#videoDropZone').classList.add('over');
-      if (ev === 'dragleave') e.target.closest('#videoDropZone').classList.remove('over');
-      if (ev === 'drop') {
-        e.target.closest('#videoDropZone').classList.remove('over');
-        handleVideoFiles(e.dataTransfer.files);
-      }
-    }
+// ── DRAG DROP ──────────────────────────────────────────
+function setupDrop(zoneId, handler){
+  const z=document.getElementById(zoneId);
+  if(!z)return;
+  z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('over');});
+  z.addEventListener('dragleave',()=>z.classList.remove('over'));
+  z.addEventListener('drop',e=>{
+    e.preventDefault(); z.classList.remove('over');
+    handler(e.dataTransfer.files);
   });
-});
+}
+setupDrop('dropSrt',    f=>handleSRTs(f));
+setupDrop('dropVid',    f=>handleVids(f));
+setupDrop('dropEdSrt',  f=>handleEdSRTs(f));
 
-// ── SRT FILES ─────────────────────────────────────────────────────────────
-function handleFiles(files) {
-  [...files].forEach(file => {
-    if (!file.name.endsWith('.srt')) return;
-    if (srtFiles.find(f => f.name === file.name)) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      const raw    = e.target.result;
-      const parsed = parseSRT(raw, file.name);
-      srtFiles.push({ name: file.name, raw, parsed });
-      renderFileList();
+// ── STEPPERS ───────────────────────────────────────────
+function changeVar(d){
+  S.varCount=Math.min(10,Math.max(1,S.varCount+d));
+  document.getElementById('varCount').textContent=S.varCount;
+}
+function changeVarE(d){
+  S.varCountE=Math.min(10,Math.max(1,S.varCountE+d));
+  document.getElementById('varCountE').textContent=S.varCountE;
+}
+
+// ── TIPO / FORMATO / DURAÇÃO / MODO ────────────────────
+function selectTipo(val, el){
+  S.tipoVal=val;
+  document.querySelectorAll('#tipoGroup .choice-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('imgFormatos').style.display = val==='imagem'?'block':'none';
+}
+function selectFormato(val, el){
+  S.formatoVal=val;
+  document.querySelectorAll('#formatoGroup .choice-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+}
+function selectDur(el){
+  S.duracaoE=+el.dataset.val;
+  document.querySelectorAll('#duracaoGroup .choice-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+}
+function selectModo(el){
+  S.modoCorte=el.dataset.val;
+  document.querySelectorAll('#modoGroup .choice-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('modoDesc').textContent = S.modoCorte==='mix'
+    ? 'A IA vai combinar os melhores trechos de todos os vídeos enviados em cada variação.'
+    : 'Cada variação é cortada de um único vídeo. Ideal para criar versões diferentes do mesmo conteúdo.';
+}
+document.querySelectorAll('#eixosGroup .choice-pill').forEach(p=>
+  p.addEventListener('click',()=>p.classList.toggle('active'))
+);
+
+// ── SRT PARSER ─────────────────────────────────────────
+function parseSRT(raw, filename){
+  const blocks=raw.trim().split(/\n\s*\n/);
+  const segments=[];
+  blocks.forEach(block=>{
+    const lines=block.trim().split('\n');
+    const tsLine=lines.find(l=>/\d{2}:\d{2}:\d{2}[,\.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[,\.]\d{3}/.test(l));
+    if(!tsLine)return;
+    const m=tsLine.match(/(\d{2}):(\d{2}):(\d{2})[,\.](\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2})[,\.](\d{3})/);
+    if(!m)return;
+    const startMs=toMs(m[1],m[2],m[3],m[4]);
+    const endMs=toMs(m[5],m[6],m[7],m[8]);
+    const text=lines.filter(l=>!/^\d+$/.test(l.trim())&&!/-->/.test(l)).join(' ').trim();
+    if(!text)return;
+    segments.push({startMs,endMs,text,source:filename.replace(/\.[^.]+$/,'')});
+  });
+  const duration=segments.length?Math.max(...segments.map(s=>s.endMs)):0;
+  const gEnd=Math.min(8000,duration*0.18);
+  const ctaS=duration*0.78;
+  const gancho=segments.filter(s=>s.startMs<gEnd);
+  const corpo=segments.filter(s=>s.startMs>=gEnd&&s.endMs<=ctaS);
+  const cta=segments.filter(s=>s.startMs>=ctaS);
+  return {segments,gancho,corpo,cta,duration};
+}
+
+// ── SRT FILES — ABA 1 ──────────────────────────────────
+function handleSRTs(files){
+  [...files].forEach(f=>{
+    if(!f.name.endsWith('.srt'))return;
+    if(S.srtFiles.find(x=>x.name===f.name))return;
+    const r=new FileReader();
+    r.onload=e=>{
+      const raw=e.target.result;
+      S.srtFiles.push({name:f.name,raw,parsed:parseSRT(raw,f.name)});
+      renderSrtList();
     };
-    reader.readAsText(file, 'UTF-8');
+    r.readAsText(f,'UTF-8');
   });
 }
-
-function removeFile(name) {
-  srtFiles = srtFiles.filter(f => f.name !== name);
-  renderFileList();
-}
-
-function renderFileList() {
-  const list = document.getElementById('fileList');
-  list.innerHTML = '';
-  srtFiles.forEach(f => {
-    const d = document.createElement('div');
-    d.className = 'file-item';
-    d.innerHTML = `
-      <span class="fi-icon">🎬</span>
+function rmSrt(name){S.srtFiles=S.srtFiles.filter(f=>f.name!==name);renderSrtList();}
+function renderSrtList(){
+  const el=document.getElementById('srtList');
+  el.innerHTML='';
+  S.srtFiles.forEach(f=>{
+    const d=document.createElement('div');
+    d.className='file-item';
+    const p=f.parsed;
+    d.innerHTML=`<span class="fi-ico">🎬</span>
       <div class="fi-info">
         <div class="fi-name">${esc(f.name)}</div>
-        <div class="fi-meta">${f.parsed.segments.length} seg · ${fmtMs(f.parsed.duration)} · Gancho: ${f.parsed.gancho.length} · Corpo: ${f.parsed.corpo.length} · CTA: ${f.parsed.cta.length}</div>
+        <div class="fi-meta">${p.segments.length} seg · ${fmtMs(p.duration)} · G:${p.gancho.length} C:${p.corpo.length} CTA:${p.cta.length}</div>
       </div>
-      <span class="fi-ok">✓ Pronto</span>
-      <button class="fi-rm" onclick="removeFile('${esc(f.name)}')">×</button>`;
-    list.appendChild(d);
+      <span class="fi-ok">✓</span>
+      <button class="fi-rm" onclick="rmSrt('${esc(f.name)}')">×</button>`;
+    el.appendChild(d);
   });
 }
 
-// ── VIDEO FILES ───────────────────────────────────────────────────────────
-function handleVideoFiles(files) {
-  [...files].forEach(file => {
-    if (!file.type.startsWith('video/')) return;
-    if (videoFiles.find(f => f.name === file.name)) return;
-    videoFiles.push(file);
+// ── PROGRESS ABA 1 ─────────────────────────────────────
+function setP1(step,pct,msg){
+  ['p1s1','p1s2','p1s3','p1s4','p1s5'].forEach((id,i)=>{
+    document.getElementById(id).className='ps'+(i+1<step?' done':i+1===step?' active':'');
   });
-  renderVideoFileList();
+  document.getElementById('pf1').style.width=pct+'%';
+  document.getElementById('pm1').textContent=msg;
 }
 
-function removeVideoFile(name) {
-  videoFiles = videoFiles.filter(f => f.name !== name);
-  renderVideoFileList();
-}
+// ══════════════════════════════════════════════════════
+//  PROMPT SÊNIOR — GERADOR ABA 1
+// ══════════════════════════════════════════════════════
+function buildPromptGen(srtCtx, sourceNames, tipo, formato, nVar, duracao, produto, publico, contexto, eixos){
 
-function renderVideoFileList() {
-  const list = document.getElementById('videoFileList');
-  list.innerHTML = '';
-  videoFiles.forEach(f => {
-    const mb  = (f.size / 1024 / 1024).toFixed(1);
-    const d   = document.createElement('div');
-    d.className = 'file-item';
-    d.innerHTML = `
-      <span class="fi-icon">🎥</span>
-      <div class="fi-info">
-        <div class="fi-name">${esc(f.name)}</div>
-        <div class="fi-meta">${mb} MB · ${f.type}</div>
-      </div>
-      <span class="fi-ok">✓ Pronto</span>
-      <button class="fi-rm" onclick="removeVideoFile('${esc(f.name)}')">×</button>`;
-    list.appendChild(d);
-  });
-}
+  const tipoLabel = tipo==='video'?'VÍDEO':'IMAGEM';
+  const formatoBlock = tipo==='imagem'
+    ? `FORMATOS SOLICITADOS: ${formato==='todos'?'Feed 1:1 + Story 9:16 + Banner 16:9':formato}`
+    : '';
 
-// ── SRT PARSER ────────────────────────────────────────────────────────────
-function parseSRT(raw, filename) {
-  const blocks   = raw.trim().split(/\n\s*\n/);
-  const segments = [];
-  blocks.forEach(block => {
-    const lines  = block.trim().split('\n');
-    const tsLine = lines.find(l => /\d{2}:\d{2}:\d{2}[,\.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[,\.]\d{3}/.test(l));
-    if (!tsLine) return;
-    const m = tsLine.match(/(\d{2}):(\d{2}):(\d{2})[,\.](\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2})[,\.](\d{3})/);
-    if (!m) return;
-    const startMs = toMs(m[1],m[2],m[3],m[4]);
-    const endMs   = toMs(m[5],m[6],m[7],m[8]);
-    const text    = lines.filter(l => !/^\d+$/.test(l.trim()) && !/-->/.test(l)).join(' ').trim();
-    if (!text) return;
-    segments.push({ startMs, endMs, text, source: filename.replace(/\.[^.]+$/, '') });
-  });
-  const duration = segments.length ? Math.max(...segments.map(s => s.endMs)) : 0;
-  const gEnd     = Math.min(8000, duration * 0.18);
-  const ctaS     = duration * 0.78;
-  const gancho   = segments.filter(s => s.startMs < gEnd);
-  const corpo    = segments.filter(s => s.startMs >= gEnd && s.endMs <= ctaS);
-  const cta      = segments.filter(s => s.startMs >= ctaS);
-  return { segments, gancho, corpo, cta, duration };
-}
+  const estruturaOutput = tipo==='video' ? `
+Para CADA variação de VÍDEO retorne:
+{
+  "numero": 1,
+  "tipo": "video",
+  "nome": "Nome criativo e memorável",
+  "eixo": "gancho|formato|cta",
+  "elemento_testado": "O que exatamente está sendo testado",
+  "gancho_texto": "Narração completa do gancho — deve parar o scroll em 3 segundos",
+  "corpo_texto": "Narração completa do corpo — aprofunda dor, apresenta solução, constrói desejo",
+  "cta_texto": "Narração do CTA — claro, urgente, sem fricção",
+  "score": 87,
+  "score_justificativa": "Frase explicando o score com base em princípios reais de conversão",
+  "score_fatores_positivos": ["fator 1", "fator 2", "fator 3"],
+  "score_fatores_negativos": ["risco 1"],
+  "storyboard": [
+    {
+      "zona": "gancho|corpo|cta",
+      "tempo_inicio": 0.0,
+      "tempo_fim": 7.5,
+      "video_fonte": "video1",
+      "fala": "Texto exato da narração dessa cena — persuasivo e natural",
+      "instrucao_cena": "Instrução detalhada: visual, texto overlay, transição, ritmo, emoção transmitida",
+      "prompt_veo3": "Prompt completo em inglês para Veo 3 gerar essa cena: descreva o sujeito, ação, cenário, iluminação, câmera, movimento, mood, estilo cinematográfico"
+    }
+  ]
+}` : `
+Para CADA variação de IMAGEM retorne:
+{
+  "numero": 1,
+  "tipo": "imagem",
+  "nome": "Nome criativo e memorável",
+  "eixo": "gancho|emocional|prova|urgencia",
+  "elemento_testado": "O que está sendo testado",
+  "conceito": "Conceito visual e estratégico em 2-3 frases — por que essa imagem vai parar o scroll",
+  "score": 87,
+  "score_justificativa": "Frase com base em princípios reais de conversão",
+  "score_fatores_positivos": ["fator 1", "fator 2"],
+  "score_fatores_negativos": ["risco 1"],
+  "formatos": [
+    {
+      "formato": "feed|story|banner",
+      "dimensoes": "1080x1080|1080x1920|1200x628",
+      "headline": "Título principal — impactante, máx 8 palavras",
+      "subheadline": "Subtítulo que aprofunda a promessa",
+      "cta_btn": "Texto do botão de CTA",
+      "copy_corpo": "Texto de apoio opcional para usar na imagem",
+      "visual_desc": "Descrição detalhada do visual: posição dos elementos, cores, tipografia, foto/ilustração, composição",
+      "prompt_nanobanana": "Prompt completo e detalhado em português para Nano Banana: descreva exatamente o que deve aparecer na imagem, estilo visual, cores, tipografia, elementos, atmosfera, produto em destaque"
+    }
+  ]
+}`;
 
-function toMs(h,m,s,ms){ return (+h)*3600000+(+m)*60000+(+s)*1000+(+ms); }
-function fmtMs(ms){ const t=Math.round(ms/1000),min=Math.floor(t/60),sec=t%60; return min>0?`${min}m${String(sec).padStart(2,'0')}s`:`${sec}s`; }
-function fmtS(s){ const min=Math.floor(s/60),sec=Math.round(s%60); return min>0?`${min}m${String(sec).padStart(2,'0')}s`:`${sec}s`; }
-function segTxt(segs){ return segs.map(s=>s.text).join(' ').trim(); }
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+  return `Você é um diretor criativo sênior com 15 anos de experiência em Direct Response Marketing no Brasil. Você já gerou mais de R$50M em vendas diretas através de criativos de Facebook Ads. Você pensa como um especialista em psicologia do consumidor, copywriting persuasivo e produção audiovisual.
 
-// ── TAGS ──────────────────────────────────────────────────────────────────
-document.querySelectorAll('.ptag').forEach(t => t.addEventListener('click', () => t.classList.toggle('on')));
-
-// ── PROGRESS ──────────────────────────────────────────────────────────────
-function setStep(n, pct, label) {
-  ['ps1','ps2','ps3','ps4','ps5'].forEach((id,i) => {
-    const el = document.getElementById(id);
-    el.className = 'ps' + (i+1 < n ? ' done' : i+1 === n ? ' active' : '');
-  });
-  document.getElementById('progFill').style.width = pct + '%';
-  document.getElementById('progLabel').textContent = label;
-}
-
-// ── PROMPT INTELIGENTE DE VENDAS ──────────────────────────────────────────
-function buildPrompt(srtCtx, sourceNames, duracao, wordTarget, gEnd, ctaS, produto, publico, contexto) {
-  const eixos = [...document.querySelectorAll('.ptag.on')].map(t=>t.textContent.trim()).join(', ') || 'Gancho Emocional, Dor, Prova Social, Urgência';
-
-  // monta contexto detalhado de cada SRT com timestamps para corte
-  const srtDetalhado = srtCtx.join('\n\n---\n\n');
-
-  return `Você é um especialista sênior em Direct Response Marketing e edição de vídeo para Facebook Ads com mais de 10 anos de experiência em campanhas de performance no mercado brasileiro.
-
-Você vai analisar os seguintes criativos de vídeo vencedores (transcrições SRT com timestamps precisos de cada vídeo fonte) e criar 10 variações de criativos altamente persuasivos para Facebook Ads.
-
-═══════════════════════════════════════════
-VÍDEOS FONTE DISPONÍVEIS: ${sourceNames.join(', ')}
+═══════════════════════════════════════════════════════
+MISSÃO: Criar ${nVar} variações de criativos de ${tipoLabel} de alta conversão para Facebook Ads.
+${formatoBlock}
 PRODUTO: ${produto}
 PÚBLICO: ${publico}
+CONTEXTO: ${contexto||'Campanha de performance no Facebook Ads Brasil'}
 DURAÇÃO ALVO: ${duracao}s
 EIXOS PRIORITÁRIOS: ${eixos}
-CONTEXTO: ${contexto || 'Campanha de performance no Facebook Ads Brasil'}
-═══════════════════════════════════════════
+═══════════════════════════════════════════════════════
 
-TRANSCRIÇÕES DOS CRIATIVOS VENCEDORES (com timestamps em ms):
-${srtDetalhado}
+TRANSCRIÇÕES DOS CRIATIVOS VENCEDORES (anúncios rodando 45+ dias):
+${srtCtx.join('\n\n---\n\n')}
 
-═══════════════════════════════════════════
-ANÁLISE QUE VOCÊ DEVE FAZER:
+═══════════════════════════════════════════════════════
+ANÁLISE OBRIGATÓRIA ANTES DE CRIAR:
 
-1. Identifique nos SRTs acima QUAL TRECHO de cada vídeo corresponde a:
-   - GANCHO: Os primeiros momentos que prendem atenção e criam identificação/curiosidade (geralmente os primeiros ${Math.round(gEnd/1000)}s de cada vídeo)
-   - CORPO: O desenvolvimento persuasivo — dor, solução, mecanismo, prova social, autoridade (meio do vídeo)  
-   - CTA: A chamada para ação com urgência ou oferta (últimos trechos do vídeo)
+Antes de gerar os criativos, analise profundamente:
 
-2. Analise O QUE FUNCIONA em cada trecho:
-   - Qual linguagem emocional ressoa com o público
-   - Quais argumentos de persuasão estão presentes
-   - Qual ritmo e estrutura narrativa é usada
-   - Quais gatilhos mentais são ativados
+1. GATILHOS EMOCIONAIS: Quais emoções os criativos vencedores ativam? Medo? Esperança? Vergonha? Raiva? Como fazem isso?
 
-3. Monte o storyboard de cada variação como um PLANO DE EDIÇÃO REAL:
-   - Selecione os MELHORES TRECHOS de cada vídeo fonte para cada zona persuasiva
-   - Use os timestamps EXATOS do SRT para definir onde cortar cada clipe
-   - Combine trechos de vídeos diferentes quando isso fortalecer a narrativa
-   - Cada cena deve ter uma FUNÇÃO PERSUASIVA clara na jornada de conversão
+2. ESTRUTURA DE PERSUASÃO: Como constroem o argumento? Qual a sequência lógica e emocional?
 
-═══════════════════════════════════════════
-REGRAS DO STORYBOARD (CRÍTICO — SISTEMA DE EDIÇÃO AUTOMÁTICA):
+3. LINGUAGEM DO PÚBLICO: Quais palavras, expressões e gírias ressoam? Qual tom (formal/informal)?
 
-O sistema de edição vai executar EXATAMENTE isso para cada cena:
-  1. Abrir o arquivo video_fonte especificado
-  2. Cortar do segundo tempo_inicio até o segundo tempo_fim DENTRO desse arquivo
-  3. Repetir para cada cena na ordem do storyboard
-  4. Emendar todos os cortes → vídeo final da variação
+4. MECANISMO ÚNICO: O que torna o produto especial? Como é apresentado?
+
+5. OBJEÇÕES TRATADAS: Quais dúvidas ou resistências o criativo antecipa e resolve?
+
+═══════════════════════════════════════════════════════
+PRINCÍPIOS INEGOCIÁVEIS DE CONVERSÃO:
+
+GANCHO (primeiros 3s): Deve causar uma das reações:
+  - "Isso sou eu!" (identificação imediata)
+  - "Como assim?!" (choque ou curiosidade)
+  - "Quero isso!" (desejo instantâneo)
+  - "Tenho medo disso" (ativação de medo relevante)
+
+CORPO: Deve seguir esta sequência psicológica:
+  - Aprofundar a dor/problema (make it real)
+  - Apresentar a causa raiz (autoridade + educação)
+  - Revelar a solução como descoberta (não como venda)
+  - Prova social específica (números, nomes, resultados reais)
+  - Mecanismo único (por que funciona quando outros falham)
+
+CTA: Deve eliminar fricção:
+  - Ação específica e simples
+  - Urgência real (não falsa)
+  - Reforçar a promessa principal
+  - Zero risco percebido
+
+DISTRIBUIÇÃO DAS ${nVar} VARIAÇÕES:
+${nVar>=8?`
+  - 3 variações testando o GANCHO (diferentes tipos de abertura)
+  - 2 variações testando o FORMATO NARRATIVO
+  - 2 variações testando o CTA e OFERTA
+  - ${nVar-7} variação(ões) testando ELEMENTOS CRIATIVOS (visual, tom, abordagem)
+`:nVar>=5?`
+  - 2 variações testando o GANCHO
+  - 2 variações testando o FORMATO/TOM
+  - 1 variação testando o CTA
+  ${nVar>5?`- ${nVar-5} variação(ões) extra criativa(s)`:''}
+`:nVar>=3?`
+  - 1 variação: Gancho emocional forte
+  - 1 variação: Abordagem educativa/autoridade
+  - 1 variação: Prova social + CTA direto
+`:nVar===2?`
+  - 1 variação: Gancho emocional de identificação
+  - 1 variação: Gancho de curiosidade/choque
+`:`
+  - 1 variação com o gancho mais forte identificado nos SRTs
+`}
+
+${tipo==='video'?`
+SOBRE O STORYBOARD:
+- tempo_inicio e tempo_fim são os SEGUNDOS DE CORTE no arquivo video_fonte
+- Use os timestamps REAIS dos SRTs para definir onde cortar
+- Cada variação deve ter cortes COMPLETAMENTE DIFERENTES
+- 4 a 8 cenas por variação
+- A soma das durações deve ser próxima de ${duracao}s
+- Prompts Veo 3: em inglês, cinematográficos, detalhados (câmera, luz, ação, mood)
+
+EXEMPLO de storyboard correto:
+  Cena 1: video1, 0.0s→7.5s  = corta video1 do segundo 0 ao 7.5 (gancho)
+  Cena 2: video2, 14.0s→28.0s = corta video2 do segundo 14 ao 28 (corpo/prova)
+  Cena 3: video1, 45.0s→58.0s = corta video1 do segundo 45 ao 58 (CTA)
+`:`
+SOBRE OS PROMPTS NANO BANANA:
+- Em português, detalhados e específicos
+- Descreva o produto em destaque, o modelo/pessoa se houver, o cenário
+- Especifique: estilo (foto real, ilustração, 3D), iluminação, cores dominantes
+- Inclua textos que devem aparecer na imagem (headline, CTA)
+- Estilo publicitário brasileiro, emocional, apelo ao público ${publico}
+`}
+
+RETORNE SOMENTE JSON VÁLIDO (sem markdown, sem texto fora):
+{
+  "analise_geral": "3-4 frases analisando os padrões de persuasão encontrados — o que funciona, por que funciona, o que você vai replicar e potencializar",
+  "padroes": {
+    "gancho_padrao": "O padrão de abertura que mais converte nesses criativos",
+    "corpo_padrao": "A estrutura persuasiva do desenvolvimento",
+    "cta_padrao": "O padrão de fechamento e chamada para ação"
+  },
+  "variacoes": [ ...${nVar} variações conforme estrutura acima... ]
+}`;
+}
+
+// ── MAIN RUN ABA 1 ─────────────────────────────────────
+async function runGen(){
+  const apiKey  = document.getElementById('apiKey').value.trim();
+  const produto = document.getElementById('g1produto').value.trim();
+  const publico = document.getElementById('g1publico').value.trim();
+  const contexto= document.getElementById('g1contexto').value.trim();
+  const duracao = +document.getElementById('g1duracao').value||60;
+
+  if(!apiKey)            { toast('⚠️ Insira a chave Groq',true); return; }
+  if(!S.srtFiles.length) { toast('⚠️ Faça upload de pelo menos 1 SRT',true); return; }
+  if(!produto)           { toast('⚠️ Descreva o produto',true); return; }
+  if(!publico)           { toast('⚠️ Descreva o público',true); return; }
+
+  const eixos = [...document.querySelectorAll('#eixosGroup .choice-pill.active')].map(p=>p.textContent.trim()).join(', ')||'Gancho Emocional, Dor, Prova Social, Urgência';
+
+  const btn=document.getElementById('btnGen');
+  btn.disabled=true; btn.textContent='⏳ GERANDO...';
+  document.getElementById('prog1').style.display='block';
+  document.getElementById('results1').style.display='none';
+
+  try {
+    setP1(1,10,'Lendo e segmentando SRTs...');
+    await delay(300);
+
+    const sourceNames = S.srtFiles.map(f=>f.name.replace(/\.[^.]+$/,''));
+    const srtCtx = S.srtFiles.map(f=>{
+      const p=f.parsed, name=f.name.replace(/\.[^.]+$/,'');
+      const segs=p.segments.map(s=>`  [${(s.startMs/1000).toFixed(2)}s→${(s.endMs/1000).toFixed(2)}s] "${s.text}"`).join('\n');
+      return `ARQUIVO: ${name} (duração: ${(p.duration/1000).toFixed(1)}s)\nSEGMENTOS:\n${segs}\n\nZONAS:\n  GANCHO: "${segTxt(p.gancho)}"\n  CORPO: "${segTxt(p.corpo)}"\n  CTA: "${segTxt(p.cta)}"`;
+    });
+
+    setP1(2,25,'Enviando para análise com IA sênior...');
+    await delay(300);
+
+    const prompt=buildPromptGen(srtCtx,sourceNames,S.tipoVal,S.formatoVal,S.varCount,duracao,produto,publico,contexto,eixos);
+
+    setP1(3,42,'Gerando criativos de alta conversão...');
+
+    const resp=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        temperature:0.82,
+        max_tokens:8000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+
+    if(!resp.ok){
+      const e=await resp.json().catch(()=>({}));
+      throw new Error(e.error?.message||`Groq erro ${resp.status}`);
+    }
+
+    setP1(4,70,'Processando resposta...');
+    await delay(300);
+
+    const data=await resp.json();
+    const rawTxt=data.choices?.[0]?.message?.content||'';
+    const match=rawTxt.match(/\{[\s\S]*\}/);
+    if(!match) throw new Error('IA não retornou JSON válido. Tente novamente.');
+    const parsed=JSON.parse(match[0]);
+
+    setP1(5,92,'Montando criativos...');
+    await delay(400);
+
+    S.generated=parsed.variacoes||[];
+
+    // análise geral
+    if(parsed.analise_geral){
+      document.getElementById('anaBody').textContent=parsed.analise_geral;
+      document.getElementById('anaBlock').style.display='block';
+    }
+    // padrões
+    if(parsed.padroes) renderPatterns(parsed.padroes);
+    // variações
+    renderVars(S.generated);
+
+    // atualiza headline
+    document.getElementById('resCount').textContent=S.generated.length;
+    setP1(5,100,'Concluído!');
+    await delay(500);
+    document.getElementById('prog1').style.display='none';
+    document.getElementById('results1').style.display='block';
+    document.getElementById('results1').scrollIntoView({behavior:'smooth'});
+
+  } catch(err){
+    document.getElementById('prog1').style.display='none';
+    toast('❌ '+err.message,true);
+  } finally {
+    btn.disabled=false; btn.textContent='⚡ GERAR CRIATIVOS COM IA';
+  }
+}
+
+// ── RENDER PATTERNS ────────────────────────────────────
+function renderPatterns(p){
+  const el=document.getElementById('patRow');
+  el.innerHTML='';
+  [{tag:'tag-g',lbl:'Gancho',txt:p.gancho_padrao},{tag:'tag-c',lbl:'Corpo',txt:p.corpo_padrao},{tag:'tag-cta',lbl:'CTA',txt:p.cta_padrao}]
+  .forEach((item,i)=>{
+    const c=document.createElement('div');
+    c.className='pat-card'; c.style.animationDelay=(i*.1)+'s';
+    c.innerHTML=`<span class="pat-tag ${item.tag}">${item.lbl}</span><div class="pat-text">"${esc(item.txt)}"</div>`;
+    el.appendChild(c);
+  });
+}
+
+// ── SCORE RING SVG ──────────────────────────────────────
+function ringHTML(score,size=58,sw=4,cls='srf'){
+  const r=(size/2)-sw, circ=2*Math.PI*r, off=circ-(score/100)*circ;
+  const col=scoreColor(score);
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle class="srb" cx="${size/2}" cy="${size/2}" r="${r}"/>
+    <circle class="${cls}" cx="${size/2}" cy="${size/2}" r="${r}" stroke="${col}"
+      stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}"/>
+  </svg>`;
+}
+
+// ── RENDER VARIATION CARDS ─────────────────────────────
+function renderVars(vars){
+  const el=document.getElementById('varGrid1');
+  el.innerHTML='';
+  vars.forEach((v,i)=>{
+    const score=v.score||70, col=scoreColor(score);
+    const eixoCls=v.eixo==='gancho'?'ex-g':v.eixo==='cta'?'ex-c':'ex-f';
+    const eixoLbl=v.eixo==='gancho'?'Gancho':v.eixo==='cta'?'CTA':v.eixo==='formato'?'Formato':'Variação';
+    const tipoCls=v.tipo==='imagem'?'type-img':'type-vid';
+    const tipoLbl=v.tipo==='imagem'?'Imagem':'Vídeo';
+    const preview=v.gancho_texto||v.conceito||'';
+    const cenas=v.storyboard?.length||v.formatos?.length||0;
+
+    const c=document.createElement('div');
+    c.className='var-card'; c.style.animationDelay=(i*.06)+'s';
+    c.onclick=()=>openDetail(v);
+    c.innerHTML=`
+      <div class="vc-head">
+        <div class="vc-top">
+          <span class="vc-index">VAR ${String(v.numero||i+1).padStart(2,'0')}</span>
+          <span class="vc-name">${esc(v.nome||'Variação')}</span>
+          <span class="vc-type ${tipoCls}">${tipoLbl}</span>
+          <span class="vc-eixo ${eixoCls}">${eixoLbl}</span>
+        </div>
+        <div class="score-row">
+          <div class="score-ring">
+            ${ringHTML(score)}
+            <div class="score-num" style="color:${col}">${score}%</div>
+          </div>
+          <div class="score-details">
+            <div class="score-lbl">Score de Conversão</div>
+            <div class="score-why">${esc(v.score_justificativa||'')}</div>
+          </div>
+        </div>
+      </div>
+      <div class="vc-preview">${esc(preview)}</div>
+      <div class="vc-foot">
+        <span class="vc-meta">${cenas} ${v.tipo==='imagem'?'formatos':'cenas'} · ${esc(v.elemento_testado||'')}</span>
+        <span class="vc-cta-hint">Ver detalhes →</span>
+      </div>`;
+    el.appendChild(c);
+  });
+}
+
+// ── DETAIL PAGE ────────────────────────────────────────
+function openDetail(v){
+  const score=v.score||70, col=scoreColor(score);
+  const pos=(v.score_fatores_positivos||[]).map(f=>`<span class="factor pos">✓ ${esc(f)}</span>`).join('');
+  const neg=(v.score_fatores_negativos||[]).map(f=>`<span class="factor neg">⚠ ${esc(f)}</span>`).join('');
+
+  let bodyHTML='';
+
+  if(v.tipo==='imagem'){
+    // ── IMAGEM ──
+    const fmts=(v.formatos||[]).map((fmt,fi)=>`
+      <div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:24px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;padding:4px 12px;border-radius:100px;background:var(--gold-dim);color:var(--gold);">${esc(fmt.formato?.toUpperCase()||'FORMATO')}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--txt3);">${esc(fmt.dimensoes||'')}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <div>
+            <div class="sc-lbl">Headline</div>
+            <div style="font-family:'Unbounded',sans-serif;font-size:18px;font-weight:800;line-height:1.2;letter-spacing:-.02em;">${esc(fmt.headline||'')}</div>
+          </div>
+          <div>
+            <div class="sc-lbl">Subheadline</div>
+            <div style="font-size:14px;color:var(--txt2);line-height:1.6;">${esc(fmt.subheadline||'')}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <div>
+            <div class="sc-lbl">Botão CTA</div>
+            <div style="display:inline-block;background:var(--acc);color:#fff;padding:10px 20px;border-radius:8px;font-weight:700;font-size:14px;">${esc(fmt.cta_btn||'')}</div>
+          </div>
+          <div>
+            <div class="sc-lbl">Copy de Apoio</div>
+            <div style="font-size:13px;color:var(--txt2);line-height:1.65;">${esc(fmt.copy_corpo||'')}</div>
+          </div>
+        </div>
+        <div style="margin-bottom:12px;">
+          <div class="sc-lbl">Descrição Visual</div>
+          <div style="font-size:13px;color:var(--txt2);line-height:1.7;font-style:italic;">${esc(fmt.visual_desc||'')}</div>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-label">Prompt Nano Banana</div>
+          <div class="prompt-text" id="pnb-${fi}">${esc(fmt.prompt_nanobanana||'')}</div>
+          <button class="btn-copy-prompt" onclick="copyPrompt('pnb-${fi}',this)">Copiar</button>
+        </div>
+      </div>`).join('');
+
+    bodyHTML=`
+      <div class="sb-sec-title" style="font-family:'Unbounded',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.03em;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
+        Conceito Criativo
+        <span style="flex:1;height:1px;background:var(--line);display:block;"></span>
+      </div>
+      <div class="ana-block" style="display:block;margin-bottom:28px;">
+        <div class="ana-kicker">// Estratégia</div>
+        <div class="ana-body">${esc(v.conceito||'')}</div>
+      </div>
+      <div style="font-family:'Unbounded',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.03em;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
+        Formatos & Prompts
+        <span style="flex:1;height:1px;background:var(--line);display:block;"></span>
+      </div>
+      ${fmts}`;
+
+  } else {
+    // ── VÍDEO ──
+    const scriptBlock=`
+      <div class="script-grid" style="margin-bottom:32px;">
+        ${[
+          {lbl:'🔴 Gancho',txt:v.gancho_texto,dot:'var(--red)'},
+          {lbl:'🟡 Corpo', txt:v.corpo_texto, dot:'var(--gold)'},
+          {lbl:'🔵 CTA',   txt:v.cta_texto,   dot:'var(--blue)'}
+        ].map(b=>`
+          <div class="script-card">
+            <div class="script-zone">
+              <span class="script-dot" style="background:${b.dot}"></span>
+              <span style="color:${b.dot}">${b.lbl}</span>
+            </div>
+            <div class="script-text">${esc(b.txt||'')}</div>
+          </div>`).join('')}
+      </div>`;
+
+    const scenes=(v.storyboard||[]).map((s,si)=>{
+      const zoneCls=s.zona==='gancho'?'sz-g':s.zona==='cta'?'sz-t':'sz-c';
+      const zoneLabel=s.zona==='gancho'?'Gancho':s.zona==='cta'?'CTA':'Corpo';
+      const tIn=parseFloat(s.tempo_inicio||0).toFixed(1);
+      const tOut=parseFloat(s.tempo_fim||0).toFixed(1);
+      const dur=(parseFloat(tOut)-parseFloat(tIn)).toFixed(1);
+      return `
+        <div class="scene">
+          <div class="scene-left">
+            <span class="scene-zone-tag ${zoneCls}">${zoneLabel}</span>
+            <div class="scene-n">${si+1}</div>
+            <span class="scene-src">${esc(s.video_fonte||'video1')}</span>
+            <div class="scene-ts">${tIn}s<br>↓<br>${tOut}s<br><span style="color:var(--acc)">${dur}s</span></div>
+          </div>
+          <div class="scene-right">
+            <div>
+              <div class="sc-lbl">🎙 Narração</div>
+              <div class="sc-narr">${esc(s.fala||'')}</div>
+            </div>
+            <div>
+              <div class="sc-lbl">🎬 Instrução de Edição</div>
+              <div class="sc-instr">${esc(s.instrucao_cena||'')}</div>
+              ${s.prompt_veo3?`
+              <div class="prompt-box" style="margin-top:12px;">
+                <div class="prompt-label">Prompt Veo 3</div>
+                <div class="prompt-text" id="pveo-${si}">${esc(s.prompt_veo3)}</div>
+                <button class="btn-copy-prompt" onclick="copyPrompt('pveo-${si}',this)">Copiar</button>
+              </div>`:''}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    bodyHTML=`
+      ${scriptBlock}
+      <div style="font-family:'Unbounded',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.03em;margin-bottom:18px;display:flex;align-items:center;gap:14px;">
+        Plano de Edição — ${(v.storyboard||[]).length} Cenas
+        <span style="flex:1;height:1px;background:var(--line);display:block;"></span>
+      </div>
+      <div class="scene-list">${scenes}</div>`;
+  }
+
+  document.getElementById('detailContent').innerHTML=`
+    <div class="detail-hero">
+      <div class="detail-eyebrow">Variação ${String(v.numero||'').padStart(2,'0')} · ${v.tipo==='imagem'?'Imagem':'Vídeo'}</div>
+      <div class="detail-title">${esc(v.nome||'')}</div>
+      <div class="detail-chips">
+        <span class="chip">${esc(v.eixo||'')}</span>
+        <span class="chip">🎯 ${esc(v.elemento_testado||'')}</span>
+      </div>
+    </div>
+    <div class="score-hero">
+      <div class="score-hero-ring">
+        ${ringHTML(v.score||70,96,6,'srf')}
+        <div class="score-hero-num" style="color:${col}">${v.score||70}%</div>
+      </div>
+      <div class="score-hero-info">
+        <div class="score-hero-lbl">Score de Conversão Estimado</div>
+        <div class="score-hero-why">${esc(v.score_justificativa||'')}</div>
+        <div class="factors">${pos}${neg}</div>
+      </div>
+    </div>
+    ${bodyHTML}
+    <div class="action-row">
+      <button class="btn-dl btn-dl-sec" onclick="copyDetail(${v.numero||0})">📋 Copiar Tudo</button>
+      <button class="btn-dl btn-dl-primary" onclick="dlDetail(${v.numero||0})">⬇ Baixar .txt</button>
+    </div>`;
+
+  document.getElementById('detailActions').innerHTML=`
+    <button class="btn-sec" onclick="copyDetail(${v.numero||0})">📋 Copiar</button>
+    <button class="btn-sec acc" onclick="dlDetail(${v.numero||0})">⬇ Baixar</button>`;
+
+  document.getElementById('detailPage').style.display='block';
+  document.getElementById('detailPage').scrollTop=0;
+  document.body.style.overflow='hidden';
+}
+
+function closeDetail(){
+  document.getElementById('detailPage').style.display='none';
+  document.body.style.overflow='';
+}
+
+function copyPrompt(id, btn){
+  const el=document.getElementById(id);
+  if(!el)return;
+  navigator.clipboard.writeText(el.textContent).then(()=>{
+    btn.textContent='✓ Copiado'; btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='Copiar';btn.classList.remove('ok');},2000);
+  });
+}
+
+function getDetailText(num){
+  const v=S.generated.find(x=>x.numero===num); if(!v)return '';
+  let t=`HALLEY CRIATIVO STUDIO\n${'═'.repeat(50)}\n`;
+  t+=`VAR ${String(v.numero).padStart(2,'0')} — ${v.nome}\n`;
+  t+=`Tipo: ${v.tipo} | Eixo: ${v.eixo} | Testando: ${v.elemento_testado}\n`;
+  t+=`Score: ${v.score}% — ${v.score_justificativa}\n${'═'.repeat(50)}\n\n`;
+  if(v.tipo==='imagem'){
+    t+=`CONCEITO:\n${v.conceito}\n\n`;
+    (v.formatos||[]).forEach(f=>{
+      t+=`FORMATO: ${f.formato} (${f.dimensoes})\n`;
+      t+=`Headline: ${f.headline}\nSubheadline: ${f.subheadline}\nCTA: ${f.cta_btn}\n`;
+      t+=`Copy: ${f.copy_corpo}\nVisual: ${f.visual_desc}\n`;
+      t+=`PROMPT NANO BANANA:\n${f.prompt_nanobanana}\n\n${'─'.repeat(40)}\n\n`;
+    });
+  } else {
+    t+=`GANCHO:\n${v.gancho_texto}\n\nCORPO:\n${v.corpo_texto}\n\nCTA:\n${v.cta_texto}\n\n${'─'.repeat(40)}\nPLANO DE EDIÇÃO:\n\n`;
+    (v.storyboard||[]).forEach((s,i)=>{
+      t+=`CENA ${i+1} [${(s.zona||'').toUpperCase()}]\n`;
+      t+=`Fonte: ${s.video_fonte} | Corte: ${s.tempo_inicio}s → ${s.tempo_fim}s\n`;
+      t+=`Fala: ${s.fala}\nEdição: ${s.instrucao_cena}\n`;
+      if(s.prompt_veo3) t+=`PROMPT VEO 3:\n${s.prompt_veo3}\n`;
+      t+='\n';
+    });
+  }
+  return t;
+}
+function copyDetail(num){ navigator.clipboard.writeText(getDetailText(num)).then(()=>toast('✓ Copiado!')); }
+function dlDetail(num){
+  const v=S.generated.find(x=>x.numero===num); if(!v)return;
+  const b=new Blob([getDetailText(num)],{type:'text/plain'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download=`var${String(v.numero).padStart(2,'0')}-${v.nome.replace(/\s+/g,'-')}.txt`; a.click();
+}
+function exportAll1(){
+  let all=''; S.generated.forEach(v=>{all+=getDetailText(v.numero)+'\n\n'+'═'.repeat(60)+'\n\n';});
+  const b=new Blob([all],{type:'text/plain'}); const a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download=`hcs-criativos-${new Date().toISOString().slice(0,10)}.txt`; a.click();
+}
+</script>
+<script>
+// ═══════════════════════════════════════════════════════
+//  HALLEY CRIATIVO STUDIO — JS ABA 2 + BACKUP
+// ═══════════════════════════════════════════════════════
+
+// ── VIDEO FILES ────────────────────────────────────────
+function handleVids(files){
+  [...files].forEach(f=>{
+    if(!f.type.startsWith('video/'))return;
+    if(S.vidFiles.find(x=>x.name===f.name))return;
+    S.vidFiles.push(f);
+  });
+  renderVidList();
+  updatePairStatus();
+}
+function rmVid(name){S.vidFiles=S.vidFiles.filter(f=>f.name!==name);renderVidList();updatePairStatus();}
+function renderVidList(){
+  const el=document.getElementById('vidList'); el.innerHTML='';
+  S.vidFiles.forEach(f=>{
+    const mb=(f.size/1024/1024).toFixed(1);
+    const d=document.createElement('div'); d.className='file-item';
+    d.innerHTML=`<span class="fi-ico">🎥</span>
+      <div class="fi-info">
+        <div class="fi-name">${esc(f.name)}</div>
+        <div class="fi-meta">${mb} MB</div>
+      </div>
+      <span class="fi-ok">✓</span>
+      <button class="fi-rm" onclick="rmVid('${esc(f.name)}')">×</button>`;
+    el.appendChild(d);
+  });
+}
+
+// ── EDITOR SRTs — ABA 2 ───────────────────────────────
+function handleEdSRTs(files){
+  [...files].forEach(f=>{
+    if(!f.name.endsWith('.srt'))return;
+    const stem=f.name.replace(/\.[^.]+$/,'');
+    const r=new FileReader();
+    r.onload=e=>{
+      S.edSrts[stem]={name:f.name,raw:e.target.result,parsed:parseSRT(e.target.result,f.name)};
+      renderEdSrtList();
+      updatePairStatus();
+    };
+    r.readAsText(f,'UTF-8');
+  });
+}
+function rmEdSrt(stem){delete S.edSrts[stem];renderEdSrtList();updatePairStatus();}
+function renderEdSrtList(){
+  const el=document.getElementById('edSrtList'); el.innerHTML='';
+  Object.entries(S.edSrts).forEach(([stem,f])=>{
+    const d=document.createElement('div'); d.className='file-item';
+    d.innerHTML=`<span class="fi-ico">📝</span>
+      <div class="fi-info">
+        <div class="fi-name">${esc(f.name)}</div>
+        <div class="fi-meta">${f.parsed.segments.length} seg · ${fmtMs(f.parsed.duration)}</div>
+      </div>
+      <span class="fi-ok">✓</span>
+      <button class="fi-rm" onclick="rmEdSrt('${esc(stem)}')">×</button>`;
+    el.appendChild(d);
+  });
+}
+
+// ── PAIR STATUS ────────────────────────────────────────
+function updatePairStatus(){
+  const el=document.getElementById('pairStatus');
+  if(!S.vidFiles.length&&!Object.keys(S.edSrts).length){el.style.display='none';return;}
+  el.style.display='block';
+  const pairs=[]; const unpaired=[];
+  S.vidFiles.forEach(f=>{
+    const stem=f.name.replace(/\.[^.]+$/,'');
+    if(S.edSrts[stem]) pairs.push(stem);
+    else unpaired.push(f.name);
+  });
+  const srtOnly=Object.keys(S.edSrts).filter(s=>!S.vidFiles.find(f=>f.name.replace(/\.[^.]+$/,'')=== s));
+  let html='<div style="display:flex;flex-direction:column;gap:8px;">';
+  pairs.forEach(s=>{
+    html+=`<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--green-dim);border:1px solid rgba(0,229,160,.2);border-radius:8px;">
+      <span style="color:var(--green);font-size:14px;">✓</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--green);">Par encontrado: <strong>${esc(s)}</strong></span>
+    </div>`;
+  });
+  unpaired.forEach(n=>{
+    html+=`<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--red-dim);border:1px solid rgba(255,68,102,.2);border-radius:8px;">
+      <span style="color:var(--red);font-size:14px;">✗</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--red);">Sem legenda: <strong>${esc(n)}</strong></span>
+    </div>`;
+  });
+  srtOnly.forEach(s=>{
+    html+=`<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--gold-dim);border:1px solid rgba(255,204,68,.2);border-radius:8px;">
+      <span style="color:var(--gold);font-size:14px;">⚠</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);">Sem vídeo: <strong>${esc(s)}.srt</strong></span>
+    </div>`;
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+// ── PROGRESS ABA 2 ─────────────────────────────────────
+function setP2(step,pct,msg){
+  ['p2s1','p2s2','p2s3','p2s4','p2s5'].forEach((id,i)=>{
+    document.getElementById(id).className='ps'+(i+1<step?' done':i+1===step?' active':'');
+  });
+  document.getElementById('pf2').style.width=pct+'%';
+  document.getElementById('pm2').textContent=msg;
+}
+
+// ── TEST BACKEND ───────────────────────────────────────
+async function testBackend(){
+  const raw=document.getElementById('backendUrl').value.trim();
+  const url=raw.replace(/\/health\/?$/,'').replace(/\/$/,'');
+  document.getElementById('backendUrl').value=url;
+  const el=document.getElementById('backendStatus');
+  if(!url){el.textContent='⚠️ Cole a URL primeiro';el.style.color='var(--red)';return;}
+  el.textContent='⏳ Testando...'; el.style.color='var(--txt3)';
+  try{
+    const r=await fetch(`${url}/health`,{signal:AbortSignal.timeout(9000)});
+    const d=await r.json();
+    el.textContent='✓ Conectado — '+(d.service||'OK');
+    el.style.color='var(--green)';
+  }catch(e){
+    el.textContent='✗ Sem resposta. Verifique a URL ou aguarde o Space acordar (30s).';
+    el.style.color='var(--red)';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  PROMPT SÊNIOR — EDITOR ABA 2
+// ══════════════════════════════════════════════════════
+function buildPromptEdit(pairsCtx, duracao, nVar, modo, produto, publico){
+  return `Você é um editor de vídeo sênior especializado em Direct Response Marketing com 15 anos de experiência criando criativos de alta conversão para Facebook Ads no Brasil.
+
+Você recebeu as transcrições (SRT) de um ou mais vídeos longos. Sua missão é analisar o conteúdo e selecionar os MELHORES TRECHOS para montar ${nVar} variação(ões) de criativos de ${duracao} segundos cada — com máximo poder de persuasão e conversão.
+
+═══════════════════════════════════════════════════════
+PRODUTO: ${produto||'não especificado'}
+PÚBLICO: ${publico||'não especificado'}
+DURAÇÃO ALVO: ${duracao}s por variação
+NÚMERO DE VARIAÇÕES: ${nVar}
+MODO: ${modo==='mix'?'Misturar trechos de diferentes vídeos':'Cada variação usa apenas um vídeo'}
+═══════════════════════════════════════════════════════
+
+TRANSCRIÇÕES DISPONÍVEIS:
+${pairsCtx}
+
+═══════════════════════════════════════════════════════
+COMO ANALISAR OS VÍDEOS:
+
+1. Leia cada segmento e avalie seu PODER DE PERSUASÃO:
+   - Qual segmento seria o melhor GANCHO? (para o scroll, cria identificação ou curiosidade)
+   - Qual aprofunda melhor a DOR/PROBLEMA?
+   - Qual apresenta melhor a SOLUÇÃO/PRODUTO?
+   - Qual tem melhor PROVA SOCIAL (depoimento, resultado, dado)?
+   - Qual tem melhor CTA (chama para ação de forma urgente e clara)?
+
+2. Para cada variação, monte uma sequência de cortes que:
+   - PARA O SCROLL em 0-3 segundos (gancho irresistível)
+   - MANTÉM ATENÇÃO com progressão emocional
+   - CONVERTE com CTA claro e urgente
+   - Totaliza aproximadamente ${duracao} segundos
+
+3. Cada variação DEVE ter uma estratégia diferente:
+   - Diferente ponto de entrada (gancho diferente)
+   - Diferente ênfase (dor vs solução vs prova)
+   - Diferente estrutura emocional
+
+═══════════════════════════════════════════════════════
+REGRA TÉCNICA DOS CORTES (CRÍTICO):
+
+O sistema de edição vai executar EXATAMENTE:
+  1. Abrir video_fonte.mp4
+  2. Cortar do segundo tempo_inicio até tempo_fim DENTRO desse arquivo
+  3. Repetir para cada corte na ordem
+  4. Emendar todos os cortes → vídeo final
 
 PORTANTO:
-- tempo_inicio = segundo exato de entrada NO VÍDEO FONTE (converta de ms: divide por 1000)
-- tempo_fim = segundo exato de saída NO VÍDEO FONTE
-- video_fonte = nome do arquivo sem extensão (ex: "video1", "video2")
-- Use os timestamps dos SRTs para saber onde cada fala está no vídeo
+  - tempo_inicio = segundo exato de entrada NO VÍDEO FONTE (ms do SRT ÷ 1000)
+  - tempo_fim = segundo exato de saída NO VÍDEO FONTE
+  - video_fonte = nome do arquivo sem extensão
 
-EXEMPLO DO QUE O SISTEMA FAZ:
-  Cena 1: video1, 0.0s → 7.5s   = pega os primeiros 7.5s do video1 (gancho)
-  Cena 2: video2, 15.2s → 28.0s = pega esse trecho do video2 (prova social)
-  Cena 3: video1, 42.0s → 55.0s = pega esse trecho do video1 (CTA)
-  → Sistema emenda: clipe1 + clipe2 + clipe3 = vídeo final persuasivo
+EXEMPLO:
+  Corte 1: video_aula, 0.0s → 8.5s   (gancho — primeiros 8.5s do vídeo)
+  Corte 2: video_aula, 142.0s → 168.0s (prova social forte no meio do vídeo)
+  Corte 3: video_aula, 1820.0s → 1847.0s (CTA no final do vídeo)
+  → Sistema emenda: gancho + prova + CTA = criativo de ~43s
 
-═══════════════════════════════════════════
-ESTRUTURA DOS 10 CRIATIVOS:
-
-EIXO 1 — GANCHO (4 variações): Teste 4 tipos de abertura diferentes:
-  - VAR 1: Pergunta de identificação ("Você sofre com...?")
-  - VAR 2: Afirmação chocante ou estatística surpreendente
-  - VAR 3: Resultado/transformação em primeiro lugar ("Em 7 dias...")
-  - VAR 4: Depoimento direto em primeira pessoa
-
-EIXO 2 — FORMATO NARRATIVO (3 variações): Teste 3 estruturas:
-  - VAR 5: UGC conversacional — pessoa comum falando direto para câmera
-  - VAR 6: Educativo — explica o problema e a solução com autoridade
-  - VAR 7: Storytelling — jornada de transformação pessoal
-
-EIXO 3 — CTA E OFERTA (3 variações): Teste 3 fechamentos:
-  - VAR 8: Urgência de tempo ou quantidade limitada
-  - VAR 9: Isca de valor (ex: "manda mensagem e receba o guia grátis")
-  - VAR 10: CTA direto e simples com garantia ou prova
-
-═══════════════════════════════════════════
-RETORNE EXATAMENTE ESTE JSON (sem texto fora, sem markdown):
+═══════════════════════════════════════════════════════
+RETORNE SOMENTE JSON VÁLIDO:
 
 {
-  "analise_geral": "3-4 frases analisando os padrões persuasivos encontrados nos criativos fonte: o que funciona, quais gatilhos são usados, qual linguagem ressoa com o público",
-  "padroes": {
-    "gancho_padrao": "padrão de abertura identificado nos criativos vencedores",
-    "corpo_padrao": "padrão de desenvolvimento persuasivo identificado",
-    "cta_padrao": "padrão de chamada para ação identificado"
-  },
+  "analise_geral": "Análise detalhada do conteúdo: quais são os momentos mais persuasivos encontrados, onde estão os melhores ganchos, provas sociais e CTAs, qual a estratégia geral para os cortes",
   "variacoes": [
     {
       "numero": 1,
-      "nome": "Nome criativo e descritivo da variação",
-      "eixo": "gancho",
-      "elemento_testado": "O que está sendo testado nessa variação",
-      "gancho_texto": "Texto completo da narração da seção de gancho",
-      "corpo_texto": "Texto completo da narração da seção de corpo",
-      "cta_texto": "Texto completo da narração do CTA",
-      "score": 87,
-      "score_justificativa": "Uma frase explicando por que esse score — baseado em princípios de persuasão e dados do mercado",
-      "score_fatores_positivos": ["fator positivo 1", "fator positivo 2", "fator positivo 3"],
-      "score_fatores_negativos": ["fator de risco 1"],
-      "storyboard": [
+      "nome": "Nome descritivo da estratégia de corte (ex: Gancho de Dor + Prova Direta)",
+      "estrategia": "Descrição em 2 frases de como essa variação foi montada e por que vai converter",
+      "duracao_total": 43.5,
+      "score": 88,
+      "score_justificativa": "Por que esse score — baseado em princípios reais de conversão",
+      "score_fatores_positivos": ["fator 1", "fator 2", "fator 3"],
+      "score_fatores_negativos": ["risco 1"],
+      "cortes": [
         {
           "zona": "gancho",
+          "video_fonte": "nome_do_video_sem_extensao",
           "tempo_inicio": 0.0,
-          "tempo_fim": 7.5,
-          "video_fonte": "video1",
-          "fala": "Texto exato da narração dessa cena — deve ser convincente e fluir naturalmente",
-          "instrucao_cena": "Instrução de edição detalhada: qual visual aparece, texto overlay, transição, ritmo, o que o telespectador vê e sente"
-        },
-        {
-          "zona": "corpo",
-          "tempo_inicio": 18.4,
-          "tempo_fim": 35.0,
-          "video_fonte": "video2",
-          "fala": "Narração do corpo — aprofunda o problema e apresenta a solução com prova social",
-          "instrucao_cena": "Instrução de edição: detalhe o que aparece visualmente, textos na tela, B-roll sugerido"
-        },
-        {
-          "zona": "cta",
-          "tempo_inicio": 48.0,
-          "tempo_fim": 60.0,
-          "video_fonte": "video1",
-          "fala": "CTA persuasivo com urgência e clareza sobre o próximo passo",
-          "instrucao_cena": "Instrução: visual de fechamento, como exibir o link/contato, animação do CTA"
+          "tempo_fim": 8.5,
+          "fala": "Transcrição exata do que é dito nesse trecho",
+          "motivo_selecao": "Por que esse trecho foi selecionado — qual gatilho emocional ele ativa e como contribui para a conversão",
+          "poder_persuasivo": "alto|medio|baixo",
+          "tipo_gatilho": "identificacao|curiosidade|dor|solucao|prova_social|autoridade|urgencia|cta"
         }
       ]
     }
@@ -1274,596 +2188,274 @@ RETORNE EXATAMENTE ESTE JSON (sem texto fora, sem markdown):
 }
 
 IMPORTANTE:
-- Cada variação deve ter entre 4 e 8 cenas no storyboard
-- Use timestamps REAIS dos SRTs para os cortes (converta ms → segundos)
-- Cada variação DEVE ter storyboard com cortes DIFERENTES
-- A soma das durações das cenas deve ser próxima de ${duracao}s
-- Distribua entre os vídeos fonte disponíveis: ${sourceNames.join(', ')}
-- O texto das falas deve ser PERSUASIVO, não apenas descritivo
-- As instruções de cena devem ser DETALHADAS para um editor de vídeo profissional`;
+- Cada corte deve ter entre 3s e 20s de duração
+- A soma dos cortes de cada variação deve ser próxima de ${duracao}s
+- Use os timestamps REAIS dos SRTs (converta ms → segundos: divida por 1000)
+- Cada variação DEVE ter cortes diferentes — não repita a mesma seleção
+- Priorize trechos com alto poder emocional e persuasivo
+- motivo_selecao deve ser detalhado e específico — explique o raciocínio de um profissional de marketing`;
 }
 
-// ── MAIN RUN ──────────────────────────────────────────────────────────────
-async function run() {
-  const apiKey = document.getElementById('apiKey').value.trim();
-  if (!apiKey)       { toast('⚠️ Insira a chave da API do Groq', true); return; }
-  if (!srtFiles.length) { toast('⚠️ Faça upload de pelo menos 1 arquivo .srt', true); return; }
+// ── MAIN RUN ABA 2 ─────────────────────────────────────
+async function runEdit(){
+  const apiKey  = document.getElementById('e2apiKey').value.trim();
+  const backUrl = document.getElementById('backendUrl').value.trim().replace(/\/health\/?$/,'').replace(/\/$/,'');
+  const backPwd = document.getElementById('backendPwd').value;
+  const produto = document.getElementById('e2produto').value.trim();
+  const publico = document.getElementById('e2publico').value.trim();
 
-  const btn = document.getElementById('btnGen');
-  btn.disabled = true; btn.textContent = '⏳ PROCESSANDO...';
-  document.getElementById('progWrap').style.display = 'block';
-  document.getElementById('results').style.display  = 'none';
+  if(!apiKey)                         { toast('⚠️ Insira a chave Groq',true); return; }
+  if(!backUrl)                        { toast('⚠️ Configure a URL do backend',true); return; }
+  if(!S.vidFiles.length)              { toast('⚠️ Faça upload dos vídeos',true); return; }
+  if(!Object.keys(S.edSrts).length)   { toast('⚠️ Faça upload das legendas SRT',true); return; }
 
-  try {
-    setStep(1, 12, 'Lendo e analisando SRTs...');
+  // verifica pares
+  const pairs=S.vidFiles.filter(f=>{
+    const stem=f.name.replace(/\.[^.]+$/,'');
+    return !!S.edSrts[stem];
+  });
+  if(!pairs.length){ toast('⚠️ Nenhum par vídeo+SRT com mesmo nome encontrado',true); return; }
+
+  const btn=document.getElementById('btnEdit');
+  btn.disabled=true; btn.textContent='⏳ ANALISANDO...';
+  document.getElementById('prog2').style.display='block';
+  document.getElementById('renderStatus').style.display='none';
+  document.getElementById('renderOut').style.display='none';
+
+  try{
+    setP2(1,10,'Lendo legendas e mapeando conteúdo...');
     await delay(300);
 
-    const duracao    = +document.getElementById('duracao').value || 60;
-    const produto    = document.getElementById('produto').value.trim()  || 'produto';
-    const publico    = document.getElementById('publico').value.trim()  || 'público geral';
-    const contexto   = document.getElementById('contexto').value.trim();
-    const wordTarget = Math.round(duracao * 2.2);
-    const gEnd       = Math.min(8, duracao * 0.18);
-    const ctaS       = duracao * 0.78;
+    // monta contexto para o prompt
+    const pairsCtx = pairs.map(vf=>{
+      const stem=vf.name.replace(/\.[^.]+$/,'');
+      const srt=S.edSrts[stem];
+      const p=srt.parsed;
+      const segs=p.segments.map(s=>`  [${(s.startMs/1000).toFixed(2)}s→${(s.endMs/1000).toFixed(2)}s] "${s.text}"`).join('\n');
+      return `VÍDEO: ${stem} (duração total: ${(p.duration/1000).toFixed(1)}s)\nTRANSCRIÇÃO COMPLETA:\n${segs}`;
+    }).join('\n\n═══════════════════════════════\n\n');
 
-    const sourceNames = srtFiles.map(f => f.name.replace(/\.[^.]+$/, ''));
-
-    // monta contexto SRT detalhado com timestamps para a IA
-    const srtCtx = srtFiles.map(f => {
-      const p    = f.parsed;
-      const name = f.name.replace(/\.[^.]+$/, '');
-      const dur  = (p.duration / 1000).toFixed(1);
-
-      const segsFormatted = p.segments.map(s =>
-        `  [${(s.startMs/1000).toFixed(2)}s → ${(s.endMs/1000).toFixed(2)}s] "${s.text}"`
-      ).join('\n');
-
-      return `ARQUIVO: ${name} (duração total: ${dur}s)
-SEGMENTOS COM TIMESTAMPS:
-${segsFormatted}
-
-ZONAS PERSUASIVAS IDENTIFICADAS:
-  GANCHO (0s→${(Math.min(8000,p.duration*0.18)/1000).toFixed(1)}s): "${segTxt(p.gancho)}"
-  CORPO:  "${segTxt(p.corpo)}"
-  CTA (últimos 22%): "${segTxt(p.cta)}"`;
-    });
-
-    setStep(2, 28, 'Enviando para análise com IA...');
+    setP2(2,24,'Enviando para análise com IA sênior de marketing...');
     await delay(300);
 
-    const prompt = buildPrompt(srtCtx, sourceNames, duracao, wordTarget, gEnd, ctaS, produto, publico, contexto);
+    const prompt=buildPromptEdit(pairsCtx,S.duracaoE,S.varCountE,S.modoCorte,produto,publico);
 
-    setStep(3, 45, 'Gerando 10 criativos de alta conversão...');
+    setP2(3,42,'Selecionando cortes persuasivos...');
 
-    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey },
-      body: JSON.stringify({
-        model:       'llama-3.3-70b-versatile',
-        temperature: 0.78,
-        max_tokens:  8000,
-        messages: [{ role:'user', content: prompt }]
+    const resp=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        temperature:0.72,
+        max_tokens:8000,
+        messages:[{role:'user',content:prompt}]
       })
     });
 
-    if (!resp.ok) {
-      const err = await resp.json().catch(()=>({}));
-      throw new Error(err.error?.message || `Erro Groq: ${resp.status}`);
+    if(!resp.ok){
+      const e=await resp.json().catch(()=>({}));
+      throw new Error(e.error?.message||`Groq erro ${resp.status}`);
     }
 
-    setStep(4, 72, 'Processando resposta...');
+    setP2(4,65,'Preparando plano de edição...');
     await delay(300);
 
-    const data   = await resp.json();
-    const rawTxt = data.choices?.[0]?.message?.content || '';
+    const data=await resp.json();
+    const rawTxt=data.choices?.[0]?.message?.content||'';
+    const match=rawTxt.match(/\{[\s\S]*\}/);
+    if(!match) throw new Error('IA não retornou JSON válido. Tente novamente.');
+    const parsed=JSON.parse(match[0]);
 
-    // extrai JSON da resposta
-    const jsonMatch = rawTxt.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('IA não retornou JSON válido. Tente novamente.');
-    const parsed = JSON.parse(jsonMatch[0]);
+    const variacoes=parsed.variacoes||[];
+    if(!variacoes.length) throw new Error('Nenhuma variação gerada. Verifique os SRTs.');
 
-    setStep(5, 92, 'Renderizando storyboards...');
-    await delay(400);
+    setP2(5,82,'Enviando para renderização...');
 
-    generated = parsed.variacoes || [];
-    if (parsed.analise_geral) {
-      document.getElementById('anaText').textContent = parsed.analise_geral;
-      document.getElementById('anaBox').style.display = 'block';
-    }
-    if (parsed.padroes) renderPatterns(parsed.padroes);
-    renderVariations(generated, duracao);
+    // mostra o painel de status de render
+    document.getElementById('prog2').style.display='none';
+    const rsEl=document.getElementById('renderStatus');
+    const fillEl=document.getElementById('rsFill');
+    const msgEl=document.getElementById('rsMsg');
+    rsEl.style.display='block';
+    fillEl.style.width='5%';
+    msgEl.textContent=`Enviando ${pairs.length} vídeo(s) e ${variacoes.length} variação(ões)...`;
 
-    setStep(5, 100, 'Concluído!');
-    await delay(500);
-    document.getElementById('progWrap').style.display = 'none';
-    document.getElementById('results').style.display  = 'block';
-    document.getElementById('results').scrollIntoView({ behavior:'smooth' });
+    // monta o FormData para o backend
+    const fd=new FormData();
 
-  } catch(err) {
-    document.getElementById('progWrap').style.display = 'none';
-    toast('❌ ' + err.message, true);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '⚡ ANALISAR E GERAR 10 CRIATIVOS';
-  }
-}
+    // converte variacoes para o formato que o backend espera (storyboard = cortes)
+    const variacoesFmt=variacoes.map(v=>({
+      ...v,
+      storyboard: (v.cortes||[]).map(c=>({
+        zona:         c.zona,
+        video_fonte:  c.video_fonte,
+        tempo_inicio: c.tempo_inicio,
+        tempo_fim:    c.tempo_fim,
+        fala:         c.fala,
+        instrucao_cena: c.motivo_selecao||''
+      }))
+    }));
 
-// ── RENDER PATTERNS ───────────────────────────────────────────────────────
-function renderPatterns(p) {
-  const grid = document.getElementById('patGrid');
-  grid.innerHTML = '';
-  [
-    { lbl:'Padrão de Gancho', txt:p.gancho_padrao, col:'var(--red)' },
-    { lbl:'Padrão de Corpo',  txt:p.corpo_padrao,  col:'var(--gold)' },
-    { lbl:'Padrão de CTA',    txt:p.cta_padrao,    col:'var(--blue)' }
-  ].forEach((item, i) => {
-    const card = document.createElement('div');
-    card.className = 'pat-card';
-    card.style.animationDelay = (i*0.1)+'s';
-    card.innerHTML = `
-      <div class="pat-lbl">
-        <span class="pat-dot" style="background:${item.col}"></span>
-        <span style="color:${item.col}">${item.lbl}</span>
-      </div>
-      <div class="pat-text">"${esc(item.txt)}"</div>`;
-    grid.appendChild(card);
-  });
-}
+    fd.append('variations',     JSON.stringify(variacoesFmt));
+    fd.append('resolution',     document.getElementById('renderRes').value);
+    fd.append('subtitle_style', document.getElementById('subtitleStyle').value);
+    fd.append('variation_ids',  JSON.stringify(variacoes.map(v=>v.numero)));
+    fd.append('access_password',backPwd);
 
-// ── SCORE ─────────────────────────────────────────────────────────────────
-function getScoreColor(s) {
-  if (s >= 80) return 'var(--green)';
-  if (s >= 65) return 'var(--gold)';
-  if (s >= 50) return 'var(--blue)';
-  return 'var(--red)';
-}
+    pairs.forEach((f,i)=>fd.append(`video_${i}`,f,f.name));
 
-function scoreRingSVG(score, size=56, stroke=4, cls='score-ring-fill') {
-  const r    = (size/2) - stroke;
-  const circ = 2 * Math.PI * r;
-  const off  = circ - (score/100)*circ;
-  const col  = getScoreColor(score);
-  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-    <circle class="score-ring-bg" cx="${size/2}" cy="${size/2}" r="${r}"/>
-    <circle class="${cls}" cx="${size/2}" cy="${size/2}" r="${r}"
-      stroke="${col}" stroke-dasharray="${circ}" stroke-dashoffset="${off}"/>
-  </svg>`;
-}
+    // fake progress durante upload/render
+    const prog=setInterval(()=>{
+      const cur=parseFloat(fillEl.style.width);
+      if(cur<88) fillEl.style.width=(cur+1.5)+'%';
+    },1200);
 
-// ── RENDER VARIATIONS ─────────────────────────────────────────────────────
-function renderVariations(vars, duracao) {
-  const grid = document.getElementById('varGrid');
-  grid.innerHTML = '';
-  vars.forEach((v, i) => {
-    const score    = v.score || 70;
-    const col      = getScoreColor(score);
-    const eixoCls  = v.eixo === 'gancho' ? 'ex-g' : v.eixo === 'cta' ? 'ex-c' : 'ex-f';
-    const eixoLbl  = v.eixo === 'gancho' ? 'Gancho' : v.eixo === 'cta' ? 'CTA' : 'Formato';
-    const preview  = (v.gancho_texto || '') + ' ' + (v.corpo_texto || '');
-    const words    = preview.split(/\s+/).length;
+    const rResp=await fetch(`${backUrl}/render`,{method:'POST',body:fd});
+    clearInterval(prog);
+    fillEl.style.width='95%';
 
-    const card = document.createElement('div');
-    card.className = 'var-card';
-    card.style.animationDelay = (i*0.06)+'s';
-    card.onclick = () => openSB(v);
-    card.innerHTML = `
-      <div class="vc-top">
-        <div class="vc-row1">
-          <span class="vc-num">VAR ${String(v.numero||i+1).padStart(2,'0')}</span>
-          <span class="vc-name">${esc(v.nome||'Variação')}</span>
-          <span class="vc-eixo ${eixoCls}">${eixoLbl}</span>
-        </div>
-        <div class="score-row">
-          <div class="score-ring">
-            ${scoreRingSVG(score)}
-            <div class="score-num" style="color:${col}">${score}%</div>
-          </div>
-          <div class="score-info">
-            <div class="score-label">Score de Conversão</div>
-            <div class="score-why">${esc(v.score_justificativa||'')}</div>
-          </div>
-        </div>
-      </div>
-      <div class="vc-body">
-        <div class="vc-preview">${esc(v.gancho_texto||v.corpo_texto||'')}</div>
-      </div>
-      <div class="vc-footer">
-        <span class="vc-words">~${words} palavras · ${(v.storyboard||[]).length} cenas</span>
-        <span class="vc-testing">${esc(v.elemento_testado||'')}</span>
-      </div>`;
-    grid.appendChild(card);
-  });
-}
-
-// ── STORYBOARD PAGE ───────────────────────────────────────────────────────
-function openSB(v) {
-  const score   = v.score || 70;
-  const col     = getScoreColor(score);
-  const eixoCls = v.eixo === 'gancho' ? 'ex-g' : v.eixo === 'cta' ? 'ex-c' : 'ex-f';
-  const eixoLbl = v.eixo === 'gancho' ? 'Gancho' : v.eixo === 'cta' ? 'CTA' : 'Formato';
-
-  // score factors
-  const pos = (v.score_fatores_positivos||[]).map(f=>`<span class="sf pos">✓ ${esc(f)}</span>`).join('');
-  const neg = (v.score_fatores_negativos||[]).map(f=>`<span class="sf neg">⚠ ${esc(f)}</span>`).join('');
-
-  // storyboard scenes
-  const scenes = (v.storyboard||[]).map((s,i) => {
-    const zoneCls = s.zona==='gancho'?'z-g':s.zona==='cta'?'z-t':'z-c';
-    const zoneLabel = s.zona==='gancho'?'Gancho':s.zona==='cta'?'CTA':'Corpo';
-    const tIn  = parseFloat(s.tempo_inicio||0).toFixed(1);
-    const tOut = parseFloat(s.tempo_fim||0).toFixed(1);
-    const dur  = (parseFloat(tOut)-parseFloat(tIn)).toFixed(1);
-    return `
-    <div class="scene">
-      <div class="scene-tc">
-        <span class="scene-zone ${zoneCls}">${zoneLabel}</span>
-        <div class="scene-time">${tIn}s<br>→<br>${tOut}s</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted2)">${dur}s</div>
-        <span class="scene-src">${esc(s.video_fonte||'video1')}</span>
-      </div>
-      <div class="scene-content">
-        <div class="sc-block">
-          <div class="sc-label">🎙 Narração</div>
-          <div class="sc-text">${esc(s.fala||'')}</div>
-        </div>
-        <div class="sc-block">
-          <div class="sc-label">🎬 Instrução de Edição</div>
-          <div class="sc-instruction">${esc(s.instrucao_cena||'')}</div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-
-  document.getElementById('sbContent').innerHTML = `
-    <div class="sb-header">
-      <div class="sb-eyebrow">Variação ${String(v.numero||'').padStart(2,'0')} · ${eixoLbl}</div>
-      <div class="sb-title">${esc(v.nome||'Variação')}</div>
-      <div class="sb-meta">
-        <span class="sb-chip"><span class="vc-eixo ${eixoCls}" style="margin:0">${eixoLbl}</span></span>
-        <span class="sb-chip">🎯 ${esc(v.elemento_testado||'')}</span>
-        <span class="sb-chip">🎬 ${(v.storyboard||[]).length} cenas</span>
-      </div>
-    </div>
-
-    <div class="score-big">
-      <div class="score-big-ring">
-        ${scoreRingSVG(score,90,6,'score-ring-fill')}
-        <div class="score-big-num" style="color:${col}">${score}%</div>
-      </div>
-      <div class="score-big-info">
-        <div class="score-big-label">Score de Conversão Estimado</div>
-        <div class="score-big-why">${esc(v.score_justificativa||'')}</div>
-        <div class="score-factors">${pos}${neg}</div>
-      </div>
-    </div>
-
-    <div class="sb-sec-title">Roteiro de Narração</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px;">
-      ${[
-        {lbl:'🔴 Gancho',txt:v.gancho_texto,col:'var(--red)'},
-        {lbl:'🟡 Corpo', txt:v.corpo_texto, col:'var(--gold)'},
-        {lbl:'🔵 CTA',   txt:v.cta_texto,   col:'var(--blue)'}
-      ].map(b=>`
-        <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:18px;">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:${b.col};margin-bottom:10px;">${b.lbl}</div>
-          <div style="font-size:13px;line-height:1.7;color:var(--text2)">${esc(b.txt||'')}</div>
-        </div>`).join('')}
-    </div>
-
-    <div class="sb-sec-title">Plano de Edição — ${(v.storyboard||[]).length} Cenas</div>
-    <div class="sb-scenes">${scenes}</div>
-
-    <div style="margin-top:28px;display:flex;gap:10px;flex-wrap:wrap;">
-      <button class="btn-sb-export btn-sb-copy" onclick="copySB(${v.numero||0})">📋 Copiar Storyboard</button>
-      <button class="btn-sb-export btn-sb-dl" onclick="downloadSB(${v.numero||0})">⬇ Baixar .txt</button>
-    </div>`;
-
-  document.getElementById('sbActions').innerHTML = `
-    <button class="btn-sb-export btn-sb-copy" onclick="copySB(${v.numero||0})">📋 Copiar</button>
-    <button class="btn-sb-export btn-sb-dl" onclick="downloadSB(${v.numero||0})">⬇ Baixar</button>`;
-
-  document.getElementById('sbPage').style.display = 'block';
-  document.getElementById('sbPage').scrollTop = 0;
-  document.body.style.overflow = 'hidden';
-}
-
-function closeSB() {
-  document.getElementById('sbPage').style.display = 'none';
-  document.body.style.overflow = '';
-}
-
-function getSBText(varNum) {
-  const v = generated.find(x => x.numero === varNum);
-  if (!v) return '';
-  let txt = `CRIATIVO STUDIO PRO — STORYBOARD\n`;
-  txt += `${'='.repeat(50)}\n`;
-  txt += `VAR ${String(v.numero).padStart(2,'0')} — ${v.nome}\n`;
-  txt += `Eixo: ${v.eixo} | Testando: ${v.elemento_testado}\n`;
-  txt += `Score: ${v.score}% — ${v.score_justificativa}\n`;
-  txt += `${'='.repeat(50)}\n\n`;
-  txt += `GANCHO:\n${v.gancho_texto}\n\n`;
-  txt += `CORPO:\n${v.corpo_texto}\n\n`;
-  txt += `CTA:\n${v.cta_texto}\n\n`;
-  txt += `${'─'.repeat(50)}\nPLANO DE EDIÇÃO:\n\n`;
-  (v.storyboard||[]).forEach((s,i) => {
-    txt += `CENA ${i+1} [${s.zona.toUpperCase()}]\n`;
-    txt += `Fonte: ${s.video_fonte} | Corte: ${s.tempo_inicio}s → ${s.tempo_fim}s (${(s.tempo_fim-s.tempo_inicio).toFixed(1)}s)\n`;
-    txt += `Fala: ${s.fala}\n`;
-    txt += `Edição: ${s.instrucao_cena}\n\n`;
-  });
-  return txt;
-}
-
-function copySB(varNum) {
-  navigator.clipboard.writeText(getSBText(varNum)).then(() => toast('✓ Storyboard copiado!'));
-}
-
-function downloadSB(varNum) {
-  const v = generated.find(x => x.numero === varNum);
-  if (!v) return;
-  const blob = new Blob([getSBText(varNum)], {type:'text/plain'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `var${String(v.numero).padStart(2,'0')}-${v.nome.replace(/\s+/g,'-')}.txt`;
-  a.click();
-}
-
-function exportAll() {
-  let all = '';
-  generated.forEach(v => { all += getSBText(v.numero) + '\n\n' + '═'.repeat(60) + '\n\n'; });
-  const blob = new Blob([all], {type:'text/plain'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `criativo-studio-todos-${new Date().toISOString().slice(0,10)}.txt`;
-  a.click();
-}
-</script>
-<script>
-// ── RENDER TAB ────────────────────────────────────────────────────────────
-function refreshVarSelect() {
-  const area = document.getElementById('varSelectArea');
-  if (!generated.length) {
-    area.innerHTML = `<div class="no-variations-msg">
-      Nenhum criativo gerado ainda.<br>
-      Vá para a aba <strong>Gerar Criativos</strong> primeiro.
-    </div>`;
-    return;
-  }
-
-  const allIds = generated.map(v => v.numero);
-  if (!selectedVarIds.size) allIds.forEach(id => selectedVarIds.add(id));
-
-  area.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-      <div style="font-size:13px;color:var(--muted2);">${generated.length} criativos disponíveis</div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn-export" style="padding:8px 14px;font-size:12px;" onclick="selectAllVars(true)">Selecionar Todos</button>
-        <button class="btn-export" style="padding:8px 14px;font-size:12px;" onclick="selectAllVars(false)">Nenhum</button>
-      </div>
-    </div>
-    <div class="var-sel-grid" id="varSelGrid"></div>`;
-
-  const grid = document.getElementById('varSelGrid');
-  generated.forEach(v => {
-    const sel = selectedVarIds.has(v.numero);
-    const col = getScoreColor(v.score||70);
-    const div = document.createElement('div');
-    div.className = 'var-sel-item' + (sel?' selected':'');
-    div.id = `vsi-${v.numero}`;
-    div.onclick = () => toggleVarSel(v.numero);
-    div.innerHTML = `
-      <input type="checkbox" ${sel?'checked':''} onclick="event.stopPropagation();toggleVarSel(${v.numero})"/>
-      <div>
-        <div class="var-sel-name">VAR ${String(v.numero).padStart(2,'0')} — ${esc(v.nome||'')}</div>
-        <div class="var-sel-score" style="color:${col}">Score: ${v.score||0}%</div>
-      </div>`;
-    grid.appendChild(div);
-  });
-}
-
-function toggleVarSel(id) {
-  if (selectedVarIds.has(id)) selectedVarIds.delete(id);
-  else selectedVarIds.add(id);
-  const item = document.getElementById(`vsi-${id}`);
-  if (item) {
-    item.classList.toggle('selected', selectedVarIds.has(id));
-    const cb = item.querySelector('input[type=checkbox]');
-    if (cb) cb.checked = selectedVarIds.has(id);
-  }
-}
-
-function selectAllVars(all) {
-  selectedVarIds.clear();
-  if (all) generated.forEach(v => selectedVarIds.add(v.numero));
-  refreshVarSelect();
-}
-
-// ── TEST BACKEND ──────────────────────────────────────────────────────────
-async function testBackend() {
-  const raw = document.getElementById('backendUrl').value.trim();
-  const url = raw.replace(/\/health\/?$/, '').replace(/\/$/, '');
-  document.getElementById('backendUrl').value = url;
-  const el = document.getElementById('backendStatus');
-  if (!url) { el.textContent = '⚠️ Cole a URL primeiro'; el.style.color = 'var(--red)'; return; }
-  el.textContent = '⏳ Testando...'; el.style.color = 'var(--muted2)';
-  try {
-    const r = await fetch(`${url}/health`, { signal: AbortSignal.timeout(8000) });
-    const d = await r.json();
-    el.textContent = '✓ Conectado — ' + (d.service || 'OK');
-    el.style.color = 'var(--green)';
-  } catch(e) {
-    el.textContent = '✗ Sem resposta — verifique a URL e se o Space está online';
-    el.style.color = 'var(--red)';
-  }
-}
-
-// ── START RENDER ──────────────────────────────────────────────────────────
-async function startRender() {
-  const url = document.getElementById('backendUrl').value.trim()
-    .replace(/\/health\/?$/, '').replace(/\/$/, '');
-  if (!url)              { toast('⚠️ Configure a URL do backend', true); return; }
-  if (!videoFiles.length){ toast('⚠️ Faça upload dos vídeos fonte', true); return; }
-  if (!selectedVarIds.size){ toast('⚠️ Selecione ao menos uma variação', true); return; }
-  if (!generated.length) { toast('⚠️ Gere os criativos primeiro', true); return; }
-
-  const varList    = generated.filter(v => selectedVarIds.has(v.numero));
-  const resolution = document.getElementById('renderResolution').value;
-  const subStyle   = document.getElementById('subtitleStyle').value;
-  const password   = document.getElementById('backendPassword').value;
-
-  const fd = new FormData();
-  fd.append('variations',      JSON.stringify(varList));
-  fd.append('resolution',      resolution);
-  fd.append('subtitle_style',  subStyle);
-  fd.append('variation_ids',   JSON.stringify([...selectedVarIds]));
-  fd.append('access_password', password);
-
-  videoFiles.forEach((f, i) => fd.append(`video_${i}`, f, f.name));
-
-  const btn = document.getElementById('btnRender');
-  btn.disabled = true; btn.textContent = '⏳ RENDERIZANDO...';
-
-  const statusEl = document.getElementById('renderStatus');
-  const progEl   = document.getElementById('rsProg');
-  const textEl   = document.getElementById('rsText');
-  statusEl.style.display = 'block';
-  document.getElementById('renderResults').style.display = 'none';
-
-  progEl.style.width = '10%';
-  textEl.textContent = `Enviando ${videoFiles.length} vídeo(s) e ${varList.length} variação(ões) para o servidor...`;
-
-  try {
-    const fakeProgress = setInterval(() => {
-      const cur = parseFloat(progEl.style.width);
-      if (cur < 85) progEl.style.width = (cur + 2) + '%';
-    }, 1500);
-
-    const r = await fetch(`${url}/render`, { method:'POST', body:fd });
-
-    clearInterval(fakeProgress);
-    progEl.style.width = '92%';
-
-    if (!r.ok) {
-      const err = await r.json().catch(()=>({error:`HTTP ${r.status}`}));
-      if (r.status === 401) throw new Error('Senha incorreta. Verifique o campo Senha de Acesso.');
-      throw new Error(err.error || `Erro ${r.status}`);
+    if(!rResp.ok){
+      const e=await rResp.json().catch(()=>({error:`HTTP ${rResp.status}`}));
+      if(rResp.status===401) throw new Error('Senha incorreta. Verifique o campo de senha.');
+      throw new Error(e.error||`Erro ${rResp.status}`);
     }
 
-    const data = await r.json();
-    progEl.style.width = '100%';
-    textEl.textContent = `✓ ${data.rendered?.length || 0} vídeo(s) renderizado(s) com sucesso!`;
+    const rData=await rResp.json();
+    fillEl.style.width='100%';
+    msgEl.textContent=`✓ ${rData.rendered?.length||0} vídeo(s) renderizado(s) com sucesso!`;
 
-    if (data.errors?.length) {
-      data.errors.forEach(e => toast(`⚠️ VAR ${e.numero}: ${e.error}`, true));
+    if(rData.errors?.length){
+      rData.errors.forEach(e=>toast(`⚠️ VAR ${e.numero}: ${e.error}`,true));
     }
 
-    const gridEl   = document.getElementById('rrGrid');
-    const resultsEl = document.getElementById('renderResults');
-    gridEl.innerHTML = '';
+    // monta resultado com relatório detalhado
+    const grid=document.getElementById('routGrid');
+    grid.innerHTML='';
 
-    data.rendered?.forEach(item => {
-      const col   = getScoreColor(item.score || 70);
-      const pwd   = document.getElementById('backendPassword').value;
-      const dlUrl = pwd
-        ? `${url}/download/${item.session}/${item.file}?access_password=${encodeURIComponent(pwd)}`
-        : `${url}/download/${item.session}/${item.file}`;
-      const div = document.createElement('div');
-      div.className = 'rr-item';
-      div.innerHTML = `
-        <div class="rr-info">
-          <div class="rr-name">VAR ${String(item.numero).padStart(2,'0')} — ${esc(item.nome)}</div>
-          <div class="rr-meta" style="color:${col}">Score: ${item.score}%
-            &nbsp;·&nbsp; <span style="color:var(--muted2)">${esc(item.file)}</span>
+    rData.rendered?.forEach(item=>{
+      const varInfo=variacoesFmt.find(v=>v.numero===item.numero)||{};
+      const col=scoreColor(item.score||varInfo.score||70);
+      const pwd=backPwd;
+      const dlUrl=pwd
+        ?`${backUrl}/download/${item.session}/${item.file}?access_password=${encodeURIComponent(pwd)}`
+        :`${backUrl}/download/${item.session}/${item.file}`;
+
+      // relatório dos cortes
+      const cortesHTML=(varInfo.cortes||varInfo.storyboard||[]).map((c,ci)=>{
+        const dur=(parseFloat(c.tempo_fim||0)-parseFloat(c.tempo_inicio||0)).toFixed(1);
+        const zoneCls=c.zona==='gancho'?'sz-g':c.zona==='cta'?'sz-t':'sz-c';
+        const zoneLabel=c.zona==='gancho'?'Gancho':c.zona==='cta'?'CTA':'Corpo';
+        const poder=c.poder_persuasivo||'alto';
+        const poderCol=poder==='alto'?'var(--green)':poder==='medio'?'var(--gold)':'var(--txt3)';
+        return `
+          <div class="cut-item">
+            <span class="cut-zone ${zoneCls}">${zoneLabel}</span>
+            <div class="cut-body">
+              <div class="cut-ts">${esc(c.video_fonte||'')} · ${c.tempo_inicio}s → ${c.tempo_fim}s · <strong>${dur}s</strong> · <span style="color:${poderCol}">poder: ${poder}</span>${c.tipo_gatilho?` · ${esc(c.tipo_gatilho)}`:''}
+              </div>
+              <div class="cut-fala">"${esc(c.fala||'')}"</div>
+              <div class="cut-why">→ ${esc(c.motivo_selecao||c.instrucao_cena||'')}</div>
+            </div>
+          </div>`;
+      }).join('');
+
+      const div=document.createElement('div');
+      div.className='rout-item';
+      div.innerHTML=`
+        <div class="rout-head">
+          <div>
+            <div class="rout-name">VAR ${String(item.numero).padStart(2,'0')} — ${esc(item.nome||varInfo.nome||'')}</div>
+            <div class="rout-meta" style="color:${col}">Score: ${item.score||varInfo.score||0}% · ${(varInfo.cortes||[]).length} cortes · ~${varInfo.duracao_total||0}s</div>
+            <div class="rout-meta" style="margin-top:4px;color:var(--txt3);font-style:italic;">${esc(varInfo.estrategia||'')}</div>
           </div>
+          <a class="btn-dl-video" href="${dlUrl}" download="${item.file}" target="_blank">⬇ Baixar MP4</a>
         </div>
-        <a class="btn-dl-video" href="${dlUrl}" download="${item.file}" target="_blank">
-          ⬇ Baixar MP4
-        </a>`;
-      gridEl.appendChild(div);
+        <div class="rout-report">
+          <div class="rout-report-title">📊 Relatório de Cortes — Raciocínio da IA</div>
+          <div class="cut-list">${cortesHTML}</div>
+        </div>`;
+      grid.appendChild(div);
     });
 
-    resultsEl.style.display = 'block';
-    resultsEl.scrollIntoView({ behavior:'smooth' });
+    document.getElementById('renderOut').style.display='block';
+    document.getElementById('renderOut').scrollIntoView({behavior:'smooth'});
 
-  } catch(err) {
-    progEl.style.width = '0%';
-    textEl.textContent = '❌ ' + err.message;
-    toast('❌ ' + err.message, true);
+  } catch(err){
+    document.getElementById('prog2').style.display='none';
+    document.getElementById('renderStatus').style.display='none';
+    toast('❌ '+err.message,true);
   } finally {
-    btn.disabled = false;
-    btn.textContent = '🎞 RENDERIZAR VÍDEOS SELECIONADOS';
+    btn.disabled=false; btn.textContent='✂ ANALISAR E CORTAR VÍDEOS';
   }
 }
 
-// ── BACKUP ────────────────────────────────────────────────────────────────
-function saveBackup() {
-  const data = {
-    version:         3,
-    savedAt:         new Date().toISOString(),
-    apiKey:          document.getElementById('apiKey').value,
-    backendUrl:      document.getElementById('backendUrl').value,
-    backendPassword: document.getElementById('backendPassword').value,
-    produto:         document.getElementById('produto').value,
-    publico:         document.getElementById('publico').value,
-    duracao:         document.getElementById('duracao').value,
-    contexto:        document.getElementById('contexto').value,
-    renderResolution:document.getElementById('renderResolution').value,
-    subtitleStyle:   document.getElementById('subtitleStyle').value,
-    generated,
-    srtFileNames:    srtFiles.map(f => f.name),
+// ══════════════════════════════════════════════════════
+//  BACKUP
+// ══════════════════════════════════════════════════════
+function saveBackup(){
+  const d={
+    version:3, savedAt:new Date().toISOString(),
+    apiKey:         document.getElementById('apiKey').value,
+    e2apiKey:       document.getElementById('e2apiKey').value,
+    backendUrl:     document.getElementById('backendUrl').value,
+    backendPwd:     document.getElementById('backendPwd').value,
+    g1produto:      document.getElementById('g1produto').value,
+    g1publico:      document.getElementById('g1publico').value,
+    g1contexto:     document.getElementById('g1contexto').value,
+    g1duracao:      document.getElementById('g1duracao').value,
+    e2produto:      document.getElementById('e2produto').value,
+    e2publico:      document.getElementById('e2publico').value,
+    tipoVal:        S.tipoVal,
+    formatoVal:     S.formatoVal,
+    varCount:       S.varCount,
+    varCountE:      S.varCountE,
+    duracaoE:       S.duracaoE,
+    modoCorte:      S.modoCorte,
+    renderRes:      document.getElementById('renderRes').value,
+    subtitleStyle:  document.getElementById('subtitleStyle').value,
+    generated:      S.generated,
   };
-
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const a    = document.createElement('a');
-  a.href     = URL.createObjectURL(blob);
-  a.download = `criativo-studio-backup-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-
-  const ts = document.getElementById('backupTs');
-  ts.style.display = 'block';
-  ts.textContent   = '✓ Salvo às ' + new Date().toLocaleTimeString('pt-BR');
+  const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download=`hcs-backup-${new Date().toISOString().slice(0,10)}.json`; a.click();
+  const ts=document.getElementById('bkTs');
+  ts.style.display='block'; ts.textContent='✓ Salvo às '+new Date().toLocaleTimeString('pt-BR');
   toast('✓ Backup salvo!');
 }
 
-function restoreBackup(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
+function restoreBackup(event){
+  const f=event.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      const set=(id,val)=>{if(val!==undefined){const el=document.getElementById(id);if(el)el.value=val;}};
+      set('apiKey',d.apiKey); set('e2apiKey',d.e2apiKey);
+      set('backendUrl',d.backendUrl); set('backendPwd',d.backendPwd);
+      set('g1produto',d.g1produto); set('g1publico',d.g1publico);
+      set('g1contexto',d.g1contexto); set('g1duracao',d.g1duracao);
+      set('e2produto',d.e2produto); set('e2publico',d.e2publico);
+      set('renderRes',d.renderRes); set('subtitleStyle',d.subtitleStyle);
 
-      if (data.apiKey)           document.getElementById('apiKey').value           = data.apiKey;
-      if (data.backendUrl)       document.getElementById('backendUrl').value        = data.backendUrl;
-      if (data.backendPassword)  document.getElementById('backendPassword').value   = data.backendPassword;
-      if (data.produto)          document.getElementById('produto').value           = data.produto;
-      if (data.publico)          document.getElementById('publico').value           = data.publico;
-      if (data.duracao)          document.getElementById('duracao').value           = data.duracao;
-      if (data.contexto)         document.getElementById('contexto').value          = data.contexto;
-      if (data.renderResolution) document.getElementById('renderResolution').value  = data.renderResolution;
-      if (data.subtitleStyle)    document.getElementById('subtitleStyle').value     = data.subtitleStyle;
+      if(d.varCount){ S.varCount=d.varCount; document.getElementById('varCount').textContent=d.varCount; }
+      if(d.varCountE){ S.varCountE=d.varCountE; document.getElementById('varCountE').textContent=d.varCountE; }
 
-      if (data.generated?.length) {
-        generated = data.generated;
-        document.getElementById('results').style.display = 'block';
-        renderVariations(generated, +data.duracao || 60);
-        toast(`✓ Backup restaurado — ${generated.length} criativos carregados!`);
+      if(d.generated?.length){
+        S.generated=d.generated;
+        document.getElementById('results1').style.display='block';
+        renderVars(S.generated);
+        document.getElementById('resCount').textContent=S.generated.length;
+        toast(`✓ Backup restaurado — ${S.generated.length} criativos carregados!`);
       } else {
         toast('✓ Configurações restauradas!');
       }
-
-      const ts = document.getElementById('backupTs');
-      ts.style.display = 'block';
-      ts.textContent   = '✓ Restaurado de ' + (data.savedAt
-        ? new Date(data.savedAt).toLocaleString('pt-BR')
-        : 'backup');
-
-    } catch(err) {
-      toast('❌ Arquivo de backup inválido', true);
-    }
+      const ts=document.getElementById('bkTs');
+      ts.style.display='block';
+      ts.textContent='✓ Restaurado de '+(d.savedAt?new Date(d.savedAt).toLocaleString('pt-BR'):'backup');
+    }catch(err){ toast('❌ Arquivo inválido',true); }
   };
-  reader.readAsText(file);
-  event.target.value = '';
+  r.readAsText(f); event.target.value='';
 }
 </script>
 </body>
