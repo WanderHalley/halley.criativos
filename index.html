@@ -3,560 +3,1030 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Criativo Studio — Facebook Ads</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Criativo Studio Pro — Facebook Ads</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #060608;
-  --s1: #0d0d12;
-  --s2: #14141c;
-  --s3: #1c1c28;
-  --border: rgba(255,255,255,0.06);
-  --border2: rgba(255,255,255,0.11);
-  --acc: #ff6b35;
-  --acc2: #ff8c5a;
-  --yellow: #ffd60a;
-  --green: #2ecc71;
-  --blue: #4fc3f7;
-  --purple: #c084fc;
-  --red: #ff4757;
-  --text: #e8e8f0;
-  --muted: #52526e;
-  --muted2: #8888a8;
+:root{
+  --bg:#07080f;
+  --s1:#0e0f1a;
+  --s2:#141522;
+  --s3:#1a1b2e;
+  --s4:#20213a;
+  --border:rgba(255,255,255,0.05);
+  --border2:rgba(255,255,255,0.09);
+  --border3:rgba(255,255,255,0.14);
+  --acc:#e8622a;
+  --acc2:#f07840;
+  --acc-glow:rgba(232,98,42,0.15);
+  --gold:#f5c842;
+  --gold2:#ffd860;
+  --green:#00d68f;
+  --green2:#00f5a8;
+  --blue:#4d9fff;
+  --blue2:#74b3ff;
+  --red:#ff4d6d;
+  --purple:#a78bfa;
+  --text:#eeeef5;
+  --text2:#c8c8dc;
+  --muted:#4a4a6a;
+  --muted2:#7070a0;
+  --muted3:#9090b8;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+html{scroll-behavior:smooth;font-size:16px;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+  line-height:1.6;
+}
 
-/* noise */
-body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.5;}
+/* ── BACKGROUND ── */
+.bg-grid{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+.bg-orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;}
+.orb1{width:700px;height:500px;background:rgba(232,98,42,0.07);top:-200px;right:-150px;}
+.orb2{width:600px;height:600px;background:rgba(77,159,255,0.04);bottom:-200px;left:-150px;}
+.orb3{width:400px;height:400px;background:rgba(167,139,250,0.04);top:40%;left:40%;}
 
-/* blobs */
-.blob{position:fixed;border-radius:50%;filter:blur(140px);pointer-events:none;z-index:0;}
-.b1{width:600px;height:400px;background:rgba(255,107,53,0.06);top:-100px;right:-100px;}
-.b2{width:500px;height:500px;background:rgba(79,195,247,0.04);bottom:-100px;left:-100px;}
+/* ── LAYOUT ── */
+.shell{position:relative;z-index:1;max-width:1140px;margin:0 auto;padding:0 24px 140px;}
 
-.shell{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:48px 24px 120px;}
+/* ── TOPBAR ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 0 32px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:40px;
+  flex-wrap:wrap;gap:16px;
+}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-icon{
+  width:42px;height:42px;
+  background:linear-gradient(135deg,var(--acc),var(--gold));
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+  box-shadow:0 4px 20px rgba(232,98,42,0.3);
+}
+.logo-text{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.02em;}
+.logo-text span{color:var(--acc);}
+.logo-badge{
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  background:rgba(232,98,42,.12);border:1px solid rgba(232,98,42,.25);
+  color:var(--acc);padding:3px 8px;border-radius:4px;
+}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.status-pill{
+  display:flex;align-items:center;gap:7px;
+  background:rgba(0,214,143,.06);border:1px solid rgba(0,214,143,.15);
+  color:var(--green);padding:8px 16px;border-radius:100px;
+  font-family:'JetBrains Mono',monospace;font-size:12px;
+}
+.status-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,214,143,.4)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(0,214,143,0)}}
 
 /* ── TABS ── */
-.tabs{display:flex;gap:4px;margin-bottom:36px;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:5px;}
-.tab{flex:1;padding:11px 16px;border-radius:9px;border:none;background:transparent;color:var(--muted2);font-family:'Instrument Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
-.tab:hover{color:var(--text);}
-.tab.active{background:var(--s3);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3);}
+.tabs{
+  display:flex;gap:2px;margin-bottom:40px;
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:14px;padding:5px;
+}
+.tab{
+  flex:1;padding:13px 20px;border-radius:10px;border:none;
+  background:transparent;color:var(--muted2);
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all .25s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  letter-spacing:-.01em;
+}
+.tab:hover{color:var(--text2);background:var(--s2);}
+.tab.active{
+  background:linear-gradient(135deg,var(--s3),var(--s4));
+  color:var(--text);
+  box-shadow:0 2px 12px rgba(0,0,0,.4);
+  border:1px solid var(--border2);
+}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
 
-/* ── RENDER PAGE ── */
-.render-status{display:none;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:22px;margin-top:16px;}
-.rs-label{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted2);margin-bottom:12px;}
-.rs-prog-bg{height:4px;background:var(--s3);border-radius:100px;overflow:hidden;margin-bottom:10px;}
-.rs-prog-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--acc),var(--yellow));border-radius:100px;transition:width .4s ease;}
-.rs-text{font-size:14px;color:var(--muted2);}
-
-.render-results{display:none;margin-top:16px;}
-.rr-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.04em;margin-bottom:16px;}
-.rr-grid{display:flex;flex-direction:column;gap:10px;}
-.rr-item{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;animation:fadeUp .3s ease;}
-.rr-info{}
-.rr-name{font-size:15px;font-weight:700;margin-bottom:3px;}
-.rr-meta{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted2);}
-.btn-dl-video{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:var(--acc);border:none;border-radius:9px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;text-decoration:none;}
-.btn-dl-video:hover{opacity:.85;transform:translateY(-1px);}
-
-.var-sel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:10px;}
-.var-sel-item{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;}
-.var-sel-item:hover{border-color:var(--acc);}
-.var-sel-item.selected{border-color:var(--acc);background:rgba(255,107,53,.06);}
-.var-sel-item input[type=checkbox]{accent-color:var(--acc);width:16px;height:16px;flex-shrink:0;}
-.var-sel-name{font-size:13px;font-weight:600;line-height:1.3;}
-.var-sel-score{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2);margin-top:2px;}
-
-.no-variations-msg{background:rgba(255,107,53,.05);border:1px solid rgba(255,107,53,.15);border-radius:10px;padding:20px;text-align:center;color:var(--muted2);font-size:14px;}
-
-/* ── HEADER ── */
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:16px;}
-.logo{display:flex;align-items:baseline;gap:6px;}
-.logo-main{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:.06em;color:var(--text);}
-.logo-v{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--acc);background:rgba(255,107,53,.12);border:1px solid rgba(255,107,53,.25);padding:3px 9px;border-radius:4px;margin-left:4px;}
-.topbar-right{display:flex;align-items:center;gap:10px;}
-.platform-badge{display:flex;align-items:center;gap:7px;background:rgba(24,119,242,.1);border:1px solid rgba(24,119,242,.25);color:#4a90d9;padding:8px 16px;border-radius:100px;font-family:'JetBrains Mono',monospace;font-size:13px;}
-.platform-dot{width:6px;height:6px;background:#4a90d9;border-radius:50%;animation:blink 2s infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+/* ── SECTION LABEL ── */
+.sec-label{
+  font-family:'Syne',sans-serif;font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.2em;
+  color:var(--muted2);margin-bottom:6px;
+}
 
 /* ── CARDS ── */
-.card{background:var(--s1);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px;}
-.card-top{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
-.step-num{width:32px;height:32px;background:var(--acc);color:#fff;border-radius:7px;font-family:'JetBrains Mono',monospace;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.card-title{font-size:18px;font-weight:700;}
-.card-body{padding:22px;}
+.card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:20px;overflow:hidden;
+  margin-bottom:16px;
+  transition:border-color .2s;
+}
+.card:hover{border-color:var(--border2);}
+.card-header{
+  padding:20px 26px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:14px;
+  background:linear-gradient(180deg,var(--s2) 0%,transparent 100%);
+}
+.step-badge{
+  width:34px;height:34px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  color:#fff;border-radius:10px;
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;box-shadow:0 4px 12px rgba(232,98,42,.3);
+}
+.card-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;letter-spacing:-.02em;}
+.card-subtitle{font-size:12px;color:var(--muted2);margin-top:1px;}
+.card-body{padding:24px 26px;}
 
 /* ── FIELDS ── */
-.flabel{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
-.flabel a{color:var(--acc);text-decoration:none;font-size:12px;}
-input,textarea,select{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:15px;padding:13px 16px;outline:none;transition:border-color .2s,box-shadow .2s;}
-input:focus,textarea:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(255,107,53,.1);}
+.flabel{
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);
+  margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;
+}
+.flabel a{color:var(--acc);text-decoration:none;font-size:11px;}
+.flabel a:hover{text-decoration:underline;}
+input,textarea,select{
+  width:100%;
+  background:var(--s2);
+  border:1px solid var(--border2);
+  border-radius:12px;
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  font-size:14px;
+  padding:13px 16px;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+input:focus,textarea:focus,select:focus{
+  border-color:var(--acc);
+  box-shadow:0 0 0 3px rgba(232,98,42,.12);
+}
+input::placeholder,textarea::placeholder{color:var(--muted);}
 select option{background:var(--s2);}
 textarea{resize:vertical;}
-.frow{margin-bottom:16px;}
+.frow{margin-bottom:18px;}
 .frow:last-child{margin-bottom:0;}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
-@media(max-width:600px){.g2,.g3{grid-template-columns:1fr;}}
-.div{height:1px;background:var(--border);margin:20px 0;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+@media(max-width:640px){.g2,.g3{grid-template-columns:1fr;}}
+.divider{height:1px;background:var(--border);margin:22px 0;}
 
 /* ── UPLOAD ── */
-.drop{border:2px dashed var(--border2);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .3s;position:relative;background:var(--s2);}
-.drop:hover,.drop.over{border-color:var(--acc);background:rgba(255,107,53,.03);}
+.drop{
+  border:2px dashed var(--border2);border-radius:16px;
+  padding:40px 24px;text-align:center;cursor:pointer;
+  transition:all .3s;position:relative;background:var(--s2);
+}
+.drop:hover,.drop.over{
+  border-color:var(--acc);
+  background:rgba(232,98,42,.04);
+  box-shadow:0 0 0 4px rgba(232,98,42,.06);
+}
 .drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.drop-icon{font-size:36px;margin-bottom:10px;display:block;}
-.drop-main{font-weight:700;font-size:17px;margin-bottom:6px;}
-.drop-sub{font-size:14px;color:var(--muted2);}
+.drop-icon{font-size:40px;margin-bottom:12px;display:block;}
+.drop-main{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:6px;color:var(--text);}
+.drop-sub{font-size:13px;color:var(--muted2);}
 
-.file-list{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
-.file-item{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;animation:fadeUp .3s ease;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.file-list{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+.file-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:12px;padding:14px 18px;
+  animation:slideUp .3s ease;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .fi-icon{font-size:22px;flex-shrink:0;}
 .fi-info{flex:1;min-width:0;}
-.fi-name{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.fi-meta{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted2);margin-top:3px;}
-.fi-ok{font-family:'JetBrains Mono',monospace;font-size:12px;padding:4px 11px;border-radius:100px;background:rgba(46,204,113,.1);color:var(--green);border:1px solid rgba(46,204,113,.2);flex-shrink:0;}
-.fi-rm{background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;padding:2px;transition:color .2s;flex-shrink:0;}
+.fi-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em;}
+.fi-meta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2);margin-top:3px;}
+.fi-ok{
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  padding:4px 12px;border-radius:100px;
+  background:rgba(0,214,143,.08);color:var(--green);
+  border:1px solid rgba(0,214,143,.2);flex-shrink:0;
+}
+.fi-rm{
+  background:none;border:none;color:var(--muted);
+  cursor:pointer;font-size:18px;padding:4px;
+  transition:color .2s;flex-shrink:0;line-height:1;
+}
 .fi-rm:hover{color:var(--red);}
 
 /* ── TAGS ── */
-.tag-group{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
-.ptag{padding:8px 18px;border-radius:100px;border:1px solid var(--border2);font-size:14px;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted2);font-family:'Instrument Sans',sans-serif;}
-.ptag:hover,.ptag.on{border-color:var(--acc);color:#000;background:var(--acc);}
+.tag-group{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.ptag{
+  padding:9px 18px;border-radius:100px;
+  border:1px solid var(--border2);font-size:13px;
+  cursor:pointer;transition:all .2s;
+  background:transparent;color:var(--muted2);
+  font-family:'Inter',sans-serif;font-weight:500;
+}
+.ptag:hover{border-color:var(--acc2);color:var(--text);}
+.ptag.on{border-color:var(--acc);color:#fff;background:var(--acc);}
 
 /* ── BTN GENERATE ── */
-.btn-gen{width:100%;padding:22px;background:var(--acc);color:#fff;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.08em;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;margin-top:4px;}
-.btn-gen::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 55%);opacity:0;transition:opacity .3s;}
-.btn-gen:hover{transform:translateY(-3px);box-shadow:0 16px 50px rgba(255,107,53,.35);}
-.btn-gen:hover::after{opacity:1;}
+.btn-gen{
+  width:100%;padding:22px;
+  background:linear-gradient(135deg,var(--acc) 0%,#c0431a 100%);
+  color:#fff;border:none;border-radius:14px;
+  font-family:'Syne',sans-serif;font-size:20px;font-weight:800;
+  letter-spacing:.04em;cursor:pointer;transition:all .3s;
+  position:relative;overflow:hidden;margin-top:6px;
+  box-shadow:0 8px 32px rgba(232,98,42,.25);
+}
+.btn-gen::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.12) 0%,transparent 60%);
+  opacity:0;transition:opacity .3s;
+}
+.btn-gen:hover{transform:translateY(-2px);box-shadow:0 16px 48px rgba(232,98,42,.4);}
+.btn-gen:hover::before{opacity:1;}
 .btn-gen:active{transform:translateY(0);}
 .btn-gen:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
 
 /* ── PROGRESS ── */
-.prog-wrap{display:none;margin-top:20px;}
-.prog-bg{height:3px;background:var(--s3);border-radius:100px;overflow:hidden;margin-bottom:12px;}
-.prog-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--acc),var(--yellow));border-radius:100px;transition:width .5s ease;}
-.prog-steps{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
-.ps{font-family:'JetBrains Mono',monospace;font-size:12px;padding:5px 12px;border-radius:100px;background:var(--s3);color:var(--muted);border:1px solid var(--border);transition:all .3s;}
-.ps.active{background:rgba(255,107,53,.1);color:var(--acc);border-color:rgba(255,107,53,.3);}
-.ps.done{background:rgba(46,204,113,.08);color:var(--green);border-color:rgba(46,204,113,.2);}
-.prog-label{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted2);text-align:center;}
+.prog-wrap{display:none;margin-top:24px;}
+.prog-bg{height:3px;background:var(--s3);border-radius:100px;overflow:hidden;margin-bottom:16px;}
+.prog-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--acc),var(--gold));
+  border-radius:100px;transition:width .5s ease;
+  box-shadow:0 0 10px rgba(232,98,42,.5);
+}
+.prog-steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.ps{
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  padding:5px 12px;border-radius:100px;
+  background:var(--s3);color:var(--muted);
+  border:1px solid var(--border);transition:all .3s;
+}
+.ps.active{background:rgba(232,98,42,.1);color:var(--acc);border-color:rgba(232,98,42,.3);}
+.ps.done{background:rgba(0,214,143,.08);color:var(--green);border-color:rgba(0,214,143,.2);}
+.prog-label{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted2);text-align:center;}
 
 /* ── RESULTS ── */
 #results{display:none;}
-.res-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;padding-top:40px;border-top:1px solid var(--border);}
-.res-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:.03em;}
-.res-title span{color:var(--acc);}
-.btn-export{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;background:var(--s2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:15px;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;}
-.btn-export:hover{border-color:var(--yellow);color:var(--yellow);}
+.res-hd{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  margin-bottom:32px;padding-top:48px;
+  border-top:1px solid var(--border);
+  flex-wrap:wrap;gap:16px;
+}
+.res-title-block{}
+.res-eyebrow{
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--acc);margin-bottom:8px;
+}
+.res-title{
+  font-family:'Syne',sans-serif;font-size:44px;font-weight:800;
+  letter-spacing:-.03em;line-height:1;
+}
+.res-title em{color:var(--acc);font-style:normal;}
+.btn-export{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 20px;background:var(--s2);
+  border:1px solid var(--border2);border-radius:12px;
+  color:var(--text2);font-size:13px;font-weight:500;
+  cursor:pointer;transition:all .2s;
+  font-family:'Inter',sans-serif;white-space:nowrap;
+}
+.btn-export:hover{border-color:var(--gold);color:var(--gold);}
 
 /* ── ANALYSIS BOX ── */
-.ana-box{background:rgba(255,107,53,.03);border:1px solid rgba(255,107,53,.12);border-radius:14px;padding:18px 22px;margin-bottom:24px;display:none;}
-.ana-label{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc2);margin-bottom:10px;}
-.ana-text{font-size:15px;color:var(--muted2);line-height:1.7;}
+.ana-box{
+  background:linear-gradient(135deg,rgba(232,98,42,.05),rgba(245,200,66,.03));
+  border:1px solid rgba(232,98,42,.15);
+  border-radius:16px;padding:22px 26px;margin-bottom:28px;display:none;
+}
+.ana-label{
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--acc2);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.ana-label::before{content:'';width:16px;height:1px;background:var(--acc2);}
+.ana-text{font-size:14px;color:var(--text2);line-height:1.75;}
 
 /* ── PATTERNS ── */
-.pat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
-@media(max-width:600px){.pat-grid{grid-template-columns:1fr;}}
-.pat-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px;animation:fadeUp .4s ease forwards;opacity:0;}
-.pat-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.15em;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.pat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px;}
+@media(max-width:640px){.pat-grid{grid-template-columns:1fr;}}
+.pat-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:14px;padding:20px;
+  animation:slideUp .4s ease forwards;opacity:0;
+}
+.pat-lbl{
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  text-transform:uppercase;letter-spacing:.15em;
+  margin-bottom:10px;display:flex;align-items:center;gap:7px;font-weight:500;
+}
 .pat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.pat-text{font-size:14px;color:var(--muted2);line-height:1.65;font-style:italic;}
+.pat-text{font-size:13px;color:var(--muted2);line-height:1.65;font-style:italic;}
 
 /* ── VARIATION CARDS ── */
-.var-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-@media(max-width:720px){.var-grid{grid-template-columns:1fr;}}
+.var-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:760px){.var-grid{grid-template-columns:1fr;}}
 
-.var-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .3s;animation:fadeUp .4s ease forwards;opacity:0;position:relative;}
-.var-card:hover{border-color:var(--acc);transform:translateY(-3px);box-shadow:0 12px 40px rgba(255,107,53,.12);}
-.var-card::before{content:'Clique para ver o roteiro →';position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(255,107,53,.15),transparent);color:var(--acc);font-size:11px;font-family:'JetBrains Mono',monospace;padding:24px 16px 10px;opacity:0;transition:opacity .3s;text-align:center;}
-.var-card:hover::before{opacity:1;}
+.var-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:18px;overflow:hidden;cursor:pointer;
+  transition:all .3s;animation:slideUp .4s ease forwards;opacity:0;
+  position:relative;
+}
+.var-card::after{
+  content:'Ver Roteiro Completo →';
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(0deg,rgba(232,98,42,.18),transparent);
+  color:var(--acc2);font-size:11px;font-family:'JetBrains Mono',monospace;
+  padding:32px 18px 12px;opacity:0;transition:opacity .3s;text-align:center;
+  letter-spacing:.05em;
+}
+.var-card:hover{
+  border-color:rgba(232,98,42,.35);
+  transform:translateY(-4px);
+  box-shadow:0 20px 60px rgba(0,0,0,.4),0 0 0 1px rgba(232,98,42,.1);
+}
+.var-card:hover::after{opacity:1;}
 
-.vc-top{padding:16px 18px;border-bottom:1px solid var(--border);}
-.vc-meta{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
-.vc-num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
-.vc-name{font-size:17px;font-weight:700;}
-.vc-eixo{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;padding:4px 11px;border-radius:100px;text-transform:uppercase;}
-.ex-g{background:rgba(255,71,87,.12);color:var(--red);border:1px solid rgba(255,71,87,.2);}
-.ex-f{background:rgba(255,214,10,.1);color:var(--yellow);border:1px solid rgba(255,214,10,.2);}
-.ex-c{background:rgba(79,195,247,.12);color:var(--blue);border:1px solid rgba(79,195,247,.2);}
+.vc-top{padding:18px 20px;border-bottom:1px solid var(--border);}
+.vc-row1{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.vc-num{
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:var(--muted2);background:var(--s3);
+  padding:3px 8px;border-radius:4px;
+}
+.vc-name{
+  font-family:'Syne',sans-serif;font-size:16px;font-weight:700;
+  letter-spacing:-.02em;flex:1;
+}
+.vc-eixo{
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.08em;padding:4px 12px;border-radius:100px;
+  text-transform:uppercase;font-weight:500;flex-shrink:0;
+}
+.ex-g{background:rgba(255,77,109,.1);color:var(--red);border:1px solid rgba(255,77,109,.2);}
+.ex-f{background:rgba(245,200,66,.08);color:var(--gold);border:1px solid rgba(245,200,66,.2);}
+.ex-c{background:rgba(77,159,255,.1);color:var(--blue);border:1px solid rgba(77,159,255,.2);}
 
 /* ── SCORE ── */
-.score-row{display:flex;align-items:center;gap:10px;}
-.score-ring{position:relative;width:52px;height:52px;flex-shrink:0;}
+.score-row{display:flex;align-items:center;gap:12px;}
+.score-ring{position:relative;width:56px;height:56px;flex-shrink:0;}
 .score-ring svg{transform:rotate(-90deg);}
 .score-ring-bg{fill:none;stroke:var(--s3);stroke-width:4;}
 .score-ring-fill{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .8s ease;}
-.score-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;}
-.score-info{}
-.score-label{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-bottom:3px;}
-.score-why{font-size:13px;color:var(--muted2);line-height:1.5;}
+.score-num{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:800;
+}
+.score-info{flex:1;}
+.score-label{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-bottom:4px;
+}
+.score-why{font-size:12px;color:var(--muted2);line-height:1.5;}
 
-.vc-body{padding:14px 18px;}
-.vc-preview{font-size:14px;color:var(--muted2);line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
-
-.vc-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.vc-words{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
-.vc-testing{font-size:13px;color:var(--muted2);}
+.vc-body{padding:16px 20px;}
+.vc-preview{
+  font-size:13px;color:var(--muted2);line-height:1.7;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+.vc-footer{
+  padding:12px 20px;border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--s2);
+}
+.vc-words{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+.vc-testing{font-size:12px;color:var(--muted2);font-style:italic;}
 
 /* ── STORYBOARD PAGE ── */
-.sb-page{display:none;position:fixed;inset:0;background:var(--bg);z-index:1000;overflow-y:auto;}
-.sb-shell{max-width:960px;margin:0 auto;padding:32px 24px 80px;}
+.sb-page{
+  display:none;position:fixed;inset:0;
+  background:var(--bg);z-index:1000;overflow-y:auto;
+}
+.sb-shell{max-width:980px;margin:0 auto;padding:36px 28px 100px;}
 
-.sb-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:12px;}
-.btn-back{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;background:var(--s1);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;}
-.btn-back:hover{border-color:var(--text);}
+.sb-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:40px;flex-wrap:wrap;gap:12px;
+}
+.btn-back{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 20px;background:var(--s1);
+  border:1px solid var(--border2);border-radius:12px;
+  color:var(--text2);font-size:14px;font-weight:500;
+  cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;
+}
+.btn-back:hover{border-color:var(--border3);color:var(--text);}
 
-.sb-header{margin-bottom:32px;}
-.sb-eyebrow{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
-.sb-eyebrow::before{content:'';width:20px;height:1px;background:var(--acc);}
-.sb-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,58px);line-height:1;letter-spacing:.02em;margin-bottom:14px;}
-.sb-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-.sb-chip{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 14px;border-radius:100px;border:1px solid var(--border2);color:var(--muted2);}
+.sb-header{margin-bottom:36px;}
+.sb-eyebrow{
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--acc);margin-bottom:12px;
+  display:flex;align-items:center;gap:10px;
+}
+.sb-eyebrow::before{content:'';width:24px;height:1px;background:var(--acc);}
+.sb-title{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(32px,5vw,56px);font-weight:800;
+  line-height:1;letter-spacing:-.03em;margin-bottom:16px;
+}
+.sb-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.sb-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  padding:6px 14px;border-radius:100px;
+  border:1px solid var(--border2);color:var(--muted2);
+}
 
 /* score big */
-.score-big{display:flex;align-items:center;gap:20px;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:28px;}
-.score-big-ring{position:relative;width:80px;height:80px;flex-shrink:0;}
+.score-big{
+  display:flex;align-items:center;gap:24px;
+  background:linear-gradient(135deg,var(--s1),var(--s2));
+  border:1px solid var(--border2);border-radius:18px;
+  padding:24px 28px;margin-bottom:32px;
+}
+.score-big-ring{position:relative;width:90px;height:90px;flex-shrink:0;}
 .score-big-ring svg{transform:rotate(-90deg);}
-.score-big-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.04em;}
-.score-big-info{}
-.score-big-label{font-family:'JetBrains Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);margin-bottom:6px;}
-.score-big-why{font-size:16px;color:var(--text);line-height:1.6;}
-.score-factors{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
-.sf{font-family:'JetBrains Mono',monospace;font-size:12px;padding:5px 12px;border-radius:100px;background:var(--s2);color:var(--muted2);border:1px solid var(--border);}
-.sf.pos{background:rgba(46,204,113,.08);color:var(--green);border-color:rgba(46,204,113,.2);}
-.sf.neg{background:rgba(255,71,87,.08);color:var(--red);border-color:rgba(255,71,87,.2);}
+.score-big-num{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.02em;
+}
+.score-big-info{flex:1;}
+.score-big-label{
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  text-transform:uppercase;letter-spacing:.2em;color:var(--muted);margin-bottom:8px;
+}
+.score-big-why{font-size:15px;color:var(--text);line-height:1.6;margin-bottom:12px;font-weight:500;}
+.score-factors{display:flex;flex-wrap:wrap;gap:8px;}
+.sf{
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  padding:5px 12px;border-radius:100px;
+  background:var(--s3);color:var(--muted2);border:1px solid var(--border);
+}
+.sf.pos{background:rgba(0,214,143,.08);color:var(--green);border-color:rgba(0,214,143,.2);}
+.sf.neg{background:rgba(255,77,109,.08);color:var(--red);border-color:rgba(255,77,109,.2);}
 
 /* storyboard */
-.sb-sec-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.06em;margin-bottom:16px;display:flex;align-items:center;gap:12px;color:var(--text);}
+.sb-sec-title{
+  font-family:'Syne',sans-serif;font-size:22px;font-weight:700;
+  letter-spacing:-.02em;margin-bottom:18px;
+  display:flex;align-items:center;gap:14px;
+}
 .sb-sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
 
-.sb-scenes{display:flex;flex-direction:column;gap:0;}
+.sb-scenes{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:16px;overflow:hidden;}
 
-.scene{display:grid;grid-template-columns:100px 1fr;border:1px solid var(--border);border-radius:0;margin-bottom:-1px;overflow:hidden;transition:background .2s;}
-.scene:first-child{border-radius:12px 12px 0 0;}
-.scene:last-child{border-radius:0 0 12px 12px;margin-bottom:0;}
-.scene:hover{background:var(--s1);z-index:1;position:relative;}
-
+.scene{
+  display:grid;grid-template-columns:110px 1fr;
+  border-bottom:1px solid var(--border);
+  transition:background .2s;
+}
+.scene:last-child{border-bottom:none;}
+.scene:hover{background:rgba(255,255,255,.015);}
 @media(max-width:600px){.scene{grid-template-columns:1fr;}}
 
-.scene-tc{background:var(--s2);padding:16px 12px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:6px;border-right:1px solid var(--border);}
+.scene-tc{
+  background:var(--s2);padding:18px 14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  gap:8px;border-right:1px solid var(--border);
+}
 @media(max-width:600px){.scene-tc{flex-direction:row;border-right:none;border-bottom:1px solid var(--border);}}
-.scene-zone{font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 10px;border-radius:4px;text-transform:uppercase;letter-spacing:.1em;text-align:center;}
-.z-g{background:rgba(255,71,87,.15);color:var(--red);}
-.z-c{background:rgba(255,214,10,.1);color:var(--yellow);}
-.z-t{background:rgba(79,195,247,.15);color:var(--blue);}
-.scene-time{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);font-weight:500;text-align:center;}
-.scene-src{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--acc);background:rgba(255,107,53,.1);padding:3px 10px;border-radius:4px;text-align:center;}
+.scene-zone{
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  padding:4px 10px;border-radius:5px;
+  text-transform:uppercase;letter-spacing:.1em;text-align:center;font-weight:500;
+}
+.z-g{background:rgba(255,77,109,.15);color:var(--red);}
+.z-c{background:rgba(245,200,66,.1);color:var(--gold);}
+.z-t{background:rgba(77,159,255,.15);color:var(--blue);}
+.scene-time{
+  font-family:'JetBrains Mono',monospace;font-size:12px;
+  color:var(--text);font-weight:500;text-align:center;line-height:1.4;
+}
+.scene-src{
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:var(--acc);background:rgba(232,98,42,.1);
+  padding:3px 10px;border-radius:5px;text-align:center;
+}
 
-.scene-content{padding:18px 22px;display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.scene-content{padding:18px 24px;display:grid;grid-template-columns:1fr 1fr;gap:20px;}
 @media(max-width:500px){.scene-content{grid-template-columns:1fr;}}
 
 .sc-block{}
-.sc-label{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted2);margin-bottom:8px;}
-.sc-text{font-size:15px;line-height:1.7;color:var(--text);}
-.sc-instruction{font-size:14px;line-height:1.65;color:var(--muted2);font-style:italic;}
+.sc-label{
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  text-transform:uppercase;letter-spacing:.15em;color:var(--muted2);margin-bottom:8px;
+}
+.sc-text{font-size:14px;line-height:1.7;color:var(--text);font-weight:400;}
+.sc-instruction{font-size:13px;line-height:1.65;color:var(--muted2);font-style:italic;}
 
-/* copy btn */
-.btn-cp-sb{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;background:var(--s2);border:1px solid var(--border);border-radius:7px;color:var(--muted2);font-size:13px;cursor:pointer;transition:all .2s;margin-top:10px;font-family:'Instrument Sans',sans-serif;}
-.btn-cp-sb:hover{border-color:var(--text);color:var(--text);}
+.btn-cp-sb{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 14px;background:var(--s2);
+  border:1px solid var(--border);border-radius:8px;
+  color:var(--muted2);font-size:12px;cursor:pointer;
+  transition:all .2s;margin-top:10px;font-family:'Inter',sans-serif;font-weight:500;
+}
+.btn-cp-sb:hover{border-color:var(--border3);color:var(--text);}
 .btn-cp-sb.ok{border-color:var(--green);color:var(--green);}
 
-/* export sb */
-.sb-actions{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;}
-.btn-sb-export{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:10px;font-size:15px;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;font-weight:600;}
-.btn-sb-copy{background:var(--s2);border:1px solid var(--border2);color:var(--text);}
+.btn-sb-export{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 22px;border-radius:12px;
+  font-size:14px;cursor:pointer;transition:all .2s;
+  font-family:'Inter',sans-serif;font-weight:600;
+}
+.btn-sb-copy{background:var(--s2);border:1px solid var(--border2);color:var(--text2);}
 .btn-sb-copy:hover{border-color:var(--acc);color:var(--acc);}
-.btn-sb-dl{background:var(--acc);border:none;color:#fff;}
-.btn-sb-dl:hover{opacity:.85;}
+.btn-sb-dl{background:var(--acc);border:none;color:#fff;box-shadow:0 4px 16px rgba(232,98,42,.3);}
+.btn-sb-dl:hover{opacity:.88;transform:translateY(-1px);}
 
-/* toast */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--s1);border:1px solid var(--green);color:var(--green);padding:13px 22px;border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:13px;z-index:99999;transform:translateY(70px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:8px;}
+/* ── RENDER TAB ── */
+.render-status{
+  display:none;background:var(--s1);border:1px solid var(--border);
+  border-radius:16px;padding:24px;margin-top:18px;
+}
+.rs-label{
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  text-transform:uppercase;letter-spacing:.15em;color:var(--muted2);margin-bottom:14px;
+}
+.rs-prog-bg{height:4px;background:var(--s3);border-radius:100px;overflow:hidden;margin-bottom:12px;}
+.rs-prog-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--green),var(--green2));
+  border-radius:100px;transition:width .4s ease;
+}
+.rs-text{font-size:14px;color:var(--muted2);}
+
+.render-results{display:none;margin-top:18px;}
+.rr-title{
+  font-family:'Syne',sans-serif;font-size:24px;font-weight:700;
+  letter-spacing:-.02em;margin-bottom:18px;
+}
+.rr-grid{display:flex;flex-direction:column;gap:12px;}
+.rr-item{
+  background:var(--s1);border:1px solid var(--border);border-radius:14px;
+  padding:18px 22px;display:flex;align-items:center;
+  justify-content:space-between;gap:16px;flex-wrap:wrap;
+  animation:slideUp .3s ease;
+}
+.rr-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:-.01em;}
+.rr-meta{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted2);}
+.btn-dl-video{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 22px;
+  background:linear-gradient(135deg,var(--green),#00b87d);
+  border:none;border-radius:10px;color:#000;
+  font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .2s;font-family:'Inter',sans-serif;
+  text-decoration:none;box-shadow:0 4px 16px rgba(0,214,143,.25);
+}
+.btn-dl-video:hover{opacity:.9;transform:translateY(-1px);}
+
+.var-sel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:12px;}
+.var-sel-item{
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:12px;padding:14px 16px;cursor:pointer;
+  transition:all .2s;display:flex;align-items:center;gap:10px;
+}
+.var-sel-item:hover{border-color:var(--border2);}
+.var-sel-item.selected{border-color:rgba(232,98,42,.4);background:rgba(232,98,42,.05);}
+.var-sel-item input[type=checkbox]{accent-color:var(--acc);width:16px;height:16px;flex-shrink:0;}
+.var-sel-name{font-size:13px;font-weight:600;line-height:1.3;letter-spacing:-.01em;}
+.var-sel-score{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2);margin-top:3px;}
+
+.no-variations-msg{
+  background:rgba(232,98,42,.04);border:1px solid rgba(232,98,42,.12);
+  border-radius:12px;padding:24px;text-align:center;
+  color:var(--muted2);font-size:14px;line-height:1.6;
+}
+
+/* ── BACKUP BAR ── */
+.backup-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:500;
+  background:rgba(14,15,26,.95);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  padding:12px 28px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.backup-bar-left{display:flex;align-items:center;gap:10px;}
+.backup-label{
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  text-transform:uppercase;letter-spacing:.15em;color:var(--muted);
+  display:flex;align-items:center;gap:6px;
+}
+.backup-label::before{content:'💾';}
+.btn-backup{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:8px 16px;border-radius:9px;
+  font-size:13px;font-weight:600;cursor:pointer;
+  transition:all .2s;font-family:'Inter',sans-serif;
+  border:1px solid var(--border2);
+}
+.btn-bk-save{background:rgba(0,214,143,.06);color:var(--green);border-color:rgba(0,214,143,.2);}
+.btn-bk-save:hover{background:rgba(0,214,143,.15);}
+.btn-bk-restore{background:rgba(77,159,255,.06);color:var(--blue);border-color:rgba(77,159,255,.2);}
+.btn-bk-restore:hover{background:rgba(77,159,255,.15);}
+.backup-ts{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);display:none;}
+#restoreInput{display:none;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:72px;right:24px;
+  background:var(--s1);border:1px solid var(--green);color:var(--green);
+  padding:13px 22px;border-radius:12px;
+  font-family:'JetBrains Mono',monospace;font-size:12px;
+  z-index:99999;transform:translateY(70px);opacity:0;
+  transition:all .3s;display:flex;align-items:center;gap:8px;
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast.err{border-color:var(--red);color:var(--red);}
 
-::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:var(--s1);}
-::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px;}
-
-/* ── BARRA DE BACKUP ── */
-.backup-bar{position:fixed;bottom:0;left:0;right:0;z-index:500;background:var(--s1);border-top:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-.backup-bar-left{display:flex;align-items:center;gap:10px;}
-.backup-label{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);display:flex;align-items:center;gap:6px;}
-.backup-label::before{content:'💾';font-size:13px;}
-.btn-backup{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;border:1px solid var(--border2);}
-.btn-bk-save{background:rgba(46,204,113,.08);color:var(--green);border-color:rgba(46,204,113,.25);}
-.btn-bk-save:hover{background:rgba(46,204,113,.18);}
-.btn-bk-restore{background:rgba(79,195,247,.08);color:var(--blue);border-color:rgba(79,195,247,.25);}
-.btn-bk-restore:hover{background:rgba(79,195,247,.18);}
-.backup-ts{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);display:none;}
-#restoreInput{display:none;}
+::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px;}
 </style>
 </head>
 <body>
-<div class="blob b1"></div>
-<div class="blob b2"></div>
+<div class="bg-grid"></div>
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<div class="bg-orb orb3"></div>
 
-<!-- ══ BARRA DE BACKUP ═══════════════════════════════════════════════════ -->
+<!-- BACKUP BAR -->
 <div class="backup-bar">
   <div class="backup-bar-left">
     <span class="backup-label">Backup Local</span>
-    <button class="btn-backup btn-bk-save" onclick="saveBackup()">⬇ Salvar Backup</button>
-    <button class="btn-backup btn-bk-restore" onclick="document.getElementById('restoreInput').click()">⬆ Restaurar Backup</button>
+    <button class="btn-backup btn-bk-save" onclick="saveBackup()">⬇ Salvar</button>
+    <button class="btn-backup btn-bk-restore" onclick="document.getElementById('restoreInput').click()">⬆ Restaurar</button>
     <input type="file" id="restoreInput" accept=".json" onchange="restoreBackup(event)"/>
   </div>
   <span class="backup-ts" id="backupTs"></span>
 </div>
 
-<!-- ══ MAIN PAGE ══════════════════════════════════════════════════════════ -->
-<div class="shell" id="mainPage">
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
+<!-- STORYBOARD PAGE -->
+<div class="sb-page" id="sbPage">
+  <div class="sb-shell">
+    <div class="sb-nav">
+      <button class="btn-back" onclick="closeSB()">← Voltar aos Criativos</button>
+      <div style="display:flex;gap:10px;" id="sbActions"></div>
+    </div>
+    <div id="sbContent"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="shell" id="mainPage">
   <div class="topbar">
     <div class="logo">
-      <span class="logo-main">Criativo Studio</span>
-      <span class="logo-v">v3</span>
+      <div class="logo-icon">🎬</div>
+      <div>
+        <div class="logo-text">Criativo<span>Studio</span></div>
+      </div>
+      <span class="logo-badge">PRO v3</span>
     </div>
     <div class="topbar-right">
-      <div class="platform-badge">
-        <span class="platform-dot"></span>Facebook Ads
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        Powered by Groq · LLaMA 3.3
       </div>
     </div>
   </div>
 
   <!-- TABS -->
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('criativos',this)">✍️ Gerar Criativos</button>
-    <button class="tab" onclick="switchTab('renderizar',this)">🎬 Renderizar Vídeos</button>
+    <button class="tab active" onclick="switchTab('gen',this)">
+      <span>⚡</span> Gerar Criativos
+    </button>
+    <button class="tab" onclick="switchTab('render',this)">
+      <span>🎞</span> Renderizar Vídeos
+    </button>
   </div>
 
-  <!-- ══ TAB: CRIATIVOS ══ -->
-  <div class="tab-panel active" id="tab-criativos">
+  <!-- ══ ABA GERAR ══ -->
+  <div class="tab-panel active" id="tab-gen">
 
-  <!-- API KEY -->
-  <div class="card">
-    <div class="card-top"><div class="step-num">1</div><div class="card-title">Chave de API — Groq</div></div>
-    <div class="card-body">
-      <div class="flabel">API Key <a href="https://console.groq.com/keys" target="_blank">↗ Obter grátis</a></div>
-      <input type="password" id="apiKey" placeholder="gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"/>
-    </div>
-  </div>
-
-  <!-- UPLOAD SRTs -->
-  <div class="card">
-    <div class="card-top"><div class="step-num">2</div><div class="card-title">Upload dos SRTs dos Criativos Vencedores</div></div>
-    <div class="card-body">
-      <div class="drop" id="dropZone">
-        <input type="file" id="srtFiles" accept=".srt,.txt" multiple/>
-        <span class="drop-icon">📂</span>
-        <div class="drop-main">Arraste os arquivos .srt aqui</div>
-        <div class="drop-sub">Múltiplos arquivos · nomeie como video1.srt, video2.srt... para rastreamento de cenas</div>
-      </div>
-      <div class="file-list" id="fileList"></div>
-    </div>
-  </div>
-
-  <!-- PARAMS -->
-  <div class="card">
-    <div class="card-top"><div class="step-num">3</div><div class="card-title">Parâmetros do Criativo</div></div>
-    <div class="card-body">
-      <div class="g3 frow">
-        <div>
-          <div class="flabel">Duração alvo</div>
-          <select id="duracao">
-            <option value="15">15s (~33 palavras)</option>
-            <option value="30">30s (~65 palavras)</option>
-            <option value="45">45s (~98 palavras)</option>
-            <option value="60" selected>60s (~130 palavras)</option>
-            <option value="90">90s (~195 palavras)</option>
-            <option value="120">2min (~260 palavras)</option>
-          </select>
-        </div>
-        <div>
-          <div class="flabel">Produto / Nicho</div>
-          <input type="text" id="produto" value="Biovein — varizes" placeholder="Ex: Biovein — varizes"/>
-        </div>
-        <div>
-          <div class="flabel">Público-alvo</div>
-          <input type="text" id="publico" value="Mulheres 35–60 anos" placeholder="Ex: Mulheres 35–60 anos"/>
-        </div>
-      </div>
-      <div class="div"></div>
-      <div class="flabel">Eixos de variação</div>
-      <div class="tag-group">
-        <button class="ptag on" data-e="gancho">🎯 Gancho — 4 vars</button>
-        <button class="ptag on" data-e="formato">🎬 Formato — 3 vars</button>
-        <button class="ptag on" data-e="cta">📣 CTA — 3 vars</button>
-      </div>
-      <div class="div"></div>
-      <div class="flabel">Contexto da marca</div>
-      <textarea id="contexto" rows="2" placeholder="Persona, canal de conversão, tom...">Persona Cris, tom acolhedor feminino. WhatsApp Business "Central Saúde Natural Brasil". Página Facebook "Pernas Leves Brasil".</textarea>
-    </div>
-  </div>
-
-  <button class="btn-gen" id="btnGen" onclick="run()">⚡ ANALISAR E GERAR 10 CRIATIVOS</button>
-
-  <div class="prog-wrap" id="progWrap">
-    <div class="prog-steps">
-      <div class="ps" id="ps1">① Parseando SRTs</div>
-      <div class="ps" id="ps2">② Mapeando timestamps</div>
-      <div class="ps" id="ps3">③ Enviando para Groq</div>
-      <div class="ps" id="ps4">④ Calculando scores</div>
-      <div class="ps" id="ps5">⑤ Gerando storyboards</div>
-    </div>
-    <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
-    <div class="prog-label" id="progLabel">Iniciando...</div>
-  </div>
-
-  <!-- RESULTS -->
-  <div id="results">
-    <div class="res-hd">
-      <div class="res-title">10 <span>Criativos</span> Gerados</div>
-      <button class="btn-export" onclick="exportAll()">📋 Exportar todos (.txt)</button>
-    </div>
-
-    <div class="ana-box" id="anaBox">
-      <div class="ana-label">🔍 Síntese da Análise</div>
-      <div class="ana-text" id="anaText"></div>
-    </div>
-
-    <div class="pat-grid" id="patGrid"></div>
-    <div class="var-grid" id="varGrid"></div>
-  </div>
-
-  </div><!-- /tab-criativos -->
-
-  <!-- ══ TAB: RENDERIZAR ══ -->
-  <div class="tab-panel" id="tab-renderizar">
-
-    <!-- URL DO BACKEND -->
+    <!-- STEP 1: API -->
     <div class="card">
-      <div class="card-top"><div class="step-num">1</div><div class="card-title">URL do Backend — Hugging Face</div></div>
+      <div class="card-header">
+        <div class="step-badge">1</div>
+        <div>
+          <div class="card-title">Configuração da API</div>
+          <div class="card-subtitle">Chave Groq para geração inteligente de criativos</div>
+        </div>
+      </div>
       <div class="card-body">
-        <div class="flabel">Cole a URL do seu Space <a href="https://huggingface.co/spaces" target="_blank">↗ huggingface.co/spaces</a></div>
-        <input type="text" id="backendUrl" placeholder="https://seu-user-criativo-studio-backend.hf.space"/>
+        <div class="frow">
+          <div class="flabel">
+            Groq API Key
+            <a href="https://console.groq.com" target="_blank">Obter chave →</a>
+          </div>
+          <input type="password" id="apiKey" placeholder="gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: SRTs -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-badge">2</div>
+        <div>
+          <div class="card-title">Criativos Vencedores (SRT)</div>
+          <div class="card-subtitle">Faça upload dos SRTs dos anúncios que estão rodando bem — a IA analisa e extrai o que funciona</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="drop" id="dropZone">
+          <input type="file" id="srtInput" accept=".srt" multiple onchange="handleFiles(this.files)"/>
+          <span class="drop-icon">📂</span>
+          <div class="drop-main">Arraste os arquivos .SRT aqui</div>
+          <div class="drop-sub">ou clique para selecionar · múltiplos arquivos aceitos</div>
+        </div>
+        <div class="file-list" id="fileList"></div>
+      </div>
+    </div>
+
+    <!-- STEP 3: PRODUTO -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-badge">3</div>
+        <div>
+          <div class="card-title">Produto & Público</div>
+          <div class="card-subtitle">Contexto para a IA gerar criativos de alta conversão</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="g2">
+          <div class="frow">
+            <div class="flabel">Produto / Oferta</div>
+            <input type="text" id="produto" placeholder="Ex: Biovein — suplemento para varizes"/>
+          </div>
+          <div class="frow">
+            <div class="flabel">Público-alvo</div>
+            <input type="text" id="publico" placeholder="Ex: Mulheres 35-60 com varizes e dor nas pernas"/>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="frow">
+            <div class="flabel">Duração alvo (segundos)</div>
+            <input type="number" id="duracao" value="60" min="15" max="180"/>
+          </div>
+          <div class="frow">
+            <div class="flabel">Contexto adicional</div>
+            <input type="text" id="contexto" placeholder="Ex: campanha fria, produto novo no mercado"/>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="sec-label">Eixos de Teste Prioritários</div>
+        <div class="tag-group">
+          <span class="ptag on" data-tag="gancho">🎯 Gancho Emocional</span>
+          <span class="ptag on" data-tag="dor">😣 Dor & Problema</span>
+          <span class="ptag on" data-tag="prova">⭐ Prova Social</span>
+          <span class="ptag on" data-tag="autoridade">🏆 Autoridade</span>
+          <span class="ptag on" data-tag="urgencia">⏰ Urgência</span>
+          <span class="ptag" data-tag="curiosidade">🔍 Curiosidade</span>
+          <span class="ptag" data-tag="resultado">✨ Resultado Visual</span>
+          <span class="ptag" data-tag="medo">⚠️ Medo da Perda</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GENERATE -->
+    <button class="btn-gen" id="btnGen" onclick="run()">
+      ⚡ ANALISAR E GERAR 10 CRIATIVOS
+    </button>
+
+    <!-- PROGRESS -->
+    <div class="prog-wrap" id="progWrap">
+      <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
+      <div class="prog-steps">
+        <span class="ps" id="ps1">① Lendo SRTs</span>
+        <span class="ps" id="ps2">② Analisando</span>
+        <span class="ps" id="ps3">③ Gerando</span>
+        <span class="ps" id="ps4">④ Processando</span>
+        <span class="ps" id="ps5">⑤ Finalizando</span>
+      </div>
+      <div class="prog-label" id="progLabel">Preparando...</div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="results">
+      <div class="res-hd">
+        <div class="res-title-block">
+          <div class="res-eyebrow">// ANÁLISE CONCLUÍDA</div>
+          <div class="res-title">10 Criativos<br><em>Gerados</em></div>
+        </div>
+        <button class="btn-export" onclick="exportAll()">⬇ Exportar Todos (.txt)</button>
+      </div>
+
+      <div class="ana-box" id="anaBox">
+        <div class="ana-label">Análise dos Criativos Fonte</div>
+        <div class="ana-text" id="anaText"></div>
+      </div>
+
+      <div class="pat-grid" id="patGrid"></div>
+
+      <div class="var-grid" id="varGrid"></div>
+    </div>
+
+  </div><!-- /tab-gen -->
+
+  <!-- ══ ABA RENDERIZAR ══ -->
+  <div class="tab-panel" id="tab-render">
+
+    <!-- STEP 1: BACKEND -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-badge">1</div>
+        <div>
+          <div class="card-title">Conexão com Backend</div>
+          <div class="card-subtitle">Servidor Hugging Face com FFmpeg para renderização</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="frow">
+          <div class="flabel">URL do Servidor</div>
+          <input type="url" id="backendUrl" placeholder="https://wanderhalleylee-criativo-studio-backend.hf.space"/>
+        </div>
         <div style="margin-top:10px;display:flex;gap:10px;align-items:center;">
-          <button class="btn-export" onclick="testBackend()" style="padding:9px 16px;font-size:13px;">🔗 Testar conexão</button>
+          <button class="btn-export" onclick="testBackend()" style="padding:10px 18px;font-size:13px;">🔗 Testar Conexão</button>
           <span id="backendStatus" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted2);"></span>
         </div>
-        <div style="margin-top:18px;">
+        <div class="divider"></div>
+        <div class="frow">
           <div class="flabel">Senha de Acesso</div>
-          <input type="password" id="backendPassword" placeholder="Senha configurada no Hugging Face (ACCESS_PASSWORD)"/>
+          <input type="password" id="backendPassword" placeholder="ACCESS_PASSWORD configurado no Hugging Face"/>
         </div>
       </div>
     </div>
 
-    <!-- UPLOAD VÍDEOS -->
+    <!-- STEP 2: VIDEOS -->
     <div class="card">
-      <div class="card-top"><div class="step-num">2</div><div class="card-title">Upload dos Vídeos Fonte</div></div>
+      <div class="card-header">
+        <div class="step-badge">2</div>
+        <div>
+          <div class="card-title">Vídeos Fonte</div>
+          <div class="card-subtitle">Os mesmos vídeos dos quais os SRTs foram extraídos</div>
+        </div>
+      </div>
       <div class="card-body">
         <div class="drop" id="videoDropZone">
-          <input type="file" id="videoFiles" accept="video/*" multiple/>
+          <input type="file" id="videoInput" accept="video/*" multiple onchange="handleVideoFiles(this.files)"/>
           <span class="drop-icon">🎥</span>
-          <div class="drop-main">Arraste os vídeos aqui</div>
-          <div class="drop-sub">Nomeie igual aos SRTs: video1.mp4, video2.mp4... · MP4, MOV, AVI</div>
+          <div class="drop-main">Arraste os vídeos fonte aqui</div>
+          <div class="drop-sub">video1.mp4, video2.mp4... · múltiplos aceitos</div>
         </div>
         <div class="file-list" id="videoFileList"></div>
       </div>
     </div>
 
-    <!-- SELECIONAR VARIAÇÕES -->
+    <!-- STEP 3: VARIAÇÕES -->
     <div class="card">
-      <div class="card-top"><div class="step-num">3</div><div class="card-title">Selecionar Variações para Renderizar</div></div>
+      <div class="card-header">
+        <div class="step-badge">3</div>
+        <div>
+          <div class="card-title">Selecionar Variações</div>
+          <div class="card-subtitle">Escolha quais criativos renderizar</div>
+        </div>
+      </div>
       <div class="card-body">
         <div id="varSelectArea">
-          <div class="no-variations-msg">⚠️ Gere os criativos primeiro na aba <strong>"Gerar Criativos"</strong> para selecionar as variações aqui.</div>
+          <div class="no-variations-msg">
+            Nenhum criativo gerado ainda.<br>
+            Vá para a aba <strong>Gerar Criativos</strong> primeiro.
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- CONFIGURAÇÕES DE SAÍDA -->
+    <!-- STEP 4: SAÍDA -->
     <div class="card">
-      <div class="card-top"><div class="step-num">4</div><div class="card-title">Configurações de Saída</div></div>
+      <div class="card-header">
+        <div class="step-badge">4</div>
+        <div>
+          <div class="card-title">Configurações de Saída</div>
+          <div class="card-subtitle">Formato e legenda dos vídeos renderizados</div>
+        </div>
+      </div>
       <div class="card-body">
-        <div class="g2 frow">
-          <div>
-            <div class="flabel">Formato do vídeo</div>
+        <div class="g2">
+          <div class="frow">
+            <div class="flabel">Formato do Vídeo</div>
             <select id="renderResolution">
               <option value="vertical">1080×1920 — Vertical (Reels/Stories)</option>
-              <option value="square">1080×1080 — Quadrado</option>
-              <option value="horizontal">1920×1080 — Horizontal</option>
-              <option value="original">Manter resolução original</option>
+              <option value="square">1080×1080 — Quadrado (Feed)</option>
+              <option value="horizontal">1920×1080 — Horizontal (YouTube)</option>
+              <option value="original">Original (sem redimensionar)</option>
             </select>
           </div>
-          <div>
+          <div class="frow">
             <div class="flabel">Legendas</div>
             <select id="subtitleStyle">
-              <option value="">Sem legenda</option>
+              <option value="">Sem Legenda</option>
               <option value="tiktok">Estilo TikTok (palavra por palavra)</option>
-              <option value="white">Texto branco com sombra</option>
-              <option value="yellow">Texto amarelo com sombra</option>
+              <option value="white">Texto Branco com Sombra</option>
+              <option value="yellow">Texto Amarelo com Sombra</option>
             </select>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- BTN RENDER -->
-    <button class="btn-gen" id="btnRender" onclick="startRender()" style="background:var(--green);color:#000;">
-      🎬 RENDERIZAR VÍDEOS SELECIONADOS
+    <!-- RENDER BTN -->
+    <button class="btn-gen" id="btnRender" onclick="startRender()" style="background:linear-gradient(135deg,var(--green),#009e6a);box-shadow:0 8px 32px rgba(0,214,143,.2);">
+      🎞 RENDERIZAR VÍDEOS SELECIONADOS
     </button>
 
-    <!-- STATUS -->
     <div class="render-status" id="renderStatus">
       <div class="rs-label">Progresso da Renderização</div>
       <div class="rs-prog-bg"><div class="rs-prog-fill" id="rsProg"></div></div>
       <div class="rs-text" id="rsText">Iniciando...</div>
     </div>
 
-    <!-- RESULTS -->
     <div class="render-results" id="renderResults">
-      <div class="rr-title">Vídeos Prontos 🎉</div>
+      <div class="rr-title">✓ Vídeos Prontos</div>
       <div class="rr-grid" id="rrGrid"></div>
     </div>
 
-  </div><!-- /tab-renderizar -->
+  </div><!-- /tab-render -->
 
 </div><!-- /shell -->
-
-<!-- ══ STORYBOARD PAGE ════════════════════════════════════════════════════ -->
-<div class="sb-page" id="sbPage">
-  <div class="sb-shell">
-    <div class="sb-nav">
-      <button class="btn-back" onclick="closeSB()">← Voltar aos criativos</button>
-      <div style="display:flex;gap:10px;">
-        <button class="btn-sb-export btn-sb-copy" onclick="copySB()">📋 Copiar roteiro</button>
-        <button class="btn-sb-export btn-sb-dl" onclick="downloadSB()">⬇ Baixar .txt</button>
-      </div>
-    </div>
-    <div id="sbContent"></div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
 <script>
-// ── STATE ─────────────────────────────────────────────────────────────────
-let srtFiles = [];
+// ── STATE ──────────────────────────────────────────────────────────────────
+let srtFiles  = [];
+let videoFiles = [];
 let generated = [];
-let currentSB = null;
+let selectedVarIds = new Set();
 
-// ── UPLOAD ────────────────────────────────────────────────────────────────
-const dz = document.getElementById('dropZone');
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('over'));
-dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); handleFiles([...e.dataTransfer.files]); });
-document.getElementById('srtFiles').addEventListener('change', e => { handleFiles([...e.target.files]); e.target.value=''; });
+// ── TOAST ──────────────────────────────────────────────────────────────────
+function toast(msg, isErr=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'toast' + (isErr?' err':'') + ' show';
+  setTimeout(() => t.className = 'toast' + (isErr?' err':''), 3200);
+}
 
+// ── TABS ──────────────────────────────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'render') refreshVarSelect();
+}
+
+// ── DRAG & DROP ───────────────────────────────────────────────────────────
+['dragover','dragleave','drop'].forEach(ev => {
+  document.addEventListener(ev, e => {
+    if (e.target.closest('#dropZone')) {
+      e.preventDefault();
+      if (ev === 'dragover') e.target.closest('#dropZone').classList.add('over');
+      if (ev === 'dragleave') e.target.closest('#dropZone').classList.remove('over');
+      if (ev === 'drop') {
+        e.target.closest('#dropZone').classList.remove('over');
+        handleFiles(e.dataTransfer.files);
+      }
+    }
+    if (e.target.closest('#videoDropZone')) {
+      e.preventDefault();
+      if (ev === 'dragover') e.target.closest('#videoDropZone').classList.add('over');
+      if (ev === 'dragleave') e.target.closest('#videoDropZone').classList.remove('over');
+      if (ev === 'drop') {
+        e.target.closest('#videoDropZone').classList.remove('over');
+        handleVideoFiles(e.dataTransfer.files);
+      }
+    }
+  });
+});
+
+// ── SRT FILES ─────────────────────────────────────────────────────────────
 function handleFiles(files) {
-  files.forEach(file => {
+  [...files].forEach(file => {
+    if (!file.name.endsWith('.srt')) return;
     if (srtFiles.find(f => f.name === file.name)) return;
     const reader = new FileReader();
     reader.onload = e => {
-      const raw = e.target.result;
+      const raw    = e.target.result;
       const parsed = parseSRT(raw, file.name);
       srtFiles.push({ name: file.name, raw, parsed });
       renderFileList();
@@ -576,10 +1046,11 @@ function renderFileList() {
   srtFiles.forEach(f => {
     const d = document.createElement('div');
     d.className = 'file-item';
-    d.innerHTML = `<span class="fi-icon">🎬</span>
+    d.innerHTML = `
+      <span class="fi-icon">🎬</span>
       <div class="fi-info">
         <div class="fi-name">${esc(f.name)}</div>
-        <div class="fi-meta">${f.parsed.segments.length} segmentos · ${fmtMs(f.parsed.duration)}</div>
+        <div class="fi-meta">${f.parsed.segments.length} seg · ${fmtMs(f.parsed.duration)} · Gancho: ${f.parsed.gancho.length} · Corpo: ${f.parsed.corpo.length} · CTA: ${f.parsed.cta.length}</div>
       </div>
       <span class="fi-ok">✓ Pronto</span>
       <button class="fi-rm" onclick="removeFile('${esc(f.name)}')">×</button>`;
@@ -587,28 +1058,62 @@ function renderFileList() {
   });
 }
 
+// ── VIDEO FILES ───────────────────────────────────────────────────────────
+function handleVideoFiles(files) {
+  [...files].forEach(file => {
+    if (!file.type.startsWith('video/')) return;
+    if (videoFiles.find(f => f.name === file.name)) return;
+    videoFiles.push(file);
+  });
+  renderVideoFileList();
+}
+
+function removeVideoFile(name) {
+  videoFiles = videoFiles.filter(f => f.name !== name);
+  renderVideoFileList();
+}
+
+function renderVideoFileList() {
+  const list = document.getElementById('videoFileList');
+  list.innerHTML = '';
+  videoFiles.forEach(f => {
+    const mb  = (f.size / 1024 / 1024).toFixed(1);
+    const d   = document.createElement('div');
+    d.className = 'file-item';
+    d.innerHTML = `
+      <span class="fi-icon">🎥</span>
+      <div class="fi-info">
+        <div class="fi-name">${esc(f.name)}</div>
+        <div class="fi-meta">${mb} MB · ${f.type}</div>
+      </div>
+      <span class="fi-ok">✓ Pronto</span>
+      <button class="fi-rm" onclick="removeVideoFile('${esc(f.name)}')">×</button>`;
+    list.appendChild(d);
+  });
+}
+
 // ── SRT PARSER ────────────────────────────────────────────────────────────
 function parseSRT(raw, filename) {
-  const blocks = raw.trim().split(/\n\s*\n/);
+  const blocks   = raw.trim().split(/\n\s*\n/);
   const segments = [];
   blocks.forEach(block => {
-    const lines = block.trim().split('\n');
+    const lines  = block.trim().split('\n');
     const tsLine = lines.find(l => /\d{2}:\d{2}:\d{2}[,\.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[,\.]\d{3}/.test(l));
     if (!tsLine) return;
     const m = tsLine.match(/(\d{2}):(\d{2}):(\d{2})[,\.](\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2})[,\.](\d{3})/);
     if (!m) return;
     const startMs = toMs(m[1],m[2],m[3],m[4]);
     const endMs   = toMs(m[5],m[6],m[7],m[8]);
-    const text = lines.filter(l => !/^\d+$/.test(l.trim()) && !/-->/.test(l)).join(' ').trim();
+    const text    = lines.filter(l => !/^\d+$/.test(l.trim()) && !/-->/.test(l)).join(' ').trim();
     if (!text) return;
     segments.push({ startMs, endMs, text, source: filename.replace(/\.[^.]+$/, '') });
   });
   const duration = segments.length ? Math.max(...segments.map(s => s.endMs)) : 0;
-  const gEnd = Math.min(8000, duration * 0.18);
-  const ctaS = duration * 0.78;
-  const gancho = segments.filter(s => s.startMs < gEnd);
-  const corpo  = segments.filter(s => s.startMs >= gEnd && s.endMs <= ctaS);
-  const cta    = segments.filter(s => s.startMs >= ctaS);
+  const gEnd     = Math.min(8000, duration * 0.18);
+  const ctaS     = duration * 0.78;
+  const gancho   = segments.filter(s => s.startMs < gEnd);
+  const corpo    = segments.filter(s => s.startMs >= gEnd && s.endMs <= ctaS);
+  const cta      = segments.filter(s => s.startMs >= ctaS);
   return { segments, gancho, corpo, cta, duration };
 }
 
@@ -616,6 +1121,8 @@ function toMs(h,m,s,ms){ return (+h)*3600000+(+m)*60000+(+s)*1000+(+ms); }
 function fmtMs(ms){ const t=Math.round(ms/1000),min=Math.floor(t/60),sec=t%60; return min>0?`${min}m${String(sec).padStart(2,'0')}s`:`${sec}s`; }
 function fmtS(s){ const min=Math.floor(s/60),sec=Math.round(s%60); return min>0?`${min}m${String(sec).padStart(2,'0')}s`:`${sec}s`; }
 function segTxt(segs){ return segs.map(s=>s.text).join(' ').trim(); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
 // ── TAGS ──────────────────────────────────────────────────────────────────
 document.querySelectorAll('.ptag').forEach(t => t.addEventListener('click', () => t.classList.toggle('on')));
@@ -630,90 +1137,247 @@ function setStep(n, pct, label) {
   document.getElementById('progLabel').textContent = label;
 }
 
-// ── MAIN ──────────────────────────────────────────────────────────────────
+// ── PROMPT INTELIGENTE DE VENDAS ──────────────────────────────────────────
+function buildPrompt(srtCtx, sourceNames, duracao, wordTarget, gEnd, ctaS, produto, publico, contexto) {
+  const eixos = [...document.querySelectorAll('.ptag.on')].map(t=>t.textContent.trim()).join(', ') || 'Gancho Emocional, Dor, Prova Social, Urgência';
+
+  // monta contexto detalhado de cada SRT com timestamps para corte
+  const srtDetalhado = srtCtx.join('\n\n---\n\n');
+
+  return `Você é um especialista sênior em Direct Response Marketing e edição de vídeo para Facebook Ads com mais de 10 anos de experiência em campanhas de performance no mercado brasileiro.
+
+Você vai analisar os seguintes criativos de vídeo vencedores (transcrições SRT com timestamps precisos de cada vídeo fonte) e criar 10 variações de criativos altamente persuasivos para Facebook Ads.
+
+═══════════════════════════════════════════
+VÍDEOS FONTE DISPONÍVEIS: ${sourceNames.join(', ')}
+PRODUTO: ${produto}
+PÚBLICO: ${publico}
+DURAÇÃO ALVO: ${duracao}s
+EIXOS PRIORITÁRIOS: ${eixos}
+CONTEXTO: ${contexto || 'Campanha de performance no Facebook Ads Brasil'}
+═══════════════════════════════════════════
+
+TRANSCRIÇÕES DOS CRIATIVOS VENCEDORES (com timestamps em ms):
+${srtDetalhado}
+
+═══════════════════════════════════════════
+ANÁLISE QUE VOCÊ DEVE FAZER:
+
+1. Identifique nos SRTs acima QUAL TRECHO de cada vídeo corresponde a:
+   - GANCHO: Os primeiros momentos que prendem atenção e criam identificação/curiosidade (geralmente os primeiros ${Math.round(gEnd/1000)}s de cada vídeo)
+   - CORPO: O desenvolvimento persuasivo — dor, solução, mecanismo, prova social, autoridade (meio do vídeo)  
+   - CTA: A chamada para ação com urgência ou oferta (últimos trechos do vídeo)
+
+2. Analise O QUE FUNCIONA em cada trecho:
+   - Qual linguagem emocional ressoa com o público
+   - Quais argumentos de persuasão estão presentes
+   - Qual ritmo e estrutura narrativa é usada
+   - Quais gatilhos mentais são ativados
+
+3. Monte o storyboard de cada variação como um PLANO DE EDIÇÃO REAL:
+   - Selecione os MELHORES TRECHOS de cada vídeo fonte para cada zona persuasiva
+   - Use os timestamps EXATOS do SRT para definir onde cortar cada clipe
+   - Combine trechos de vídeos diferentes quando isso fortalecer a narrativa
+   - Cada cena deve ter uma FUNÇÃO PERSUASIVA clara na jornada de conversão
+
+═══════════════════════════════════════════
+REGRAS DO STORYBOARD (CRÍTICO — SISTEMA DE EDIÇÃO AUTOMÁTICA):
+
+O sistema de edição vai executar EXATAMENTE isso para cada cena:
+  1. Abrir o arquivo video_fonte especificado
+  2. Cortar do segundo tempo_inicio até o segundo tempo_fim DENTRO desse arquivo
+  3. Repetir para cada cena na ordem do storyboard
+  4. Emendar todos os cortes → vídeo final da variação
+
+PORTANTO:
+- tempo_inicio = segundo exato de entrada NO VÍDEO FONTE (converta de ms: divide por 1000)
+- tempo_fim = segundo exato de saída NO VÍDEO FONTE
+- video_fonte = nome do arquivo sem extensão (ex: "video1", "video2")
+- Use os timestamps dos SRTs para saber onde cada fala está no vídeo
+
+EXEMPLO DO QUE O SISTEMA FAZ:
+  Cena 1: video1, 0.0s → 7.5s   = pega os primeiros 7.5s do video1 (gancho)
+  Cena 2: video2, 15.2s → 28.0s = pega esse trecho do video2 (prova social)
+  Cena 3: video1, 42.0s → 55.0s = pega esse trecho do video1 (CTA)
+  → Sistema emenda: clipe1 + clipe2 + clipe3 = vídeo final persuasivo
+
+═══════════════════════════════════════════
+ESTRUTURA DOS 10 CRIATIVOS:
+
+EIXO 1 — GANCHO (4 variações): Teste 4 tipos de abertura diferentes:
+  - VAR 1: Pergunta de identificação ("Você sofre com...?")
+  - VAR 2: Afirmação chocante ou estatística surpreendente
+  - VAR 3: Resultado/transformação em primeiro lugar ("Em 7 dias...")
+  - VAR 4: Depoimento direto em primeira pessoa
+
+EIXO 2 — FORMATO NARRATIVO (3 variações): Teste 3 estruturas:
+  - VAR 5: UGC conversacional — pessoa comum falando direto para câmera
+  - VAR 6: Educativo — explica o problema e a solução com autoridade
+  - VAR 7: Storytelling — jornada de transformação pessoal
+
+EIXO 3 — CTA E OFERTA (3 variações): Teste 3 fechamentos:
+  - VAR 8: Urgência de tempo ou quantidade limitada
+  - VAR 9: Isca de valor (ex: "manda mensagem e receba o guia grátis")
+  - VAR 10: CTA direto e simples com garantia ou prova
+
+═══════════════════════════════════════════
+RETORNE EXATAMENTE ESTE JSON (sem texto fora, sem markdown):
+
+{
+  "analise_geral": "3-4 frases analisando os padrões persuasivos encontrados nos criativos fonte: o que funciona, quais gatilhos são usados, qual linguagem ressoa com o público",
+  "padroes": {
+    "gancho_padrao": "padrão de abertura identificado nos criativos vencedores",
+    "corpo_padrao": "padrão de desenvolvimento persuasivo identificado",
+    "cta_padrao": "padrão de chamada para ação identificado"
+  },
+  "variacoes": [
+    {
+      "numero": 1,
+      "nome": "Nome criativo e descritivo da variação",
+      "eixo": "gancho",
+      "elemento_testado": "O que está sendo testado nessa variação",
+      "gancho_texto": "Texto completo da narração da seção de gancho",
+      "corpo_texto": "Texto completo da narração da seção de corpo",
+      "cta_texto": "Texto completo da narração do CTA",
+      "score": 87,
+      "score_justificativa": "Uma frase explicando por que esse score — baseado em princípios de persuasão e dados do mercado",
+      "score_fatores_positivos": ["fator positivo 1", "fator positivo 2", "fator positivo 3"],
+      "score_fatores_negativos": ["fator de risco 1"],
+      "storyboard": [
+        {
+          "zona": "gancho",
+          "tempo_inicio": 0.0,
+          "tempo_fim": 7.5,
+          "video_fonte": "video1",
+          "fala": "Texto exato da narração dessa cena — deve ser convincente e fluir naturalmente",
+          "instrucao_cena": "Instrução de edição detalhada: qual visual aparece, texto overlay, transição, ritmo, o que o telespectador vê e sente"
+        },
+        {
+          "zona": "corpo",
+          "tempo_inicio": 18.4,
+          "tempo_fim": 35.0,
+          "video_fonte": "video2",
+          "fala": "Narração do corpo — aprofunda o problema e apresenta a solução com prova social",
+          "instrucao_cena": "Instrução de edição: detalhe o que aparece visualmente, textos na tela, B-roll sugerido"
+        },
+        {
+          "zona": "cta",
+          "tempo_inicio": 48.0,
+          "tempo_fim": 60.0,
+          "video_fonte": "video1",
+          "fala": "CTA persuasivo com urgência e clareza sobre o próximo passo",
+          "instrucao_cena": "Instrução: visual de fechamento, como exibir o link/contato, animação do CTA"
+        }
+      ]
+    }
+  ]
+}
+
+IMPORTANTE:
+- Cada variação deve ter entre 4 e 8 cenas no storyboard
+- Use timestamps REAIS dos SRTs para os cortes (converta ms → segundos)
+- Cada variação DEVE ter storyboard com cortes DIFERENTES
+- A soma das durações das cenas deve ser próxima de ${duracao}s
+- Distribua entre os vídeos fonte disponíveis: ${sourceNames.join(', ')}
+- O texto das falas deve ser PERSUASIVO, não apenas descritivo
+- As instruções de cena devem ser DETALHADAS para um editor de vídeo profissional`;
+}
+
+// ── MAIN RUN ──────────────────────────────────────────────────────────────
 async function run() {
   const apiKey = document.getElementById('apiKey').value.trim();
-  if (!apiKey) { toast('⚠️ Insira a chave da API do Groq', true); return; }
+  if (!apiKey)       { toast('⚠️ Insira a chave da API do Groq', true); return; }
   if (!srtFiles.length) { toast('⚠️ Faça upload de pelo menos 1 arquivo .srt', true); return; }
 
   const btn = document.getElementById('btnGen');
   btn.disabled = true; btn.textContent = '⏳ PROCESSANDO...';
   document.getElementById('progWrap').style.display = 'block';
-  document.getElementById('results').style.display = 'none';
-  generated = [];
+  document.getElementById('results').style.display  = 'none';
 
   try {
-    setStep(1, 10, `Parseando ${srtFiles.length} arquivo(s)...`);
-    await delay(300);
-    setStep(2, 25, 'Mapeando timestamps e zonas...');
+    setStep(1, 12, 'Lendo e analisando SRTs...');
     await delay(300);
 
-    const duracao   = document.getElementById('duracao').value;
-    const produto   = document.getElementById('produto').value;
-    const publico   = document.getElementById('publico').value;
-    const contexto  = document.getElementById('contexto').value;
-    const wordTarget = Math.round((+duracao / 60) * 130);
-    const gEnd = Math.min(8, Math.round(+duracao * 0.18));
-    const ctaS = Math.round(+duracao * 0.78);
-
-    // Build SRT contexts
-    const srtCtx = srtFiles.map(f => {
-      const p = f.parsed;
-      const srcName = f.name.replace(/\.[^.]+$/, '');
-      const segLines = p.segments.map(s =>
-        `[${fmtMs(s.startMs)}→${fmtMs(s.endMs)}][${srcName}] ${s.text}`
-      ).join('\n');
-      return `=== ${f.name} (${fmtMs(p.duration)}) ===
-[GANCHO 0s→${fmtMs(Math.min(8000, p.duration*0.18))}]: ${segTxt(p.gancho)||'(vazio)'}
-[CORPO]: ${segTxt(p.corpo)||'(vazio)'}
-[CTA]: ${segTxt(p.cta)||'(vazio)'}
-[SEGMENTOS COMPLETOS]:
-${segLines}`;
-    });
+    const duracao    = +document.getElementById('duracao').value || 60;
+    const produto    = document.getElementById('produto').value.trim()  || 'produto';
+    const publico    = document.getElementById('publico').value.trim()  || 'público geral';
+    const contexto   = document.getElementById('contexto').value.trim();
+    const wordTarget = Math.round(duracao * 2.2);
+    const gEnd       = Math.min(8, duracao * 0.18);
+    const ctaS       = duracao * 0.78;
 
     const sourceNames = srtFiles.map(f => f.name.replace(/\.[^.]+$/, ''));
 
-    setStep(3, 45, 'Enviando para Groq · Llama 3.3 70B...');
+    // monta contexto SRT detalhado com timestamps para a IA
+    const srtCtx = srtFiles.map(f => {
+      const p    = f.parsed;
+      const name = f.name.replace(/\.[^.]+$/, '');
+      const dur  = (p.duration / 1000).toFixed(1);
+
+      const segsFormatted = p.segments.map(s =>
+        `  [${(s.startMs/1000).toFixed(2)}s → ${(s.endMs/1000).toFixed(2)}s] "${s.text}"`
+      ).join('\n');
+
+      return `ARQUIVO: ${name} (duração total: ${dur}s)
+SEGMENTOS COM TIMESTAMPS:
+${segsFormatted}
+
+ZONAS PERSUASIVAS IDENTIFICADAS:
+  GANCHO (0s→${(Math.min(8000,p.duration*0.18)/1000).toFixed(1)}s): "${segTxt(p.gancho)}"
+  CORPO:  "${segTxt(p.corpo)}"
+  CTA (últimos 22%): "${segTxt(p.cta)}"`;
+    });
+
+    setStep(2, 28, 'Enviando para análise com IA...');
+    await delay(300);
+
+    const prompt = buildPrompt(srtCtx, sourceNames, duracao, wordTarget, gEnd, ctaS, produto, publico, contexto);
+
+    setStep(3, 45, 'Gerando 10 criativos de alta conversão...');
 
     const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        max_tokens: 8000,
-        temperature: 0.75,
-        messages: [
-          { role: 'system', content: 'Especialista em copywriting e direção de vídeo para Facebook Ads Brasil. Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown.' },
-          { role: 'user', content: buildPrompt(srtCtx, sourceNames, duracao, wordTarget, gEnd, ctaS, produto, publico, contexto) }
-        ]
+        model:       'llama-3.3-70b-versatile',
+        temperature: 0.78,
+        max_tokens:  8000,
+        messages: [{ role:'user', content: prompt }]
       })
     });
 
-    setStep(4, 70, 'Calculando scores de acerto...');
-    if (!resp.ok) { const e = await resp.json(); throw new Error(e.error?.message || 'Erro na API'); }
-    const data = await resp.json();
-    const raw = data.choices[0].message.content;
+    if (!resp.ok) {
+      const err = await resp.json().catch(()=>({}));
+      throw new Error(err.error?.message || `Erro Groq: ${resp.status}`);
+    }
 
-    let parsed;
-    try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
-    catch(e) { throw new Error('Erro ao interpretar resposta. Tente novamente.'); }
+    setStep(4, 72, 'Processando resposta...');
+    await delay(300);
+
+    const data   = await resp.json();
+    const rawTxt = data.choices?.[0]?.message?.content || '';
+
+    // extrai JSON da resposta
+    const jsonMatch = rawTxt.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('IA não retornou JSON válido. Tente novamente.');
+    const parsed = JSON.parse(jsonMatch[0]);
 
     setStep(5, 92, 'Renderizando storyboards...');
     await delay(400);
-    generated = parsed.variacoes || [];
 
+    generated = parsed.variacoes || [];
     if (parsed.analise_geral) {
       document.getElementById('anaText').textContent = parsed.analise_geral;
       document.getElementById('anaBox').style.display = 'block';
     }
     if (parsed.padroes) renderPatterns(parsed.padroes);
-    renderVariations(generated, +duracao);
+    renderVariations(generated, duracao);
 
     setStep(5, 100, 'Concluído!');
     await delay(500);
     document.getElementById('progWrap').style.display = 'none';
-    document.getElementById('results').style.display = 'block';
-    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('results').style.display  = 'block';
+    document.getElementById('results').scrollIntoView({ behavior:'smooth' });
 
   } catch(err) {
     document.getElementById('progWrap').style.display = 'none';
@@ -724,192 +1388,127 @@ ${segLines}`;
   }
 }
 
-function buildPrompt(srtCtx, sourceNames, duracao, wordTarget, gEnd, ctaS, produto, publico, contexto) {
-  return `Você analisará ${srtCtx.length} criativo(s) SRT de anúncios Facebook Ads validados (rodando 45+ dias).
-
-FONTES DE VÍDEO DISPONÍVEIS: ${sourceNames.join(', ')}
-Cada fonte tem seus próprios timestamps no SRT abaixo. Use os timestamps do SRT para definir os cortes.
-
-CRIATIVOS ANALISADOS (com timestamps originais de cada vídeo):
-${srtCtx.join('\n\n')}
-
-PARÂMETROS:
-- Produto: ${produto}
-- Público: ${publico}
-- Duração alvo: ${duracao}s (~${wordTarget} palavras)
-- Gancho: 0s→${gEnd}s | Corpo: ${gEnd}s→${ctaS}s | CTA: ${ctaS}s→${duracao}s
-- Contexto: ${contexto}
-
-TAREFA:
-1. "analise_geral": 3-4 frases sobre padrões identificados.
-2. "padroes": {gancho_padrao, corpo_padrao, cta_padrao}
-3. "variacoes": 10 variações com plano de corte e montagem.
-
-EIXO 1 — GANCHO (4 vars): pergunta identificação | afirmação chocante | estatística | resultado/transformação
-EIXO 2 — FORMATO (3 vars): UGC conversacional | educativo | depoimento 1ª pessoa
-EIXO 3 — CTA (3 vars): WhatsApp urgência | isca digital gratuita | escassez estoque
-
-REGRA CRÍTICA DO STORYBOARD:
-O storyboard define um plano de edição de vídeo automático. O sistema de edição vai:
-1. Abrir o arquivo video_fonte (ex: video1)
-2. Cortar esse arquivo exatamente de tempo_inicio até tempo_fim (segundos dentro desse arquivo)
-3. Repetir para cada cena na ordem
-4. Emendar todos os cortes para formar o vídeo final
-
-PORTANTO: tempo_inicio e tempo_fim são SEMPRE os segundos de entrada e saída DENTRO DO ARQUIVO video_fonte.
-NÃO são a posição no vídeo de saída. São o ponto de corte no vídeo original.
-
-EXEMPLO CORRETO:
-- Cena 1: video_fonte="video1", tempo_inicio=0, tempo_fim=8 → pega video1 do segundo 0 ao 8
-- Cena 2: video_fonte="video2", tempo_inicio=12, tempo_fim=20 → pega video2 do segundo 12 ao 20
-- Cena 3: video_fonte="video1", tempo_inicio=25, tempo_fim=35 → pega video1 do segundo 25 ao 35
-- Resultado: emenda os 3 cortes → vídeo final de ~21s
-
-Use os timestamps reais do SRT de cada vídeo para definir os cortes.
-Cada variação DEVE ter cortes diferentes, usando trechos diferentes dos vídeos fonte.
-
-PARA CADA VARIAÇÃO retorne:
-- numero, nome, eixo (gancho|formato|cta), elemento_testado
-- gancho_texto, corpo_texto, cta_texto (textos completos da narração)
-- score: 0-100 estimando chance de conversão no Facebook Ads para o nicho
-- score_justificativa: 1 frase explicando o score
-- score_fatores_positivos: array de 2-3 strings curtas
-- score_fatores_negativos: array de 1-2 strings curtas
-- storyboard: array de 4 a 8 cenas, cada cena com:
-  {
-    zona: "gancho"|"corpo"|"cta",
-    tempo_inicio: SEGUNDOS DE ENTRADA NO VIDEO_FONTE (número decimal, ex: 3.5),
-    tempo_fim: SEGUNDOS DE SAÍDA NO VIDEO_FONTE (número decimal, ex: 11.0),
-    video_fonte: nome exato do arquivo sem extensão (ex: "${sourceNames[0] || 'video1'}"),
-    fala: "texto da narração nesse trecho",
-    instrucao_cena: "instrução de edição: texto overlay, transição, b-roll"
-  }
-
-IMPORTANTE:
-- Cada variação deve usar combinações e trechos DIFERENTES dos vídeos fonte
-- Os timestamps devem vir dos segmentos reais do SRT de cada vídeo
-- A soma das durações das cenas deve ser próxima de ${duracao}s
-- Distribua as cenas entre os diferentes vídeos fonte disponíveis
-
-Responda SOMENTE JSON válido, sem texto fora do JSON:
-{"analise_geral":"...","padroes":{...},"variacoes":[...]}`;
-}
-
-// ── RENDER ────────────────────────────────────────────────────────────────
+// ── RENDER PATTERNS ───────────────────────────────────────────────────────
 function renderPatterns(p) {
   const grid = document.getElementById('patGrid');
   grid.innerHTML = '';
   [
-    { lbl: 'Padrão de Gancho', txt: p.gancho_padrao, col: 'var(--red)' },
-    { lbl: 'Padrão de Corpo',  txt: p.corpo_padrao,  col: 'var(--yellow)' },
-    { lbl: 'Padrão de CTA',    txt: p.cta_padrao,    col: 'var(--blue)' }
+    { lbl:'Padrão de Gancho', txt:p.gancho_padrao, col:'var(--red)' },
+    { lbl:'Padrão de Corpo',  txt:p.corpo_padrao,  col:'var(--gold)' },
+    { lbl:'Padrão de CTA',    txt:p.cta_padrao,    col:'var(--blue)' }
   ].forEach((item, i) => {
     const card = document.createElement('div');
     card.className = 'pat-card';
     card.style.animationDelay = (i*0.1)+'s';
-    card.innerHTML = `<div class="pat-lbl"><span class="pat-dot" style="background:${item.col}"></span><span style="color:${item.col}">${item.lbl}</span></div><div class="pat-text">"${esc(item.txt)}"</div>`;
+    card.innerHTML = `
+      <div class="pat-lbl">
+        <span class="pat-dot" style="background:${item.col}"></span>
+        <span style="color:${item.col}">${item.lbl}</span>
+      </div>
+      <div class="pat-text">"${esc(item.txt)}"</div>`;
     grid.appendChild(card);
   });
 }
 
+// ── SCORE ─────────────────────────────────────────────────────────────────
 function getScoreColor(s) {
-  if (s >= 80) return '#2ecc71';
-  if (s >= 65) return '#ffd60a';
-  return '#ff4757';
+  if (s >= 80) return 'var(--green)';
+  if (s >= 65) return 'var(--gold)';
+  if (s >= 50) return 'var(--blue)';
+  return 'var(--red)';
 }
 
+function scoreRingSVG(score, size=56, stroke=4, cls='score-ring-fill') {
+  const r    = (size/2) - stroke;
+  const circ = 2 * Math.PI * r;
+  const off  = circ - (score/100)*circ;
+  const col  = getScoreColor(score);
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle class="score-ring-bg" cx="${size/2}" cy="${size/2}" r="${r}"/>
+    <circle class="${cls}" cx="${size/2}" cy="${size/2}" r="${r}"
+      stroke="${col}" stroke-dasharray="${circ}" stroke-dashoffset="${off}"/>
+  </svg>`;
+}
+
+// ── RENDER VARIATIONS ─────────────────────────────────────────────────────
 function renderVariations(vars, duracao) {
   const grid = document.getElementById('varGrid');
   grid.innerHTML = '';
-  const wt = Math.round((duracao/60)*130);
-
   vars.forEach((v, i) => {
-    const tw = [v.gancho_texto, v.corpo_texto, v.cta_texto].join(' ').split(' ').filter(Boolean).length;
-    const sc = v.score || 70;
-    const color = getScoreColor(sc);
-    const r = 22, circ = 2*Math.PI*r;
-    const offset = circ - (sc/100)*circ;
-    const eixoCls = {gancho:'ex-g',formato:'ex-f',cta:'ex-c'}[v.eixo]||'ex-g';
-    const eixoLbl = {gancho:'Eixo 1 — Gancho',formato:'Eixo 2 — Formato',cta:'Eixo 3 — CTA'}[v.eixo]||v.eixo;
+    const score    = v.score || 70;
+    const col      = getScoreColor(score);
+    const eixoCls  = v.eixo === 'gancho' ? 'ex-g' : v.eixo === 'cta' ? 'ex-c' : 'ex-f';
+    const eixoLbl  = v.eixo === 'gancho' ? 'Gancho' : v.eixo === 'cta' ? 'CTA' : 'Formato';
+    const preview  = (v.gancho_texto || '') + ' ' + (v.corpo_texto || '');
+    const words    = preview.split(/\s+/).length;
 
     const card = document.createElement('div');
     card.className = 'var-card';
-    card.style.animationDelay = (i*0.05)+'s';
-    card.setAttribute('data-idx', i);
-    card.addEventListener('click', () => openSB(i));
-
+    card.style.animationDelay = (i*0.06)+'s';
+    card.onclick = () => openSB(v);
     card.innerHTML = `
       <div class="vc-top">
-        <div class="vc-meta">
-          <span class="vc-num">VAR ${String(v.numero).padStart(2,'0')}</span>
-          <span class="vc-name">${esc(v.nome)}</span>
+        <div class="vc-row1">
+          <span class="vc-num">VAR ${String(v.numero||i+1).padStart(2,'0')}</span>
+          <span class="vc-name">${esc(v.nome||'Variação')}</span>
           <span class="vc-eixo ${eixoCls}">${eixoLbl}</span>
         </div>
         <div class="score-row">
           <div class="score-ring">
-            <svg width="52" height="52" viewBox="0 0 52 52">
-              <circle class="score-ring-bg" cx="26" cy="26" r="${r}"/>
-              <circle class="score-ring-fill" cx="26" cy="26" r="${r}"
-                stroke="${color}"
-                stroke-dasharray="${circ}"
-                stroke-dashoffset="${offset}"/>
-            </svg>
-            <div class="score-num" style="color:${color}">${sc}%</div>
+            ${scoreRingSVG(score)}
+            <div class="score-num" style="color:${col}">${score}%</div>
           </div>
           <div class="score-info">
-            <div class="score-label">Score de Acerto</div>
+            <div class="score-label">Score de Conversão</div>
             <div class="score-why">${esc(v.score_justificativa||'')}</div>
           </div>
         </div>
       </div>
       <div class="vc-body">
-        <div class="vc-preview">${esc(v.gancho_texto||'')} ${esc(v.corpo_texto||'').substring(0,120)}...</div>
+        <div class="vc-preview">${esc(v.gancho_texto||v.corpo_texto||'')}</div>
       </div>
       <div class="vc-footer">
-        <span class="vc-words">~${tw} palavras · ${duracao}s · ${(v.storyboard||[]).length} cenas</span>
-        <span class="vc-testing">🎯 ${esc(v.elemento_testado||'')}</span>
+        <span class="vc-words">~${words} palavras · ${(v.storyboard||[]).length} cenas</span>
+        <span class="vc-testing">${esc(v.elemento_testado||'')}</span>
       </div>`;
     grid.appendChild(card);
   });
 }
 
-// ── STORYBOARD ────────────────────────────────────────────────────────────
-function openSB(idx) {
-  const v = generated[idx];
-  if (!v) return;
-  currentSB = v;
+// ── STORYBOARD PAGE ───────────────────────────────────────────────────────
+function openSB(v) {
+  const score   = v.score || 70;
+  const col     = getScoreColor(score);
+  const eixoCls = v.eixo === 'gancho' ? 'ex-g' : v.eixo === 'cta' ? 'ex-c' : 'ex-f';
+  const eixoLbl = v.eixo === 'gancho' ? 'Gancho' : v.eixo === 'cta' ? 'CTA' : 'Formato';
 
-  const sc = v.score || 70;
-  const color = getScoreColor(sc);
-  const r = 34, circ = 2*Math.PI*r;
-  const offset = circ - (sc/100)*circ;
+  // score factors
+  const pos = (v.score_fatores_positivos||[]).map(f=>`<span class="sf pos">✓ ${esc(f)}</span>`).join('');
+  const neg = (v.score_fatores_negativos||[]).map(f=>`<span class="sf neg">⚠ ${esc(f)}</span>`).join('');
 
-  const eixoLbl = {gancho:'Eixo 1 — Gancho',formato:'Eixo 2 — Formato',cta:'Eixo 3 — CTA'}[v.eixo]||v.eixo;
-  const duracao = document.getElementById('duracao').value;
-  const produto = document.getElementById('produto').value;
-
-  const posFatores = (v.score_fatores_positivos||[]).map(f=>`<span class="sf pos">✓ ${esc(f)}</span>`).join('');
-  const negFatores = (v.score_fatores_negativos||[]).map(f=>`<span class="sf neg">− ${esc(f)}</span>`).join('');
-
-  const scenesHtml = (v.storyboard||[]).map((cena, ci) => {
-    const zoneCls = {gancho:'z-g',corpo:'z-c',cta:'z-t'}[cena.zona]||'z-g';
-    const zoneLbl = {gancho:'🎬 Gancho',corpo:'📝 Corpo',cta:'📣 CTA'}[cena.zona]||cena.zona;
-    return `<div class="scene">
+  // storyboard scenes
+  const scenes = (v.storyboard||[]).map((s,i) => {
+    const zoneCls = s.zona==='gancho'?'z-g':s.zona==='cta'?'z-t':'z-c';
+    const zoneLabel = s.zona==='gancho'?'Gancho':s.zona==='cta'?'CTA':'Corpo';
+    const tIn  = parseFloat(s.tempo_inicio||0).toFixed(1);
+    const tOut = parseFloat(s.tempo_fim||0).toFixed(1);
+    const dur  = (parseFloat(tOut)-parseFloat(tIn)).toFixed(1);
+    return `
+    <div class="scene">
       <div class="scene-tc">
-        <div class="scene-zone ${zoneCls}">${zoneLbl}</div>
-        <div class="scene-time">${fmtS(cena.tempo_inicio)} → ${fmtS(cena.tempo_fim)}</div>
-        <div class="scene-src">${esc(cena.video_fonte||'')}</div>
+        <span class="scene-zone ${zoneCls}">${zoneLabel}</span>
+        <div class="scene-time">${tIn}s<br>→<br>${tOut}s</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted2)">${dur}s</div>
+        <span class="scene-src">${esc(s.video_fonte||'video1')}</span>
       </div>
       <div class="scene-content">
         <div class="sc-block">
-          <div class="sc-label">🎙 Fala / Narração</div>
-          <div class="sc-text" id="sb-fala-${ci}">${esc(cena.fala||'')}</div>
-          <button class="btn-cp-sb" onclick="cpSBblock('sb-fala-${ci}',this)">⎘ Copiar fala</button>
+          <div class="sc-label">🎙 Narração</div>
+          <div class="sc-text">${esc(s.fala||'')}</div>
         </div>
         <div class="sc-block">
-          <div class="sc-label">🎥 Instrução de Cena</div>
-          <div class="sc-instruction" id="sb-inst-${ci}">${esc(cena.instrucao_cena||'')}</div>
-          <button class="btn-cp-sb" onclick="cpSBblock('sb-inst-${ci}',this)">⎘ Copiar instrução</button>
+          <div class="sc-label">🎬 Instrução de Edição</div>
+          <div class="sc-instruction">${esc(s.instrucao_cena||'')}</div>
         </div>
       </div>
     </div>`;
@@ -917,36 +1516,51 @@ function openSB(idx) {
 
   document.getElementById('sbContent').innerHTML = `
     <div class="sb-header">
-      <div class="sb-eyebrow">Roteiro de Produção — Facebook Ads</div>
-      <div class="sb-title">VAR ${String(v.numero).padStart(2,'0')} — ${esc(v.nome)}</div>
+      <div class="sb-eyebrow">Variação ${String(v.numero||'').padStart(2,'0')} · ${eixoLbl}</div>
+      <div class="sb-title">${esc(v.nome||'Variação')}</div>
       <div class="sb-meta">
-        <span class="sb-chip">${eixoLbl}</span>
+        <span class="sb-chip"><span class="vc-eixo ${eixoCls}" style="margin:0">${eixoLbl}</span></span>
         <span class="sb-chip">🎯 ${esc(v.elemento_testado||'')}</span>
-        <span class="sb-chip">⏱ ${duracao}s</span>
-        <span class="sb-chip">📦 ${esc(produto)}</span>
+        <span class="sb-chip">🎬 ${(v.storyboard||[]).length} cenas</span>
       </div>
     </div>
 
     <div class="score-big">
       <div class="score-big-ring">
-        <svg width="80" height="80" viewBox="0 0 80 80">
-          <circle fill="none" stroke="var(--s3)" stroke-width="5" cx="40" cy="40" r="${r}"/>
-          <circle fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round"
-            cx="40" cy="40" r="${r}"
-            stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
-        </svg>
-        <div class="score-big-num" style="color:${color}">${sc}%</div>
+        ${scoreRingSVG(score,90,6,'score-ring-fill')}
+        <div class="score-big-num" style="color:${col}">${score}%</div>
       </div>
       <div class="score-big-info">
-        <div class="score-big-label">Score de Acerto Estimado — Facebook Ads</div>
+        <div class="score-big-label">Score de Conversão Estimado</div>
         <div class="score-big-why">${esc(v.score_justificativa||'')}</div>
-        <div class="score-factors">${posFatores}${negFatores}</div>
+        <div class="score-factors">${pos}${neg}</div>
       </div>
     </div>
 
-    <div class="sb-sec-title">Storyboard de Produção</div>
-    <div class="sb-scenes">${scenesHtml}</div>
-  `;
+    <div class="sb-sec-title">Roteiro de Narração</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px;">
+      ${[
+        {lbl:'🔴 Gancho',txt:v.gancho_texto,col:'var(--red)'},
+        {lbl:'🟡 Corpo', txt:v.corpo_texto, col:'var(--gold)'},
+        {lbl:'🔵 CTA',   txt:v.cta_texto,   col:'var(--blue)'}
+      ].map(b=>`
+        <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:18px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:${b.col};margin-bottom:10px;">${b.lbl}</div>
+          <div style="font-size:13px;line-height:1.7;color:var(--text2)">${esc(b.txt||'')}</div>
+        </div>`).join('')}
+    </div>
+
+    <div class="sb-sec-title">Plano de Edição — ${(v.storyboard||[]).length} Cenas</div>
+    <div class="sb-scenes">${scenes}</div>
+
+    <div style="margin-top:28px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn-sb-export btn-sb-copy" onclick="copySB(${v.numero||0})">📋 Copiar Storyboard</button>
+      <button class="btn-sb-export btn-sb-dl" onclick="downloadSB(${v.numero||0})">⬇ Baixar .txt</button>
+    </div>`;
+
+  document.getElementById('sbActions').innerHTML = `
+    <button class="btn-sb-export btn-sb-copy" onclick="copySB(${v.numero||0})">📋 Copiar</button>
+    <button class="btn-sb-export btn-sb-dl" onclick="downloadSB(${v.numero||0})">⬇ Baixar</button>`;
 
   document.getElementById('sbPage').style.display = 'block';
   document.getElementById('sbPage').scrollTop = 0;
@@ -958,254 +1572,113 @@ function closeSB() {
   document.body.style.overflow = '';
 }
 
-function cpSBblock(id, btn) {
-  const el = document.getElementById(id);
-  navigator.clipboard.writeText(el.innerText).then(() => {
-    btn.textContent = '✓ Copiado'; btn.classList.add('ok');
-    setTimeout(() => { btn.textContent = '⎘ Copiar'; btn.classList.remove('ok'); }, 2000);
+function getSBText(varNum) {
+  const v = generated.find(x => x.numero === varNum);
+  if (!v) return '';
+  let txt = `CRIATIVO STUDIO PRO — STORYBOARD\n`;
+  txt += `${'='.repeat(50)}\n`;
+  txt += `VAR ${String(v.numero).padStart(2,'0')} — ${v.nome}\n`;
+  txt += `Eixo: ${v.eixo} | Testando: ${v.elemento_testado}\n`;
+  txt += `Score: ${v.score}% — ${v.score_justificativa}\n`;
+  txt += `${'='.repeat(50)}\n\n`;
+  txt += `GANCHO:\n${v.gancho_texto}\n\n`;
+  txt += `CORPO:\n${v.corpo_texto}\n\n`;
+  txt += `CTA:\n${v.cta_texto}\n\n`;
+  txt += `${'─'.repeat(50)}\nPLANO DE EDIÇÃO:\n\n`;
+  (v.storyboard||[]).forEach((s,i) => {
+    txt += `CENA ${i+1} [${s.zona.toUpperCase()}]\n`;
+    txt += `Fonte: ${s.video_fonte} | Corte: ${s.tempo_inicio}s → ${s.tempo_fim}s (${(s.tempo_fim-s.tempo_inicio).toFixed(1)}s)\n`;
+    txt += `Fala: ${s.fala}\n`;
+    txt += `Edição: ${s.instrucao_cena}\n\n`;
   });
+  return txt;
 }
 
-function getSBText() {
-  const v = currentSB; if (!v) return '';
-  const duracao = document.getElementById('duracao').value;
-  const produto = document.getElementById('produto').value;
-  let out = `ROTEIRO DE PRODUÇÃO — FACEBOOK ADS\n`;
-  out += `VAR ${String(v.numero).padStart(2,'0')} — ${v.nome}\n`;
-  out += `Produto: ${produto} | Duração: ${duracao}s | Score: ${v.score}%\n`;
-  out += `Testando: ${v.elemento_testado}\n${'═'.repeat(60)}\n\n`;
-  out += `SCORE DE ACERTO: ${v.score}%\n${v.score_justificativa}\n`;
-  if (v.score_fatores_positivos?.length) out += `+ ${v.score_fatores_positivos.join(' | ')}\n`;
-  if (v.score_fatores_negativos?.length) out += `- ${v.score_fatores_negativos.join(' | ')}\n`;
-  out += `\n${'═'.repeat(60)}\nSTORYBOARD\n${'═'.repeat(60)}\n\n`;
-  (v.storyboard||[]).forEach((cena, i) => {
-    out += `CENA ${i+1} — ${(cena.zona||'').toUpperCase()}\n`;
-    out += `Tempo: ${fmtS(cena.tempo_inicio)} → ${fmtS(cena.tempo_fim)}\n`;
-    out += `Vídeo fonte: ${cena.video_fonte}\n`;
-    out += `Fala: ${cena.fala}\n`;
-    out += `Instrução: ${cena.instrucao_cena}\n\n`;
-  });
-  return out;
+function copySB(varNum) {
+  navigator.clipboard.writeText(getSBText(varNum)).then(() => toast('✓ Storyboard copiado!'));
 }
 
-function copySB() {
-  navigator.clipboard.writeText(getSBText()).then(() => toast('Roteiro copiado!'));
-}
-
-function downloadSB() {
-  const v = currentSB; if (!v) return;
-  const blob = new Blob([getSBText()], { type: 'text/plain;charset=utf-8' });
+function downloadSB(varNum) {
+  const v = generated.find(x => x.numero === varNum);
+  if (!v) return;
+  const blob = new Blob([getSBText(varNum)], {type:'text/plain'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `storyboard-var${v.numero}-${(v.nome||'').replace(/\s+/g,'-').toLowerCase()}.txt`;
+  a.download = `var${String(v.numero).padStart(2,'0')}-${v.nome.replace(/\s+/g,'-')}.txt`;
   a.click();
-  toast('Storyboard baixado!');
 }
 
 function exportAll() {
-  if (!generated.length) return;
-  const produto = document.getElementById('produto').value;
-  const duracao = document.getElementById('duracao').value;
-  let out = `CRIATIVO STUDIO v3 — TODOS OS CRIATIVOS\nProduto: ${produto} | Duração: ${duracao}s\n${'═'.repeat(60)}\n\n`;
-  generated.forEach(v => {
-    out += `VAR ${String(v.numero).padStart(2,'0')} — ${v.nome} | Score: ${v.score}%\n`;
-    out += `Eixo: ${v.eixo} | Testando: ${v.elemento_testado}\n${'─'.repeat(40)}\n`;
-    out += `🎬 GANCHO:\n${v.gancho_texto}\n\n📝 CORPO:\n${v.corpo_texto}\n\n📣 CTA:\n${v.cta_texto}\n\n${'═'.repeat(60)}\n\n`;
-  });
-  const blob = new Blob([out], { type: 'text/plain;charset=utf-8' });
+  let all = '';
+  generated.forEach(v => { all += getSBText(v.numero) + '\n\n' + '═'.repeat(60) + '\n\n'; });
+  const blob = new Blob([all], {type:'text/plain'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `criativos-${produto.replace(/\s+/g,'-').toLowerCase()}-${duracao}s.txt`;
+  a.download = `criativo-studio-todos-${new Date().toISOString().slice(0,10)}.txt`;
   a.click();
-  toast('Exportado!');
 }
-
-// ── UTILS ─────────────────────────────────────────────────────────────────
-function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
-function toast(msg, isErr=false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast' + (isErr?' err':'');
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-// ── ESC key to close storyboard ───────────────────────────────────────────
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSB(); });
-
-// ── BACKUP ────────────────────────────────────────────────────────────────
-function saveBackup() {
-  const data = {
-    version:        3,
-    savedAt:        new Date().toISOString(),
-    apiKey:         document.getElementById('apiKey').value,
-    backendUrl:     document.getElementById('backendUrl').value,
-    backendPassword:document.getElementById('backendPassword').value,
-    produto:        document.getElementById('produto').value,
-    publico:        document.getElementById('publico').value,
-    duracao:        document.getElementById('duracao').value,
-    contexto:       document.getElementById('contexto').value,
-    renderResolution: document.getElementById('renderResolution').value,
-    subtitleStyle:  document.getElementById('subtitleStyle').value,
-    generated:      generated,
-    srtFileNames:   srtFiles.map(f => f.name),
-  };
-
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const a    = document.createElement('a');
-  a.href     = URL.createObjectURL(blob);
-  a.download = `criativo-studio-backup-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-
-  const ts = document.getElementById('backupTs');
-  ts.style.display = 'block';
-  ts.textContent   = '✓ Backup salvo às ' + new Date().toLocaleTimeString('pt-BR');
-  toast('✓ Backup salvo!');
-}
-
-function restoreBackup(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
-
-      if (data.apiKey)          document.getElementById('apiKey').value          = data.apiKey;
-      if (data.backendUrl)      document.getElementById('backendUrl').value       = data.backendUrl;
-      if (data.backendPassword) document.getElementById('backendPassword').value  = data.backendPassword;
-      if (data.produto)         document.getElementById('produto').value          = data.produto;
-      if (data.publico)         document.getElementById('publico').value          = data.publico;
-      if (data.duracao)         document.getElementById('duracao').value          = data.duracao;
-      if (data.contexto)        document.getElementById('contexto').value         = data.contexto;
-      if (data.renderResolution) document.getElementById('renderResolution').value = data.renderResolution;
-      if (data.subtitleStyle)   document.getElementById('subtitleStyle').value    = data.subtitleStyle;
-
-      if (data.generated?.length) {
-        generated = data.generated;
-        document.getElementById('results').style.display = 'block';
-        renderVariations(generated, +data.duracao || 60);
-        toast('✓ Backup restaurado — ' + generated.length + ' criativos carregados!');
-      } else {
-        toast('✓ Configurações restauradas!');
-      }
-
-      const ts = document.getElementById('backupTs');
-      ts.style.display = 'block';
-      ts.textContent   = '✓ Restaurado de ' + (data.savedAt ? new Date(data.savedAt).toLocaleString('pt-BR') : 'backup');
-
-    } catch(err) {
-      toast('❌ Arquivo de backup inválido', true);
-    }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
-}
-
-
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  btn.classList.add('active');
-  if (name === 'renderizar') refreshVarSelect();
-}
-
-// ── VIDEO UPLOAD ──────────────────────────────────────────────────────────
-let videoFiles = [];
-
-const vdz = document.getElementById('videoDropZone');
-vdz.addEventListener('dragover', e => { e.preventDefault(); vdz.classList.add('over'); });
-vdz.addEventListener('dragleave', () => vdz.classList.remove('over'));
-vdz.addEventListener('drop', e => { e.preventDefault(); vdz.classList.remove('over'); handleVideoFiles([...e.dataTransfer.files]); });
-document.getElementById('videoFiles').addEventListener('change', e => { handleVideoFiles([...e.target.files]); e.target.value=''; });
-
-function handleVideoFiles(files) {
-  files.forEach(f => {
-    if (!videoFiles.find(v => v.name === f.name)) videoFiles.push(f);
-  });
-  renderVideoList();
-}
-
-function removeVideo(name) {
-  videoFiles = videoFiles.filter(f => f.name !== name);
-  renderVideoList();
-}
-
-function renderVideoList() {
-  const list = document.getElementById('videoFileList');
-  list.innerHTML = '';
-  videoFiles.forEach(f => {
-    const size = (f.size / 1024 / 1024).toFixed(1);
-    const d = document.createElement('div');
-    d.className = 'file-item';
-    d.innerHTML = `<span class="fi-icon">🎥</span>
-      <div class="fi-info">
-        <div class="fi-name">${esc(f.name)}</div>
-        <div class="fi-meta">${size} MB</div>
-      </div>
-      <span class="fi-ok">✓ Pronto</span>
-      <button class="fi-rm" onclick="removeVideo('${esc(f.name)}')">×</button>`;
-    list.appendChild(d);
-  });
-}
-
-// ── VARIATION SELECT ──────────────────────────────────────────────────────
-let selectedVarIds = new Set();
-
+</script>
+<script>
+// ── RENDER TAB ────────────────────────────────────────────────────────────
 function refreshVarSelect() {
   const area = document.getElementById('varSelectArea');
   if (!generated.length) {
-    area.innerHTML = '<div class="no-variations-msg">⚠️ Gere os criativos primeiro na aba <strong>"Gerar Criativos"</strong> para selecionar as variações aqui.</div>';
+    area.innerHTML = `<div class="no-variations-msg">
+      Nenhum criativo gerado ainda.<br>
+      Vá para a aba <strong>Gerar Criativos</strong> primeiro.
+    </div>`;
     return;
   }
-  if (selectedVarIds.size === 0) generated.forEach(v => selectedVarIds.add(v.numero));
 
-  const sc = getScoreColor;
+  const allIds = generated.map(v => v.numero);
+  if (!selectedVarIds.size) allIds.forEach(id => selectedVarIds.add(id));
+
   area.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-      <span style="font-size:14px;color:var(--muted2);">Selecione quais variações renderizar:</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:13px;color:var(--muted2);">${generated.length} criativos disponíveis</div>
       <div style="display:flex;gap:8px;">
-        <button class="btn-export" onclick="selectAllVars(true)" style="padding:7px 14px;font-size:12px;">✓ Todas</button>
-        <button class="btn-export" onclick="selectAllVars(false)" style="padding:7px 14px;font-size:12px;">✗ Nenhuma</button>
+        <button class="btn-export" style="padding:8px 14px;font-size:12px;" onclick="selectAllVars(true)">Selecionar Todos</button>
+        <button class="btn-export" style="padding:8px 14px;font-size:12px;" onclick="selectAllVars(false)">Nenhum</button>
       </div>
     </div>
     <div class="var-sel-grid" id="varSelGrid"></div>`;
 
   const grid = document.getElementById('varSelGrid');
   generated.forEach(v => {
-    const checked = selectedVarIds.has(v.numero);
-    const color = getScoreColor(v.score || 70);
-    const item = document.createElement('div');
-    item.className = 'var-sel-item' + (checked ? ' selected' : '');
-    item.id = `vsi-${v.numero}`;
-    item.onclick = () => toggleVar(v.numero);
-    item.innerHTML = `
-      <input type="checkbox" ${checked ? 'checked' : ''} id="vsc-${v.numero}" onclick="event.stopPropagation();toggleVar(${v.numero})"/>
+    const sel = selectedVarIds.has(v.numero);
+    const col = getScoreColor(v.score||70);
+    const div = document.createElement('div');
+    div.className = 'var-sel-item' + (sel?' selected':'');
+    div.id = `vsi-${v.numero}`;
+    div.onclick = () => toggleVarSel(v.numero);
+    div.innerHTML = `
+      <input type="checkbox" ${sel?'checked':''} onclick="event.stopPropagation();toggleVarSel(${v.numero})"/>
       <div>
-        <div class="var-sel-name">VAR ${String(v.numero).padStart(2,'0')} — ${esc(v.nome)}</div>
-        <div class="var-sel-score" style="color:${color}">Score: ${v.score}%</div>
+        <div class="var-sel-name">VAR ${String(v.numero).padStart(2,'0')} — ${esc(v.nome||'')}</div>
+        <div class="var-sel-score" style="color:${col}">Score: ${v.score||0}%</div>
       </div>`;
-    grid.appendChild(item);
+    grid.appendChild(div);
   });
 }
 
-function toggleVar(num) {
-  if (selectedVarIds.has(num)) selectedVarIds.delete(num);
-  else selectedVarIds.add(num);
-  const item = document.getElementById(`vsi-${num}`);
-  const cb   = document.getElementById(`vsc-${num}`);
-  if (item) item.classList.toggle('selected', selectedVarIds.has(num));
-  if (cb)   cb.checked = selectedVarIds.has(num);
+function toggleVarSel(id) {
+  if (selectedVarIds.has(id)) selectedVarIds.delete(id);
+  else selectedVarIds.add(id);
+  const item = document.getElementById(`vsi-${id}`);
+  if (item) {
+    item.classList.toggle('selected', selectedVarIds.has(id));
+    const cb = item.querySelector('input[type=checkbox]');
+    if (cb) cb.checked = selectedVarIds.has(id);
+  }
 }
 
 function selectAllVars(all) {
-  selectedVarIds = new Set(all ? generated.map(v => v.numero) : []);
+  selectedVarIds.clear();
+  if (all) generated.forEach(v => selectedVarIds.add(v.numero));
   refreshVarSelect();
 }
 
-// ── BACKEND TEST ──────────────────────────────────────────────────────────
+// ── TEST BACKEND ──────────────────────────────────────────────────────────
 async function testBackend() {
   const raw = document.getElementById('backendUrl').value.trim();
   const url = raw.replace(/\/health\/?$/, '').replace(/\/$/, '');
@@ -1224,73 +1697,72 @@ async function testBackend() {
   }
 }
 
-// ── RENDER ────────────────────────────────────────────────────────────────
+// ── START RENDER ──────────────────────────────────────────────────────────
 async function startRender() {
-  const url = document.getElementById('backendUrl').value.trim().replace(/\/health\/?$/, '').replace(/\/$/, '');
-  if (!url)             { toast('⚠️ Cole a URL do backend', true); return; }
-  if (!videoFiles.length) { toast('⚠️ Faça upload dos vídeos', true); return; }
-  if (!generated.length)  { toast('⚠️ Gere os criativos primeiro', true); return; }
-  if (!selectedVarIds.size){ toast('⚠️ Selecione ao menos 1 variação', true); return; }
+  const url = document.getElementById('backendUrl').value.trim()
+    .replace(/\/health\/?$/, '').replace(/\/$/, '');
+  if (!url)              { toast('⚠️ Configure a URL do backend', true); return; }
+  if (!videoFiles.length){ toast('⚠️ Faça upload dos vídeos fonte', true); return; }
+  if (!selectedVarIds.size){ toast('⚠️ Selecione ao menos uma variação', true); return; }
+  if (!generated.length) { toast('⚠️ Gere os criativos primeiro', true); return; }
+
+  const varList    = generated.filter(v => selectedVarIds.has(v.numero));
+  const resolution = document.getElementById('renderResolution').value;
+  const subStyle   = document.getElementById('subtitleStyle').value;
+  const password   = document.getElementById('backendPassword').value;
+
+  const fd = new FormData();
+  fd.append('variations',      JSON.stringify(varList));
+  fd.append('resolution',      resolution);
+  fd.append('subtitle_style',  subStyle);
+  fd.append('variation_ids',   JSON.stringify([...selectedVarIds]));
+  fd.append('access_password', password);
+
+  videoFiles.forEach((f, i) => fd.append(`video_${i}`, f, f.name));
 
   const btn = document.getElementById('btnRender');
   btn.disabled = true; btn.textContent = '⏳ RENDERIZANDO...';
 
-  const statusEl  = document.getElementById('renderStatus');
-  const progEl    = document.getElementById('rsProg');
-  const textEl    = document.getElementById('rsText');
-  const resultsEl = document.getElementById('renderResults');
-  const gridEl    = document.getElementById('rrGrid');
+  const statusEl = document.getElementById('renderStatus');
+  const progEl   = document.getElementById('rsProg');
+  const textEl   = document.getElementById('rsText');
+  statusEl.style.display = 'block';
+  document.getElementById('renderResults').style.display = 'none';
 
-  statusEl.style.display  = 'block';
-  resultsEl.style.display = 'none';
-  gridEl.innerHTML = '';
-
-  const setRS = (pct, txt) => {
-    progEl.style.width = pct + '%';
-    textEl.textContent = txt;
-  };
+  progEl.style.width = '10%';
+  textEl.textContent = `Enviando ${videoFiles.length} vídeo(s) e ${varList.length} variação(ões) para o servidor...`;
 
   try {
-    setRS(10, 'Preparando arquivos...');
+    const fakeProgress = setInterval(() => {
+      const cur = parseFloat(progEl.style.width);
+      if (cur < 85) progEl.style.width = (cur + 2) + '%';
+    }, 1500);
 
-    const varList    = generated.filter(v => selectedVarIds.has(v.numero));
-    const resolution = document.getElementById('renderResolution').value;
-    const subStyle   = document.getElementById('subtitleStyle').value;
-    const password   = document.getElementById('backendPassword').value;
+    const r = await fetch(`${url}/render`, { method:'POST', body:fd });
 
-    const fd = new FormData();
-    fd.append('variations',     JSON.stringify(varList));
-    fd.append('resolution',     resolution);
-    fd.append('subtitle_style', subStyle);
-    fd.append('variation_ids',  JSON.stringify([...selectedVarIds]));
-    fd.append('access_password', password);
+    clearInterval(fakeProgress);
+    progEl.style.width = '92%';
 
-    videoFiles.forEach((f, i) => fd.append(`video_${i}`, f, f.name));
-
-    setRS(25, `Enviando ${videoFiles.length} vídeo(s) para o servidor...`);
-
-    const resp = await fetch(`${url}/render`, { method: 'POST', body: fd });
-
-    setRS(70, 'Processando cortes e legendas com FFmpeg...');
-
-    if (!resp.ok) {
-      const e = await resp.json();
-      throw new Error(e.error || 'Erro no servidor');
+    if (!r.ok) {
+      const err = await r.json().catch(()=>({error:`HTTP ${r.status}`}));
+      if (r.status === 401) throw new Error('Senha incorreta. Verifique o campo Senha de Acesso.');
+      throw new Error(err.error || `Erro ${r.status}`);
     }
 
-    const data = await resp.json();
-    setRS(95, 'Preparando downloads...');
+    const data = await r.json();
+    progEl.style.width = '100%';
+    textEl.textContent = `✓ ${data.rendered?.length || 0} vídeo(s) renderizado(s) com sucesso!`;
 
     if (data.errors?.length) {
-      data.errors.forEach(e => toast(`❌ VAR ${e.numero}: ${e.error}`, true));
+      data.errors.forEach(e => toast(`⚠️ VAR ${e.numero}: ${e.error}`, true));
     }
 
-    if (!data.rendered?.length) throw new Error('Nenhum vídeo foi gerado.');
+    const gridEl   = document.getElementById('rrGrid');
+    const resultsEl = document.getElementById('renderResults');
+    gridEl.innerHTML = '';
 
-    setRS(100, `✓ ${data.rendered.length} vídeo(s) prontos!`);
-
-    data.rendered.forEach(item => {
-      const color = getScoreColor(item.score || 70);
+    data.rendered?.forEach(item => {
+      const col   = getScoreColor(item.score || 70);
       const pwd   = document.getElementById('backendPassword').value;
       const dlUrl = pwd
         ? `${url}/download/${item.session}/${item.file}?access_password=${encodeURIComponent(pwd)}`
@@ -1300,7 +1772,9 @@ async function startRender() {
       div.innerHTML = `
         <div class="rr-info">
           <div class="rr-name">VAR ${String(item.numero).padStart(2,'0')} — ${esc(item.nome)}</div>
-          <div class="rr-meta" style="color:${color}">Score: ${item.score}% &nbsp;·&nbsp; <span style="color:var(--muted2)">${esc(item.file)}</span></div>
+          <div class="rr-meta" style="color:${col}">Score: ${item.score}%
+            &nbsp;·&nbsp; <span style="color:var(--muted2)">${esc(item.file)}</span>
+          </div>
         </div>
         <a class="btn-dl-video" href="${dlUrl}" download="${item.file}" target="_blank">
           ⬇ Baixar MP4
@@ -1309,16 +1783,87 @@ async function startRender() {
     });
 
     resultsEl.style.display = 'block';
-    resultsEl.scrollIntoView({ behavior: 'smooth' });
+    resultsEl.scrollIntoView({ behavior:'smooth' });
 
   } catch(err) {
-    setRS(0, '');
-    statusEl.style.display = 'none';
+    progEl.style.width = '0%';
+    textEl.textContent = '❌ ' + err.message;
     toast('❌ ' + err.message, true);
   } finally {
     btn.disabled = false;
-    btn.textContent = '🎬 RENDERIZAR VÍDEOS SELECIONADOS';
+    btn.textContent = '🎞 RENDERIZAR VÍDEOS SELECIONADOS';
   }
+}
+
+// ── BACKUP ────────────────────────────────────────────────────────────────
+function saveBackup() {
+  const data = {
+    version:         3,
+    savedAt:         new Date().toISOString(),
+    apiKey:          document.getElementById('apiKey').value,
+    backendUrl:      document.getElementById('backendUrl').value,
+    backendPassword: document.getElementById('backendPassword').value,
+    produto:         document.getElementById('produto').value,
+    publico:         document.getElementById('publico').value,
+    duracao:         document.getElementById('duracao').value,
+    contexto:        document.getElementById('contexto').value,
+    renderResolution:document.getElementById('renderResolution').value,
+    subtitleStyle:   document.getElementById('subtitleStyle').value,
+    generated,
+    srtFileNames:    srtFiles.map(f => f.name),
+  };
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `criativo-studio-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+
+  const ts = document.getElementById('backupTs');
+  ts.style.display = 'block';
+  ts.textContent   = '✓ Salvo às ' + new Date().toLocaleTimeString('pt-BR');
+  toast('✓ Backup salvo!');
+}
+
+function restoreBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+
+      if (data.apiKey)           document.getElementById('apiKey').value           = data.apiKey;
+      if (data.backendUrl)       document.getElementById('backendUrl').value        = data.backendUrl;
+      if (data.backendPassword)  document.getElementById('backendPassword').value   = data.backendPassword;
+      if (data.produto)          document.getElementById('produto').value           = data.produto;
+      if (data.publico)          document.getElementById('publico').value           = data.publico;
+      if (data.duracao)          document.getElementById('duracao').value           = data.duracao;
+      if (data.contexto)         document.getElementById('contexto').value          = data.contexto;
+      if (data.renderResolution) document.getElementById('renderResolution').value  = data.renderResolution;
+      if (data.subtitleStyle)    document.getElementById('subtitleStyle').value     = data.subtitleStyle;
+
+      if (data.generated?.length) {
+        generated = data.generated;
+        document.getElementById('results').style.display = 'block';
+        renderVariations(generated, +data.duracao || 60);
+        toast(`✓ Backup restaurado — ${generated.length} criativos carregados!`);
+      } else {
+        toast('✓ Configurações restauradas!');
+      }
+
+      const ts = document.getElementById('backupTs');
+      ts.style.display = 'block';
+      ts.textContent   = '✓ Restaurado de ' + (data.savedAt
+        ? new Date(data.savedAt).toLocaleString('pt-BR')
+        : 'backup');
+
+    } catch(err) {
+      toast('❌ Arquivo de backup inválido', true);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
 }
 </script>
 </body>
