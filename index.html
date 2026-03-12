@@ -10,9 +10,7 @@
 </head>
 <body>
 
-    <!-- ============================================================ -->
     <!-- HEADER -->
-    <!-- ============================================================ -->
     <header class="header">
         <div class="header-inner">
             <div class="logo">
@@ -40,9 +38,7 @@
         </div>
     </header>
 
-    <!-- ============================================================ -->
     <!-- MAIN APP -->
-    <!-- ============================================================ -->
     <main class="main-app">
 
         <!-- TABS -->
@@ -61,12 +57,9 @@
             </button>
         </div>
 
-        <!-- ============================================================ -->
-        <!-- ABA 1: GERADOR DE CRIATIVOS -->
-        <!-- ============================================================ -->
+        <!-- ========== ABA 1: GERADOR DE CRIATIVOS ========== -->
         <section id="tab-creative" class="tab-content active">
 
-            <!-- Type Selector -->
             <div class="type-selector">
                 <button class="type-btn active" data-type="video" onclick="selectCreativeType('video')">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -84,7 +77,6 @@
                 </button>
             </div>
 
-            <!-- Form -->
             <form id="creative-form" class="form-card">
                 <div class="form-grid">
                     <div class="form-group">
@@ -121,8 +113,6 @@
                             <option value="Kwai Ads">Kwai Ads</option>
                         </select>
                     </div>
-
-                    <!-- Image-only: Formato -->
                     <div class="form-group" id="formato-group" style="display:none;">
                         <label for="formato">Formato da Imagem</label>
                         <select id="formato">
@@ -132,14 +122,12 @@
                             <option value="banner">Banner (16:9 — 1920x1080)</option>
                         </select>
                     </div>
-
                     <div class="form-group full-width">
                         <label for="contexto">Contexto Extra (opcional)</label>
                         <textarea id="contexto" rows="3" placeholder="Informações adicionais: diferenciais, promoção, dados do produto..."></textarea>
                     </div>
                 </div>
 
-                <!-- Stepper de Variações -->
                 <div class="stepper-container">
                     <label>Variações</label>
                     <div class="stepper">
@@ -166,21 +154,18 @@
                 </button>
             </form>
 
-            <!-- Results -->
             <div id="creative-results" class="results-container"></div>
         </section>
 
-        <!-- ============================================================ -->
-        <!-- ABA 2: EDITOR AUTOMÁTICO -->
-        <!-- ============================================================ -->
+        <!-- ========== ABA 2: EDITOR AUTOMÁTICO (CORTE REAL) ========== -->
         <section id="tab-editor" class="tab-content">
 
             <div class="editor-intro">
-                <h2>Editor Automático por IA</h2>
-                <p>Upload de vídeos + SRTs pareados → IA analisa poder persuasivo → Gera cortes otimizados para conversão</p>
+                <h2>Editor Automático com IA</h2>
+                <p>Suba vídeos + SRTs pareados → IA analisa poder persuasivo → Corta e emenda automaticamente com estrutura Gancho → Corpo → CTA</p>
             </div>
 
-            <!-- Upload Area -->
+            <!-- UPLOAD -->
             <div class="upload-section">
                 <div class="upload-zone" id="upload-zone">
                     <div class="upload-icon">
@@ -191,46 +176,51 @@
                         </svg>
                     </div>
                     <p class="upload-text">Arraste arquivos ou <span>clique para selecionar</span></p>
-                    <p class="upload-hint">Vídeos (.mp4, .mov, .webm) + Legendas (.srt) — Pareados pelo mesmo nome</p>
-                    <input type="file" id="file-input" multiple accept=".mp4,.mov,.webm,.avi,.mkv,.srt,.vtt,.sub" style="display:none;">
+                    <p class="upload-hint">Vídeos (.mp4, .mov, .webm) + Legendas (.srt) — Cada vídeo PRECISA ter um SRT com o mesmo nome</p>
+                    <input type="file" id="file-input" multiple accept=".mp4,.mov,.webm,.avi,.mkv,.m4v,.srt,.vtt,.sub" style="display:none;">
                 </div>
 
-                <!-- File List with Pairing Indicator -->
                 <div id="file-list" class="file-list" style="display:none;">
-                    <h3>Arquivos Carregados</h3>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                        <h3>Arquivos Carregados</h3>
+                        <button class="btn-clear-files" onclick="clearAllFiles()">Limpar Tudo</button>
+                    </div>
                     <div id="file-pairs"></div>
+                    <div id="upload-status" style="margin-top:12px;"></div>
                 </div>
             </div>
 
-            <!-- Editor Settings -->
+            <!-- SETTINGS -->
             <div class="editor-settings" id="editor-settings" style="display:none;">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;color:var(--text-primary);">Configurações de Corte</h3>
+
                 <div class="settings-grid">
                     <div class="setting-group">
-                        <label>Duração do Corte</label>
+                        <label>Modo de Corte</label>
+                        <div class="mode-options">
+                            <button type="button" class="mode-btn active" data-mode="individual" onclick="selectMode('individual')">
+                                Um de Cada
+                                <small>Corta e emenda cada vídeo separado</small>
+                            </button>
+                            <button type="button" class="mode-btn" data-mode="todos" onclick="selectMode('todos')">
+                                Cortar Todos
+                                <small>Mistura trechos de todos os vídeos</small>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label>Duração do Vídeo Final</label>
                         <div class="duration-options">
                             <button type="button" class="dur-btn" data-dur="30" onclick="selectDuration(30)">30s</button>
-                            <button type="button" class="dur-btn active" data-dur="60" onclick="selectDuration(60)">60s</button>
                             <button type="button" class="dur-btn" data-dur="45" onclick="selectDuration(45)">45s</button>
+                            <button type="button" class="dur-btn active" data-dur="60" onclick="selectDuration(60)">60s</button>
                             <button type="button" class="dur-btn" data-dur="90" onclick="selectDuration(90)">90s</button>
                         </div>
                     </div>
 
                     <div class="setting-group">
-                        <label>Modo</label>
-                        <div class="mode-options">
-                            <button type="button" class="mode-btn active" data-mode="individual" onclick="selectMode('individual')">
-                                Individual
-                                <small>Cada vídeo separado</small>
-                            </button>
-                            <button type="button" class="mode-btn" data-mode="mix" onclick="selectMode('mix')">
-                                Mix
-                                <small>Combina trechos de todos</small>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="setting-group">
-                        <label>Variações</label>
+                        <label>Variações por Vídeo</label>
                         <div class="stepper">
                             <button type="button" class="stepper-btn" onclick="adjustVariations(-1, 'editor')">−</button>
                             <div class="stepper-display">
@@ -241,35 +231,39 @@
                     </div>
                 </div>
 
+                <div class="mode-description" id="mode-description">
+                    <div class="mode-desc-icon">ℹ️</div>
+                    <div id="mode-desc-text">
+                        <strong>Modo "Um de Cada":</strong> A IA corta e emenda cada vídeo separadamente. Se você subiu 2 vídeos e pediu 2 variações, você recebe 4 vídeos prontos (2 para cada).
+                    </div>
+                </div>
+
                 <button class="btn-generate" id="btn-generate-editor" onclick="generateEditorCuts()">
                     <span class="btn-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                            <polygon points="5 3 19 12 5 21 5 3"/>
                         </svg>
                     </span>
-                    <span class="btn-text">Analisar e Gerar Cortes</span>
+                    <span class="btn-text">Cortar e Montar Vídeos</span>
                     <span class="btn-loading" style="display:none;">
                         <div class="spinner"></div>
-                        Analisando poder persuasivo...
+                        Analisando, cortando e montando...
                     </span>
                 </button>
             </div>
 
-            <!-- Editor Results -->
             <div id="editor-results" class="results-container"></div>
         </section>
 
     </main>
 
-    <!-- ============================================================ -->
     <!-- FOOTER -->
-    <!-- ============================================================ -->
     <footer class="footer">
         <p>Halley Criativos Studio © 2026 — Powered by AI Machine Learning</p>
         <p class="footer-sub">Especialista em Direct Response Marketing & Vendas Sênior</p>
     </footer>
 
-    <!-- TOAST NOTIFICATION -->
+    <!-- TOAST -->
     <div id="toast" class="toast"></div>
 
     <script src="js/app.js"></script>
