@@ -1,723 +1,340 @@
 /**
- * HALLEY CRIATIVOS STUDIO — Frontend Application
- * IA Especialista em Vendas Sênior & Direct Response Marketing
- * 
- * Arquitetura: Vanilla JS modular (zero dependências)
- * Deploy: Cloudflare Pages (GitHub)
- * Backend: Hugging Face Spaces (FastAPI)
+ * HALLEY CRIATIVOS STUDIO — Frontend v3
+ * Aba 1: Gerador de Criativos (Mixtral 8x7B)
+ * Aba 2: Editor Automático (Corte real FFmpeg)
  */
 
-// ============================================================
-// CONFIGURAÇÃO
-// ============================================================
-
 const CONFIG = {
-    // ⚠️ ALTERE PARA A URL DO SEU SPACE NO HUGGING FACE
-    API_BASE: 'https://SEU-USUARIO-halley-criativos-studio.hf.space',
-    // Exemplo: 'https://johndoe-halley-criativos-studio.hf.space'
+    API_BASE: 'https://wanderhalleylee-criativo-studio-backend.hf.space',
 };
 
-// ============================================================
-// ESTADO GLOBAL
-// ============================================================
-
 const STATE = {
-    creativeType: 'video',         // 'video' ou 'image'
+    creativeType: 'video',
     creativeVariations: 1,
     editorVariations: 1,
     editorDuration: 60,
     editorMode: 'individual',
-    uploadedFiles: [],             // Arquivos carregados
-    parsedSRTs: [],                // SRTs parseados pelo backend
+    uploadedFiles: [],
+    sessionId: null,
+    validPairs: [],
 };
 
-// ============================================================
-// TABS
-// ============================================================
-
+// === TABS ===
 function switchTab(tab) {
-    // Update tab buttons
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
-
-    // Update tab content
     document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
     document.getElementById(`tab-${tab}`).classList.add('active');
 }
 
-// ============================================================
-// CREATIVE TYPE SELECTOR
-// ============================================================
-
+// === CREATIVE TYPE ===
 function selectCreativeType(type) {
     STATE.creativeType = type;
-    document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
     document.querySelector(`.type-btn[data-type="${type}"]`).classList.add('active');
-
-    // Show/hide image format selector
-    const formatGroup = document.getElementById('formato-group');
-    formatGroup.style.display = type === 'image' ? 'flex' : 'none';
+    document.getElementById('formato-group').style.display = type === 'image' ? 'flex' : 'none';
 }
 
-// ============================================================
-// STEPPER
-// ============================================================
-
-function adjustVariations(delta, context) {
-    const key = context === 'creative' ? 'creativeVariations' : 'editorVariations';
-    const displayId = context === 'creative' ? 'creative-variations' : 'editor-variations';
-
-    STATE[key] = Math.max(1, Math.min(10, STATE[key] + delta));
-    document.getElementById(displayId).textContent = STATE[key];
+// === STEPPER ===
+function adjustVariations(delta, ctx) {
+    const k = ctx === 'creative' ? 'creativeVariations' : 'editorVariations';
+    const id = ctx === 'creative' ? 'creative-variations' : 'editor-variations';
+    STATE[k] = Math.max(1, Math.min(10, STATE[k] + delta));
+    document.getElementById(id).textContent = STATE[k];
 }
 
-// ============================================================
-// DURATION & MODE SELECTORS (Editor)
-// ============================================================
-
-function selectDuration(dur) {
-    STATE.editorDuration = dur;
-    document.querySelectorAll('.dur-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`.dur-btn[data-dur="${dur}"]`).classList.add('active');
+// === DURATION & MODE ===
+function selectDuration(d) {
+    STATE.editorDuration = d;
+    document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.dur-btn[data-dur="${d}"]`).classList.add('active');
+}
+function selectMode(m) {
+    STATE.editorMode = m;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.mode-btn[data-mode="${m}"]`).classList.add('active');
+    const desc = document.getElementById('mode-desc-text');
+    if (m === 'individual') {
+        desc.innerHTML = '<strong>Modo "Um de Cada":</strong> A IA corta e emenda cada vídeo separadamente. Se você subiu 2 vídeos e pediu 2 variações, recebe 4 vídeos prontos (2 de cada).';
+    } else {
+        desc.innerHTML = '<strong>Modo "Cortar Todos":</strong> A IA pega os melhores trechos de TODOS os vídeos e monta um único vídeo mixado. Se pediu 2 variações, recebe 2 vídeos (cada um misturando todas as fontes).';
+    }
 }
 
-function selectMode(mode) {
-    STATE.editorMode = mode;
-    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+// === TOAST ===
+function showToast(msg, type='success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = `toast ${type} show`;
+    setTimeout(() => { t.className = 'toast'; }, 3500);
 }
 
-// ============================================================
-// TOAST NOTIFICATIONS
-// ============================================================
-
-function showToast(message, type = 'success') {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.className = `toast ${type} show`;
-    setTimeout(() => { toast.className = 'toast'; }, 3500);
-}
-
-// ============================================================
-// COPY TO CLIPBOARD
-// ============================================================
-
-function copyToClipboard(text, btnElement) {
+// === COPY ===
+function copyToClipboard(text, btn) {
     navigator.clipboard.writeText(text).then(() => {
-        const original = btnElement.innerHTML;
-        btnElement.innerHTML = '✓ Copiado!';
-        btnElement.classList.add('copied');
-        showToast('Prompt copiado para a área de transferência!');
-        setTimeout(() => {
-            btnElement.innerHTML = original;
-            btnElement.classList.remove('copied');
-        }, 2000);
+        const o = btn.innerHTML; btn.innerHTML = '✓ Copiado!'; btn.classList.add('copied');
+        showToast('Copiado!');
+        setTimeout(() => { btn.innerHTML = o; btn.classList.remove('copied'); }, 2000);
     }).catch(() => {
-        // Fallback
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        showToast('Prompt copiado!');
+        const ta = document.createElement('textarea'); ta.value = text;
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta); showToast('Copiado!');
     });
 }
 
-// ============================================================
-// LOADING STATE
-// ============================================================
-
-function setLoading(buttonId, loading) {
-    const btn = document.getElementById(buttonId);
-    const textSpan = btn.querySelector('.btn-text');
-    const loadingSpan = btn.querySelector('.btn-loading');
-
-    if (loading) {
-        btn.disabled = true;
-        textSpan.style.display = 'none';
-        loadingSpan.style.display = 'flex';
-    } else {
-        btn.disabled = false;
-        textSpan.style.display = 'inline';
-        loadingSpan.style.display = 'none';
-    }
+// === LOADING ===
+function setLoading(id, on) {
+    const btn = document.getElementById(id);
+    btn.disabled = on;
+    btn.querySelector('.btn-text').style.display = on ? 'none' : 'inline';
+    btn.querySelector('.btn-loading').style.display = on ? 'flex' : 'none';
 }
+function escapeHtml(t) { if(!t) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
 // ============================================================
 // ABA 1 — GERADOR DE CRIATIVOS
 // ============================================================
-
-document.getElementById('creative-form').addEventListener('submit', async function (e) {
+document.getElementById('creative-form').addEventListener('submit', async function(e) {
     e.preventDefault();
-
     const produto = document.getElementById('produto').value.trim();
     const publico = document.getElementById('publico').value.trim();
     const objetivo = document.getElementById('objetivo').value.trim();
-    const tom = document.getElementById('tom').value;
-    const plataforma = document.getElementById('plataforma').value;
-    const contexto = document.getElementById('contexto').value.trim();
-    const formato = document.getElementById('formato').value;
-
-    if (!produto || !publico || !objetivo) {
-        showToast('Preencha todos os campos obrigatórios!', 'error');
-        return;
-    }
-
+    if (!produto || !publico || !objetivo) { showToast('Preencha todos os campos obrigatórios!','error'); return; }
     setLoading('btn-generate-creative', true);
-
     try {
-        const endpoint = STATE.creativeType === 'video'
-            ? '/api/v1/creative/video'
-            : '/api/v1/creative/image';
-
+        const ep = STATE.creativeType==='video' ? '/api/v1/creative/video' : '/api/v1/creative/image';
         const body = {
-            produto,
-            publico_alvo: publico,
-            objetivo,
-            tom_voz: tom,
-            plataforma,
+            produto, publico_alvo: publico, objetivo,
+            tom_voz: document.getElementById('tom').value,
+            plataforma: document.getElementById('plataforma').value,
             variacoes: STATE.creativeVariations,
-            contexto_extra: contexto,
+            contexto_extra: document.getElementById('contexto').value.trim()
         };
-
-        if (STATE.creativeType === 'image') {
-            body.formato = formato;
-        }
-
-        const response = await fetch(`${CONFIG.API_BASE}${endpoint}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
+        if (STATE.creativeType==='image') body.formato = document.getElementById('formato').value;
+        const res = await fetch(`${CONFIG.API_BASE}${ep}`, {
+            method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
         });
-
-        if (!response.ok) throw new Error(`Erro ${response.status}`);
-
-        const data = await response.json();
-
-        if (STATE.creativeType === 'video') {
-            renderVideoResults(data.variacoes);
-        } else {
-            renderImageResults(data.variacoes);
-        }
-
-        showToast(`${data.total_variacoes} variação(ões) gerada(s) com sucesso!`);
-
-    } catch (err) {
-        console.error(err);
-        showToast('Erro ao conectar com a IA. Verifique se o backend está online.', 'error');
-    } finally {
-        setLoading('btn-generate-creative', false);
-    }
+        if (!res.ok) throw new Error(`Erro ${res.status}`);
+        const data = await res.json();
+        if (STATE.creativeType==='video') renderVideoResults(data.variacoes);
+        else renderImageResults(data.variacoes);
+        showToast(`${data.total_variacoes} variação(ões) gerada(s)!`);
+    } catch(err) { console.error(err); showToast('Erro ao conectar com a IA. Verifique o backend.','error'); }
+    finally { setLoading('btn-generate-creative', false); }
 });
 
-// ============================================================
-// RENDER — VIDEO RESULTS
-// ============================================================
-
-function renderVideoResults(variacoes) {
-    const container = document.getElementById('creative-results');
-    container.innerHTML = '';
-
-    variacoes.forEach(v => {
-        const card = document.createElement('div');
-        card.className = 'result-card';
-
-        // Header
-        let html = `
-            <div class="result-header">
-                <span class="result-badge">Variação ${v.variacao}</span>
-                <span class="result-framework">${v.framework}</span>
-            </div>
-            <div class="result-angle">${v.angulo_criativo}</div>
-        `;
-
-        // Roteiro Completo
-        const roteiroId = `roteiro-${v.variacao}`;
-        html += `
-            <div class="roteiro-block">
-                <div class="roteiro-title">Roteiro Completo</div>
-                <div class="roteiro-text" id="${roteiroId}">${escapeHtml(v.roteiro_completo)}</div>
-                <button class="btn-copy" onclick="copyToClipboard(document.getElementById('${roteiroId}').innerText, this)">
-                    Copiar Roteiro
-                </button>
-            </div>
-        `;
-
-        // Storyboard
-        html += '<h3 style="font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:16px;">Storyboard — Cena a Cena</h3>';
-
-        v.storyboard.forEach(scene => {
-            const promptId = `veo3-${v.variacao}-${scene.cena}`;
-            html += `
-                <div class="scene-card">
-                    <div class="scene-header">
-                        <div class="scene-phase">
-                            <div class="scene-number">${scene.cena}</div>
-                            <span class="scene-phase-name">${scene.fase}</span>
-                        </div>
-                        <span class="scene-time">${scene.tempo}</span>
-                    </div>
-                    <div class="scene-objective">${scene.objetivo_da_cena}</div>
-                    
-                    <div class="scene-section">
-                        <div class="scene-section-title">Narração</div>
-                        <div class="scene-narration">${escapeHtml(scene['narração'])}</div>
-                    </div>
-                    
-                    <div class="scene-section">
-                        <div class="scene-section-title">Descrição Visual</div>
-                        <div class="scene-visual">${escapeHtml(scene['descrição_visual'])}</div>
-                    </div>
-                    
-                    <div class="scene-cut">${scene.corte_sugerido}</div>
-                    
-                    <div class="prompt-block">
-                        <div class="prompt-label">Prompt Veo 3</div>
-                        <div class="prompt-text" id="${promptId}">${escapeHtml(scene.prompt_veo3)}</div>
-                        <button class="btn-copy" onclick="copyToClipboard(document.getElementById('${promptId}').innerText, this)">
-                            Copiar
-                        </button>
-                    </div>
-                </div>
-            `;
-        });
-
-        card.innerHTML = html;
-        container.appendChild(card);
-    });
-
-    // Scroll to results
-    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// ============================================================
-// RENDER — IMAGE RESULTS
-// ============================================================
-
-function renderImageResults(variacoes) {
-    const container = document.getElementById('creative-results');
-    container.innerHTML = '';
-
-    variacoes.forEach(v => {
-        const card = document.createElement('div');
-        card.className = 'result-card';
-
-        let html = `
-            <div class="result-header">
-                <span class="result-badge">Variação ${v.variacao}</span>
-                <span class="result-framework">${v.plataforma}</span>
-            </div>
-            <div class="result-angle">${v.angulo_criativo}</div>
-        `;
-
-        // Copy Section
-        html += `
-            <div class="image-copy-section">
-                <div class="copy-item">
-                    <div class="copy-item-label">Headline</div>
-                    <div class="copy-item-headline">${escapeHtml(v.headline)}</div>
-                </div>
-                <div class="copy-item">
-                    <div class="copy-item-label">Subheadline</div>
-                    <div class="copy-item-subheadline">${escapeHtml(v.subheadline)}</div>
-                </div>
-                <div class="copy-item">
-                    <div class="copy-item-label">CTA (Call-to-Action)</div>
-                    <div class="copy-item-cta">${escapeHtml(v.cta)}</div>
-                </div>
-                <div class="copy-item">
-                    <div class="copy-item-label">Conceito Criativo</div>
-                    <div class="copy-item-subheadline">${escapeHtml(v.conceito)}</div>
-                </div>
-            </div>
-        `;
-
-        // Format Prompts
-        html += '<div class="format-prompts">';
-        for (const [fmtKey, fmtData] of Object.entries(v.formatos)) {
-            const promptId = `nano-${v.variacao}-${fmtKey}`;
-            html += `
-                <div class="format-card">
-                    <div class="format-header">
-                        <span class="format-name">${fmtData.formato}</span>
-                        <span class="format-res">${fmtData.resolucao}</span>
-                    </div>
-                    <div class="prompt-block" style="position:relative;">
-                        <div class="prompt-label">Prompt Nano Banana</div>
-                        <div class="prompt-text" id="${promptId}">${escapeHtml(fmtData.prompt_nano_banana)}</div>
-                        <button class="btn-copy" onclick="copyToClipboard(document.getElementById('${promptId}').innerText, this)">
-                            Copiar
-                        </button>
-                    </div>
-                </div>
-            `;
+function renderVideoResults(vars) {
+    const c = document.getElementById('creative-results'); c.innerHTML = '';
+    vars.forEach(v => {
+        const card = document.createElement('div'); card.className = 'result-card';
+        let h = `<div class="result-header"><span class="result-badge">Variação ${v.variacao}</span><span class="result-framework">${v.framework||''}</span></div>
+        <div class="result-angle">${escapeHtml(v.angulo_criativo)}</div>`;
+        const rid = `roteiro-${v.variacao}`;
+        h += `<div class="roteiro-block"><div class="roteiro-title">Roteiro Completo</div><div class="roteiro-text" id="${rid}">${escapeHtml(v.roteiro_completo)}</div>
+        <button class="btn-copy" onclick="copyToClipboard(document.getElementById('${rid}').innerText,this)">Copiar Roteiro</button></div>`;
+        if (v.storyboard && v.storyboard.length) {
+            h += '<h3 style="font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text-primary)">Storyboard</h3>';
+            v.storyboard.forEach(sc => {
+                const pid = `veo3-${v.variacao}-${sc.cena}`;
+                h += `<div class="scene-card"><div class="scene-header"><div class="scene-phase"><div class="scene-number">${sc.cena}</div>
+                <span class="scene-phase-name">${sc.fase||''}</span></div><span class="scene-time">${sc.tempo||''}</span></div>
+                <div class="scene-objective">${escapeHtml(sc.objetivo_da_cena||'')}</div>
+                <div class="scene-section"><div class="scene-section-title">Narração</div><div class="scene-narration">${escapeHtml(sc['narração']||sc.narracao||'')}</div></div>
+                <div class="scene-section"><div class="scene-section-title">Visual</div><div class="scene-visual">${escapeHtml(sc['descrição_visual']||sc.descricao_visual||'')}</div></div>
+                <div class="scene-cut">${escapeHtml(sc.corte_sugerido||'')}</div>
+                <div class="prompt-block"><div class="prompt-label">Prompt Veo 3</div><div class="prompt-text" id="${pid}">${escapeHtml(sc.prompt_veo3||'')}</div>
+                <button class="btn-copy" onclick="copyToClipboard(document.getElementById('${pid}').innerText,this)">Copiar</button></div></div>`;
+            });
         }
-        html += '</div>';
-
-        card.innerHTML = html;
-        container.appendChild(card);
+        card.innerHTML = h; c.appendChild(card);
     });
+    c.scrollIntoView({behavior:'smooth',block:'start'});
+}
 
-    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+function renderImageResults(vars) {
+    const c = document.getElementById('creative-results'); c.innerHTML = '';
+    vars.forEach(v => {
+        const card = document.createElement('div'); card.className = 'result-card';
+        let h = `<div class="result-header"><span class="result-badge">Variação ${v.variacao}</span><span class="result-framework">${v.plataforma||''}</span></div>
+        <div class="result-angle">${escapeHtml(v.angulo_criativo)}</div>
+        <div class="image-copy-section">
+            <div class="copy-item"><div class="copy-item-label">Headline</div><div class="copy-item-headline">${escapeHtml(v.headline)}</div></div>
+            <div class="copy-item"><div class="copy-item-label">Subheadline</div><div class="copy-item-subheadline">${escapeHtml(v.subheadline)}</div></div>
+            <div class="copy-item"><div class="copy-item-label">CTA</div><div class="copy-item-cta">${escapeHtml(v.cta)}</div></div>
+            <div class="copy-item"><div class="copy-item-label">Conceito</div><div class="copy-item-subheadline">${escapeHtml(v.conceito)}</div></div>
+        </div><div class="format-prompts">`;
+        if (v.formatos) {
+            for (const [fk,fd] of Object.entries(v.formatos)) {
+                const pid = `nano-${v.variacao}-${fk}`;
+                h += `<div class="format-card"><div class="format-header"><span class="format-name">${fd.formato||''}</span><span class="format-res">${fd.resolucao||''}</span></div>
+                <div class="prompt-block" style="position:relative"><div class="prompt-label">Prompt Nano Banana</div><div class="prompt-text" id="${pid}">${escapeHtml(fd.prompt_nano_banana||'')}</div>
+                <button class="btn-copy" onclick="copyToClipboard(document.getElementById('${pid}').innerText,this)">Copiar</button></div></div>`;
+            }
+        }
+        h += '</div>';
+        card.innerHTML = h; c.appendChild(card);
+    });
+    c.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 // ============================================================
-// ABA 2 — EDITOR AUTOMÁTICO: FILE UPLOAD
+// ABA 2 — EDITOR AUTOMÁTICO
 // ============================================================
-
 const uploadZone = document.getElementById('upload-zone');
 const fileInput = document.getElementById('file-input');
-
-// Click to upload
 uploadZone.addEventListener('click', () => fileInput.click());
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+fileInput.addEventListener('change', e => handleFiles(e.target.files));
 
-// Drag & Drop
-uploadZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadZone.classList.add('dragover');
-});
-
-uploadZone.addEventListener('dragleave', () => {
-    uploadZone.classList.remove('dragover');
-});
-
-uploadZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    uploadZone.classList.remove('dragover');
-    handleFiles(e.dataTransfer.files);
-});
-
-// File input change
-fileInput.addEventListener('change', (e) => {
-    handleFiles(e.target.files);
-});
-
-function handleFiles(fileList) {
-    const newFiles = Array.from(fileList);
-    STATE.uploadedFiles = [...STATE.uploadedFiles, ...newFiles];
-    renderFileList();
-    processUploadedSRTs();
+function handleFiles(fl) { STATE.uploadedFiles = [...STATE.uploadedFiles, ...Array.from(fl)]; renderFileList(); }
+function clearAllFiles() {
+    STATE.uploadedFiles=[]; STATE.sessionId=null; STATE.validPairs=[];
+    document.getElementById('file-list').style.display='none';
+    document.getElementById('editor-settings').style.display='none';
+    document.getElementById('editor-results').innerHTML='';
+    fileInput.value=''; showToast('Arquivos removidos.');
 }
-
-function removeFile(index) {
-    STATE.uploadedFiles.splice(index, 1);
-    renderFileList();
-    if (STATE.uploadedFiles.length === 0) {
-        document.getElementById('editor-settings').style.display = 'none';
-    }
-    processUploadedSRTs();
-}
+function removeFile(i) { STATE.uploadedFiles.splice(i,1); if(!STATE.uploadedFiles.length){clearAllFiles();return;} renderFileList(); }
 
 function renderFileList() {
-    const listContainer = document.getElementById('file-list');
-    const pairsContainer = document.getElementById('file-pairs');
-
-    if (STATE.uploadedFiles.length === 0) {
-        listContainer.style.display = 'none';
-        return;
+    const listEl=document.getElementById('file-list'), pairsEl=document.getElementById('file-pairs'), statusEl=document.getElementById('upload-status');
+    if(!STATE.uploadedFiles.length){listEl.style.display='none';return;}
+    listEl.style.display='block';
+    const vExts=['mp4','mov','webm','avi','mkv','m4v'], sExts=['srt','vtt','sub'];
+    const videos=[], srts=[];
+    STATE.uploadedFiles.forEach((f,i)=>{
+        const ext=f.name.split('.').pop().toLowerCase(), base=f.name.replace(/\.[^.]+$/,'').toLowerCase();
+        if(vExts.includes(ext)) videos.push({file:f,idx:i,name:f.name,base});
+        else if(sExts.includes(ext)) srts.push({file:f,idx:i,name:f.name,base});
+    });
+    const srtMap={}; srts.forEach(s=>{srtMap[s.base]=s;});
+    let html='', pairedCount=0;
+    videos.forEach(v=>{
+        const paired=srtMap[v.base]; if(paired) pairedCount++;
+        html+=`<div class="file-pair"><div class="file-pair-info"><span class="file-pair-icon">🎬</span>
+        <div><div class="file-pair-name">${escapeHtml(v.name)}</div>
+        <div class="file-pair-type">${paired?'+ SRT: '+escapeHtml(paired.name):'SRT não encontrado'}</div></div></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+        <span class="file-pair-status ${paired?'paired':'missing'}">${paired?'✅ Par válido':'❌ Será recusado'}</span>
+        <button class="file-pair-remove" onclick="removeFile(${v.idx})">✕</button></div></div>`;
+    });
+    srts.forEach(s=>{
+        if(!videos.find(v=>v.base===s.base)){
+            html+=`<div class="file-pair"><div class="file-pair-info"><span class="file-pair-icon">📝</span>
+            <div><div class="file-pair-name">${escapeHtml(s.name)}</div><div class="file-pair-type">SRT sem vídeo pareado</div></div></div>
+            <div style="display:flex;align-items:center;gap:8px;">
+            <span class="file-pair-status missing">⚠️ Sem vídeo</span>
+            <button class="file-pair-remove" onclick="removeFile(${s.idx})">✕</button></div></div>`;
+        }
+    });
+    pairsEl.innerHTML=html;
+    if(pairedCount>0){
+        statusEl.innerHTML=`<span style="color:var(--success);font-weight:600;">${pairedCount} par(es) válido(s)</span> — pronto para enviar
+        <br><button id="btn-upload-to-backend" class="btn-generate" style="margin-top:16px;" onclick="uploadToBackend()">
+        <span class="btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+        <span class="btn-text">Enviar para IA Analisar</span>
+        <span class="btn-loading" style="display:none;"><div class="spinner"></div>Enviando arquivos...</span></button>`;
+    } else {
+        statusEl.innerHTML=`<span style="color:var(--error);font-weight:600;">Nenhum par válido.</span> Cada vídeo precisa de um SRT com o mesmo nome.`;
+        document.getElementById('editor-settings').style.display='none';
     }
-
-    listContainer.style.display = 'block';
-
-    // Separate videos and SRTs
-    const videos = [];
-    const srts = [];
-
-    STATE.uploadedFiles.forEach((file, idx) => {
-        const ext = file.name.split('.').pop().toLowerCase();
-        if (['srt', 'vtt', 'sub'].includes(ext)) {
-            srts.push({ file, idx, name: file.name });
-        } else {
-            videos.push({ file, idx, name: file.name });
-        }
-    });
-
-    // Find pairs
-    const getBaseName = (name) => name.replace(/\.[^.]+$/, '').toLowerCase();
-
-    let html = '';
-
-    // Render videos with pair status
-    videos.forEach(v => {
-        const baseName = getBaseName(v.name);
-        const paired = srts.find(s => getBaseName(s.name) === baseName);
-
-        html += `
-            <div class="file-pair">
-                <div class="file-pair-info">
-                    <span class="file-pair-icon">🎬</span>
-                    <div>
-                        <div class="file-pair-name">${escapeHtml(v.name)}</div>
-                        <div class="file-pair-type">Vídeo${paired ? ' + SRT: ' + paired.name : ''}</div>
-                    </div>
-                </div>
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <span class="file-pair-status ${paired ? 'paired' : 'missing'}">
-                        ${paired ? '✅ Par encontrado' : '⚠️ SRT não encontrado'}
-                    </span>
-                    <button class="file-pair-remove" onclick="removeFile(${v.idx})" title="Remover">✕</button>
-                </div>
-            </div>
-        `;
-    });
-
-    // Render SRTs without pair
-    srts.forEach(s => {
-        const baseName = getBaseName(s.name);
-        const paired = videos.find(v => getBaseName(v.name) === baseName);
-        if (!paired) {
-            html += `
-                <div class="file-pair">
-                    <div class="file-pair-info">
-                        <span class="file-pair-icon">📝</span>
-                        <div>
-                            <div class="file-pair-name">${escapeHtml(s.name)}</div>
-                            <div class="file-pair-type">Legenda SRT (sem vídeo pareado)</div>
-                        </div>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:8px;">
-                        <span class="file-pair-status paired">✅ SRT carregado</span>
-                        <button class="file-pair-remove" onclick="removeFile(${s.idx})" title="Remover">✕</button>
-                    </div>
-                </div>
-            `;
-        }
-    });
-
-    pairsContainer.innerHTML = html;
 }
 
-// ============================================================
-// PROCESS SRTs
-// ============================================================
-
-async function processUploadedSRTs() {
-    const srtFiles = STATE.uploadedFiles.filter(f => {
-        const ext = f.name.split('.').pop().toLowerCase();
-        return ['srt', 'vtt', 'sub'].includes(ext);
-    });
-
-    if (srtFiles.length === 0) {
-        STATE.parsedSRTs = [];
-        document.getElementById('editor-settings').style.display = 'none';
-        return;
-    }
-
-    // Upload SRTs to backend for parsing
+async function uploadToBackend() {
+    const btn=document.getElementById('btn-upload-to-backend');
+    btn.disabled=true; btn.querySelector('.btn-text').style.display='none'; btn.querySelector('.btn-loading').style.display='flex';
     try {
-        const formData = new FormData();
-        srtFiles.forEach(f => formData.append('files', f));
-
-        const response = await fetch(`${CONFIG.API_BASE}/api/v1/editor/upload-srt`, {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) throw new Error(`Erro ${response.status}`);
-
-        const data = await response.json();
-        STATE.parsedSRTs = data.files;
-        document.getElementById('editor-settings').style.display = 'block';
-        showToast(`${data.total_files} SRT(s) analisado(s) com sucesso!`);
-
-    } catch (err) {
-        console.error(err);
-        // Fallback: parse locally
-        STATE.parsedSRTs = await parseSTRsLocally(srtFiles);
-        if (STATE.parsedSRTs.length > 0) {
-            document.getElementById('editor-settings').style.display = 'block';
-            showToast(`${STATE.parsedSRTs.length} SRT(s) processado(s) localmente.`);
-        }
-    }
+        const fd=new FormData(); STATE.uploadedFiles.forEach(f=>fd.append('files',f));
+        const res=await fetch(`${CONFIG.API_BASE}/api/v2/editor/upload`,{method:'POST',body:fd});
+        if(!res.ok){const err=await res.json();throw new Error(err.detail||`Erro ${res.status}`);}
+        const data=await res.json();
+        STATE.sessionId=data.session_id; STATE.validPairs=data.pairs;
+        if(data.rejected&&data.rejected.length>0){
+            showToast(`${data.total_pairs} par(es) aceito(s). Recusados: ${data.rejected.map(r=>r.video).join(', ')}`,'error');
+        } else { showToast(`${data.total_pairs} par(es) enviado(s) e validado(s)!`); }
+        document.getElementById('editor-settings').style.display='block';
+        document.getElementById('editor-settings').scrollIntoView({behavior:'smooth'});
+    } catch(err){ console.error(err); showToast(err.message||'Erro ao enviar arquivos.','error'); }
+    finally { btn.disabled=false; btn.querySelector('.btn-text').style.display='inline'; btn.querySelector('.btn-loading').style.display='none'; }
 }
-
-// Local SRT parser fallback
-async function parseSTRsLocally(files) {
-    const results = [];
-    for (const file of files) {
-        const text = await file.text();
-        const segments = [];
-        const blocks = text.trim().split(/\n\s*\n/);
-
-        for (const block of blocks) {
-            const lines = block.trim().split('\n');
-            if (lines.length < 2) continue;
-
-            const index = parseInt(lines[0]);
-            if (isNaN(index)) continue;
-
-            const timeMatch = lines[1].match(
-                /(\d{2}:\d{2}:\d{2}[,.]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[,.]\d{3})/
-            );
-            if (!timeMatch) continue;
-
-            const start = timeMatch[1].replace(',', '.');
-            const end = timeMatch[2].replace(',', '.');
-            const segText = lines.slice(2).join(' ').replace(/<[^>]+>/g, '').trim();
-
-            if (segText) {
-                const startSec = timestampToSeconds(start);
-                const endSec = timestampToSeconds(end);
-                segments.push({
-                    index,
-                    start,
-                    end,
-                    start_seconds: startSec,
-                    end_seconds: endSec,
-                    duration_seconds: Math.round((endSec - startSec) * 100) / 100,
-                    text: segText
-                });
-            }
-        }
-
-        results.push({
-            filename: file.name,
-            total_segments: segments.length,
-            segments
-        });
-    }
-    return results;
-}
-
-function timestampToSeconds(ts) {
-    const parts = ts.replace(',', '.').split(':');
-    return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseFloat(parts[2]);
-}
-
-// ============================================================
-// GENERATE EDITOR CUTS
-// ============================================================
 
 async function generateEditorCuts() {
-    if (STATE.parsedSRTs.length === 0) {
-        showToast('Carregue pelo menos um arquivo SRT.', 'error');
-        return;
-    }
-
-    setLoading('btn-generate-editor', true);
-
+    if(!STATE.sessionId){showToast('Envie os arquivos primeiro.','error');return;}
+    setLoading('btn-generate-editor',true);
+    const rEl=document.getElementById('editor-results');
+    rEl.innerHTML=`<div class="processing-overlay"><div class="processing-spinner"></div>
+    <div class="processing-text">A IA está analisando, cortando e montando seus vídeos...</div>
+    <div class="processing-sub">Estrutura: Gancho → Corpo → CTA | Pode levar alguns minutos</div></div>`;
     try {
-        const formData = new FormData();
-        formData.append('srt_data', JSON.stringify(STATE.parsedSRTs));
-        formData.append('duracao', STATE.editorDuration);
-        formData.append('variacoes', STATE.editorVariations);
-        formData.append('modo', STATE.editorMode);
-
-        const response = await fetch(`${CONFIG.API_BASE}/api/v1/editor/generate-cuts`, {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) throw new Error(`Erro ${response.status}`);
-
-        const data = await response.json();
-        renderEditorResults(data);
-        showToast(`${data.total_variacoes} variação(ões) de corte gerada(s)!`);
-
-    } catch (err) {
-        console.error(err);
-        showToast('Erro ao gerar cortes. Verifique o backend.', 'error');
-    } finally {
-        setLoading('btn-generate-editor', false);
-    }
+        const fd=new FormData();
+        fd.append('session_id',STATE.sessionId); fd.append('duracao',STATE.editorDuration);
+        fd.append('variacoes',STATE.editorVariations); fd.append('modo',STATE.editorMode);
+        const res=await fetch(`${CONFIG.API_BASE}/api/v2/editor/generate`,{method:'POST',body:fd});
+        if(!res.ok){const err=await res.json();throw new Error(err.detail||`Erro ${res.status}`);}
+        const data=await res.json();
+        renderEditorResults(data); showToast(`${data.total_videos_gerados} vídeo(s) gerado(s)!`);
+    } catch(err){ console.error(err); rEl.innerHTML=''; showToast(err.message||'Erro ao gerar cortes.','error'); }
+    finally { setLoading('btn-generate-editor',false); }
 }
-
-// ============================================================
-// RENDER — EDITOR RESULTS
-// ============================================================
 
 function renderEditorResults(data) {
-    const container = document.getElementById('editor-results');
-    container.innerHTML = '';
-
-    data.variacoes.forEach(v => {
-        const card = document.createElement('div');
-        card.className = 'variation-card';
-
-        // Header
-        let html = `
-            <div class="variation-header">
-                <span class="result-badge">Variação ${v.variacao}</span>
-                <div class="variation-meta">
-                    <span class="meta-chip">Duração: <strong>${v.duracao_total_segundos}s</strong> / ${v.duracao_alvo_segundos}s</span>
-                    <span class="meta-chip">Cortes: <strong>${v.total_cortes}</strong></span>
-                    <span class="meta-chip">Score Médio: <strong>${v.score_medio_persuasivo}</strong>/100</span>
-                    <span class="meta-chip">Modo: <strong>${v.modo}</strong></span>
-                </div>
-            </div>
-        `;
-
-        // Trigger Distribution
-        if (v.distribuicao_gatilhos && Object.keys(v.distribuicao_gatilhos).length > 0) {
-            html += '<div class="trigger-distribution">';
-            for (const [trigger, count] of Object.entries(v.distribuicao_gatilhos)) {
-                html += `<span class="trigger-tag">${trigger} × ${count}</span>`;
-            }
-            html += '</div>';
+    const c=document.getElementById('editor-results'); c.innerHTML='';
+    data.resultados.forEach(r=>{
+        const card=document.createElement('div'); card.className='variation-card';
+        const src=r.modo==='todos'?`Mix: ${r.source_videos.join(' + ')}`:`Fonte: ${r.source_video}`;
+        let h=`<div class="variation-header"><div><span class="result-badge">Variação ${r.variacao}</span>
+        <span class="video-source-label" style="margin-left:8px;">${escapeHtml(src)}</span></div>
+        <div class="variation-meta"><span class="meta-chip">Modo: <strong>${r.modo==='todos'?'Cortar Todos':'Um de Cada'}</strong></span>
+        <span class="meta-chip">Duração alvo: <strong>${r.duracao_alvo}s</strong></span></div></div>`;
+        if(r.estrutura){
+            const e=r.estrutura;
+            h+=`<div class="structure-overview">
+            <div class="structure-phase gancho"><div class="structure-phase-name">Gancho</div><div class="structure-phase-stats">${e.duracao_gancho||0}s</div><div class="structure-phase-sub">${e.total_gancho||0} corte(s)</div></div>
+            <div class="structure-phase corpo"><div class="structure-phase-name">Corpo</div><div class="structure-phase-stats">${e.duracao_corpo||0}s</div><div class="structure-phase-sub">${e.total_corpo||0} corte(s)</div></div>
+            <div class="structure-phase cta"><div class="structure-phase-name">CTA</div><div class="structure-phase-stats">${e.duracao_cta||0}s</div><div class="structure-phase-sub">${e.total_cta||0} corte(s)</div></div></div>`;
+            if(e.duracao_total) h+=`<div class="meta-chip" style="margin-bottom:20px;">Duração real: <strong>${e.duracao_total}s</strong> / ${e.duracao_alvo}s alvo</div>`;
         }
-
-        // Cuts
-        v.cortes.forEach(cut => {
-            const scoreClass = cut.score_persuasivo >= 60 ? 'high' : cut.score_persuasivo >= 30 ? 'mid' : 'low';
-
-            html += `
-                <div class="cut-card ${scoreClass}-score">
-                    <div class="cut-header">
-                        <span class="cut-number">Corte #${cut.corte_numero} — ${escapeHtml(cut.arquivo_origem)}</span>
-                        <div class="cut-score">
-                            <div class="score-bar">
-                                <div class="score-fill ${scoreClass}" style="width: ${cut.score_persuasivo}%"></div>
-                            </div>
-                            <span class="score-value ${scoreClass}">${cut.score_persuasivo}/100</span>
-                        </div>
-                    </div>
-                    <div class="cut-timestamps">${cut.timestamp_inicio} → ${cut.timestamp_fim} (${cut.duracao_segundos}s)</div>
-                    <div class="cut-text">"${escapeHtml(cut.fala)}"</div>
-                    <div class="cut-reason">${escapeHtml(cut.motivo_selecao)}</div>
-            `;
-
-            if (cut.gatilhos_ativados && cut.gatilhos_ativados.length > 0) {
-                html += '<div class="cut-triggers">';
-                cut.gatilhos_ativados.forEach(g => {
-                    html += `<span class="cut-trigger-tag">${g}</span>`;
-                });
-                html += '</div>';
-            }
-
-            html += '</div>';
-        });
-
-        card.innerHTML = html;
-        container.appendChild(card);
+        if(r.video_gerado&&r.download_url){
+            h+=`<a href="${CONFIG.API_BASE}${r.download_url}" class="btn-download" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Baixar ${escapeHtml(r.output_filename)}</a>`;
+        } else {
+            h+=`<div style="padding:12px 16px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:8px;color:#ef4444;font-size:13px;font-weight:600;margin-bottom:16px;">⚠️ Erro ao gerar este vídeo. Tente novamente.</div>`;
+        }
+        if(r.relatorio&&r.relatorio.length){
+            h+=`<h3 style="font-size:15px;font-weight:700;margin:24px 0 16px;color:var(--text-primary);">Relatório Detalhado dos Cortes</h3>`;
+            r.relatorio.forEach(cut=>{
+                const fc=cut.fase_estrutural.toLowerCase();
+                const sc=cut.score_persuasivo>=60?'high':cut.score_persuasivo>=30?'mid':'low';
+                h+=`<div class="cut-card fase-${fc}"><div class="cut-header"><div style="display:flex;align-items:center;gap:8px;">
+                <span class="cut-number">Corte #${cut.corte_numero}</span><span class="fase-badge ${fc}">${cut.fase_estrutural}</span>
+                ${cut.arquivo_origem?`<span class="video-source-label">${escapeHtml(cut.arquivo_origem)}</span>`:''}</div>
+                <div class="cut-score"><div class="score-bar"><div class="score-fill ${sc}" style="width:${cut.score_persuasivo}%"></div></div>
+                <span class="score-value ${sc}">${cut.score_persuasivo}/100</span></div></div>
+                <div class="cut-timestamps">${cut.timestamp_inicio} → ${cut.timestamp_fim} (${cut.duracao_segundos}s)</div>
+                <div class="cut-text">"${escapeHtml(cut.fala)}"</div>
+                <div class="cut-reason">${escapeHtml(cut.motivo_selecao)}</div>`;
+                if(cut.gatilhos_ativados&&cut.gatilhos_ativados.length){
+                    h+='<div class="cut-triggers">';
+                    cut.gatilhos_ativados.forEach(g=>{h+=`<span class="cut-trigger-tag">${g}</span>`;});
+                    h+='</div>';
+                }
+                h+='</div>';
+            });
+        }
+        card.innerHTML=h; c.appendChild(card);
     });
-
-    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    c.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-// ============================================================
-// UTILITIES
-// ============================================================
-
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-// ============================================================
-// INITIALIZATION
-// ============================================================
-
+// === INIT ===
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('%c🚀 Halley Criativos Studio', 'font-size:20px;font-weight:bold;color:#6366f1;');
-    console.log('%cIA Especialista em Vendas Sênior & Direct Response Marketing', 'font-size:12px;color:#a855f7;');
-    console.log(`%cBackend: ${CONFIG.API_BASE}`, 'font-size:11px;color:#888;');
-
-    // Check backend health
-    fetch(`${CONFIG.API_BASE}/health`)
-        .then(r => r.json())
-        .then(() => console.log('✅ Backend conectado'))
-        .catch(() => console.warn('⚠️ Backend offline — verifique o Hugging Face Space'));
+    console.log('%c🚀 Halley Criativos Studio v3','font-size:20px;font-weight:bold;color:#6366f1;');
+    fetch(`${CONFIG.API_BASE}/health`).then(r=>r.json()).then(d=>{
+        console.log('✅ Backend conectado');
+        if(d.ffmpeg_available) console.log('✅ FFmpeg disponível');
+    }).catch(()=>console.warn('⚠️ Backend offline'));
 });
