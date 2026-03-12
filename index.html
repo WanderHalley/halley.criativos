@@ -36,15 +36,11 @@
 
         <div class="tabs-container">
             <button class="tab active" data-tab="creative" onclick="switchTab('creative')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-                </svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                 Gerador de Criativos
             </button>
             <button class="tab" data-tab="editor" onclick="switchTab('editor')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-                </svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
                 Editor Automático
             </button>
         </div>
@@ -54,21 +50,17 @@
 
             <div class="editor-intro">
                 <h2>Gerador de Criativos com IA</h2>
-                <p>Suba arquivos SRT ou TXT → A IA extrai o conhecimento → Gera roteiros, storyboards e prompts de imagem/vídeo automaticamente</p>
+                <p>Suba SRT ou TXT + informe o produto e público → A IA gera roteiros, storyboards e prompts automaticamente</p>
             </div>
 
-            <!-- UPLOAD SRT/TXT -->
+            <!-- UPLOAD -->
             <div class="upload-section">
                 <div class="upload-zone" id="creative-upload-zone">
                     <div class="upload-icon">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="17 8 12 3 7 8"/>
-                            <line x1="12" y1="3" x2="12" y2="15"/>
-                        </svg>
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                     </div>
                     <p class="upload-text">Arraste arquivos ou <span>clique para selecionar</span></p>
-                    <p class="upload-hint">Legendas (.srt, .vtt) ou Textos (.txt) — A IA vai extrair todo o conhecimento deles</p>
+                    <p class="upload-hint">Legendas (.srt, .vtt) ou Textos (.txt) — A IA extrai o conhecimento deles</p>
                     <input type="file" id="creative-file-input" multiple accept=".srt,.vtt,.sub,.txt" style="display:none;">
                 </div>
 
@@ -81,9 +73,31 @@
                 </div>
             </div>
 
-            <!-- TIPO + VARIAÇÕES -->
+            <!-- DADOS DO PRODUTO + CONFIGURAÇÕES -->
             <div id="creative-settings" class="editor-settings" style="display:none;">
-                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;color:var(--text-primary);">Configurações</h3>
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;color:var(--text-primary);">Dados do Produto & Configurações</h3>
+
+                <div class="form-grid" style="margin-bottom:24px;">
+                    <div class="form-group">
+                        <label for="produto">Nome do Produto / Serviço</label>
+                        <input type="text" id="produto" placeholder="Ex: Biovem Suplemento Natural, Curso de Marketing..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="publico">Público-Alvo</label>
+                        <input type="text" id="publico" placeholder="Ex: Mulheres 30-55 anos, Empreendedores digitais..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tom">Tom de Voz</label>
+                        <select id="tom">
+                            <option value="persuasivo e direto">Persuasivo e Direto</option>
+                            <option value="empático e acolhedor">Empático e Acolhedor</option>
+                            <option value="urgente e escasso">Urgente e Escasso</option>
+                            <option value="educativo e autoridade">Educativo e Autoridade</option>
+                            <option value="storytelling emocional">Storytelling Emocional</option>
+                            <option value="provocativo e disruptivo">Provocativo e Disruptivo</option>
+                        </select>
+                    </div>
+                </div>
 
                 <div class="settings-grid">
                     <div class="setting-group">
@@ -91,11 +105,11 @@
                         <div class="mode-options">
                             <button type="button" class="mode-btn active" data-ctype="video" onclick="selectCreativeType('video')">
                                 Vídeo
-                                <small>Roteiro + Storyboard + Prompts Nano Banana + Veo 3</small>
+                                <small>Roteiro + Storyboard + Nano Banana + Veo 3</small>
                             </button>
                             <button type="button" class="mode-btn" data-ctype="image" onclick="selectCreativeType('image')">
                                 Imagem
-                                <small>Copy persuasiva + Prompts Nano Banana por formato</small>
+                                <small>Copy persuasiva + Prompts Nano Banana</small>
                             </button>
                         </div>
                     </div>
@@ -104,9 +118,7 @@
                         <label>Variações</label>
                         <div class="stepper">
                             <button type="button" class="stepper-btn" onclick="adjustVariations(-1, 'creative')">−</button>
-                            <div class="stepper-display">
-                                <span id="creative-variations">1</span>
-                            </div>
+                            <div class="stepper-display"><span id="creative-variations">1</span></div>
                             <button type="button" class="stepper-btn" onclick="adjustVariations(1, 'creative')">+</button>
                         </div>
                     </div>
@@ -115,21 +127,14 @@
                 <div class="mode-description">
                     <div class="mode-desc-icon">ℹ️</div>
                     <div id="creative-mode-desc">
-                        <strong>Vídeo:</strong> A IA lê seus SRTs/TXTs, extrai produto, público, argumentos e dores, e gera roteiros completos com storyboard. Para cada cena: prompt Nano Banana (imagem) + prompt Veo 3 (vídeo animado).
+                        <strong>Vídeo:</strong> A IA lê seus SRTs/TXTs, combina com o produto e público informados, e gera roteiros completos. Cada cena tem: prompt Nano Banana (imagem) + prompt Veo 3 (animação).
                     </div>
                 </div>
 
                 <button class="btn-generate" id="btn-generate-creative" onclick="generateCreatives()">
-                    <span class="btn-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
-                        </svg>
-                    </span>
+                    <span class="btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg></span>
                     <span class="btn-text">Gerar Criativos com IA</span>
-                    <span class="btn-loading" style="display:none;">
-                        <div class="spinner"></div>
-                        Extraindo conhecimento e gerando...
-                    </span>
+                    <span class="btn-loading" style="display:none;"><div class="spinner"></div>Extraindo conhecimento e gerando...</span>
                 </button>
             </div>
 
@@ -141,18 +146,12 @@
 
             <div class="editor-intro">
                 <h2>Editor Automático com IA</h2>
-                <p>Suba vídeos + SRTs pareados → IA analisa poder persuasivo → Corta e emenda automaticamente com estrutura Gancho → Corpo → CTA</p>
+                <p>Suba vídeos + SRTs pareados → IA analisa poder persuasivo → Corta e emenda com Gancho → Corpo → CTA</p>
             </div>
 
             <div class="upload-section">
                 <div class="upload-zone" id="upload-zone">
-                    <div class="upload-icon">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="17 8 12 3 7 8"/>
-                            <line x1="12" y1="3" x2="12" y2="15"/>
-                        </svg>
-                    </div>
+                    <div class="upload-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
                     <p class="upload-text">Arraste arquivos ou <span>clique para selecionar</span></p>
                     <p class="upload-hint">Vídeos (.mp4, .mov, .webm) + Legendas (.srt) — Cada vídeo PRECISA ter um SRT com o mesmo nome</p>
                     <input type="file" id="file-input" multiple accept=".mp4,.mov,.webm,.avi,.mkv,.m4v,.srt,.vtt,.sub" style="display:none;">
@@ -170,22 +169,14 @@
 
             <div class="editor-settings" id="editor-settings" style="display:none;">
                 <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;color:var(--text-primary);">Configurações de Corte</h3>
-
                 <div class="settings-grid">
                     <div class="setting-group">
                         <label>Modo de Corte</label>
                         <div class="mode-options">
-                            <button type="button" class="mode-btn active" data-mode="individual" onclick="selectMode('individual')">
-                                Um de Cada
-                                <small>Corta e emenda cada vídeo separado</small>
-                            </button>
-                            <button type="button" class="mode-btn" data-mode="todos" onclick="selectMode('todos')">
-                                Cortar Todos
-                                <small>Mistura trechos de todos os vídeos</small>
-                            </button>
+                            <button type="button" class="mode-btn active" data-mode="individual" onclick="selectMode('individual')">Um de Cada<small>Corta cada vídeo separado</small></button>
+                            <button type="button" class="mode-btn" data-mode="todos" onclick="selectMode('todos')">Cortar Todos<small>Mistura todos os vídeos</small></button>
                         </div>
                     </div>
-
                     <div class="setting-group">
                         <label>Duração do Vídeo Final</label>
                         <div class="duration-options">
@@ -195,37 +186,23 @@
                             <button type="button" class="dur-btn" data-dur="90" onclick="selectDuration(90)">90s</button>
                         </div>
                     </div>
-
                     <div class="setting-group">
-                        <label>Variações por Vídeo</label>
+                        <label>Variações</label>
                         <div class="stepper">
                             <button type="button" class="stepper-btn" onclick="adjustVariations(-1, 'editor')">−</button>
-                            <div class="stepper-display">
-                                <span id="editor-variations">1</span>
-                            </div>
+                            <div class="stepper-display"><span id="editor-variations">1</span></div>
                             <button type="button" class="stepper-btn" onclick="adjustVariations(1, 'editor')">+</button>
                         </div>
                     </div>
                 </div>
-
                 <div class="mode-description" id="mode-description">
                     <div class="mode-desc-icon">ℹ️</div>
-                    <div id="mode-desc-text">
-                        <strong>Modo "Um de Cada":</strong> A IA corta e emenda cada vídeo separadamente. Se você subiu 2 vídeos e pediu 2 variações, você recebe 4 vídeos prontos (2 para cada).
-                    </div>
+                    <div id="mode-desc-text"><strong>Modo "Um de Cada":</strong> Corta e emenda cada vídeo separadamente. 2 vídeos + 2 variações = 4 vídeos prontos.</div>
                 </div>
-
                 <button class="btn-generate" id="btn-generate-editor" onclick="generateEditorCuts()">
-                    <span class="btn-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="5 3 19 12 5 21 5 3"/>
-                        </svg>
-                    </span>
+                    <span class="btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg></span>
                     <span class="btn-text">Cortar e Montar Vídeos</span>
-                    <span class="btn-loading" style="display:none;">
-                        <div class="spinner"></div>
-                        Analisando, cortando e montando...
-                    </span>
+                    <span class="btn-loading" style="display:none;"><div class="spinner"></div>Analisando, cortando e montando...</span>
                 </button>
             </div>
 
