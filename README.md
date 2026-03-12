@@ -1,28 +1,63 @@
+# 🚀 Halley Criativos Studio
+
+**IA Especialista em Vendas Sênior & Direct Response Marketing**
+
+Sistema completo com Machine Learning para geração de criativos de alta conversão e edição automática baseada em análise persuasiva.
+
 ---
-title: Criativo Studio Backend
-emoji: 🎬
-colorFrom: orange
-colorTo: red
-sdk: docker
-pinned: false
+
+## 🏗️ Arquitetura
+
+| Componente | Tecnologia | Deploy |
+|---|---|---|
+| **Frontend** | HTML + CSS + Vanilla JS | Cloudflare Pages (via GitHub) |
+| **Backend** | Python + FastAPI + Transformers | Hugging Face Spaces (Docker) |
+| **ML Models** | BERT Multilingual + BART MNLI | Carregados no HF Spaces |
+
 ---
 
-# Criativo Studio — Backend de Renderização
+## ⚡ Funcionalidades
 
-Backend Flask + FFmpeg para corte e edição automática de vídeos.
+### Aba 1 — Gerador de Criativos
+- **Vídeo**: Roteiro completo + Storyboard com cortes + Prompt Veo 3 por cena
+- **Imagem**: Conceito + Headline + Subheadline + CTA + Prompt Nano Banana em PT-BR
+- Stepper de 1–10 variações
+- 5 frameworks de Direct Response (AIDA, PAS, BAB, QUEST, Storytelling)
+- Botão copiar individual em cada prompt
+- Formatos: Feed (1:1) / Story (9:16) / Banner (16:9) / Todos
 
-## Endpoints
+### Aba 2 — Editor Automático
+- Upload de vídeos + SRTs com indicador visual de par encontrado/faltando
+- Duração configurável: 30/45/60/90 segundos
+- Modo individual ou mix
+- 1–10 variações
+- Análise de poder persuasivo com ML (15 gatilhos mapeados)
+- Relatório detalhado por corte: timestamp, fala, score, gatilhos, motivo de seleção
 
-- `GET /health` — status do servidor
-- `POST /render` — renderiza variações de vídeo
-- `GET /download/{session}/{filename}` — baixa vídeo gerado
-- `DELETE /cleanup/{session}` — limpa arquivos temporários
+---
 
-## Como fazer deploy
+## 🚀 Deploy — Passo a Passo
 
-1. Crie um Space no Hugging Face (huggingface.co/spaces)
-2. Escolha **Docker** como SDK
-3. Faça upload dos arquivos: `app.py`, `requirements.txt`, `Dockerfile`, `README.md`
-4. O Space builda automaticamente
-5. Copie a URL do Space (ex: `https://seu-user-criativo-studio-backend.hf.space`)
-6. Cole essa URL no campo "URL do Backend" no Criativo Studio
+### 1. Backend (Hugging Face Spaces)
+
+1. Acesse [huggingface.co/new-space](https://huggingface.co/new-space)
+2. Configure:
+   - **Space name**: `halley-criativos-studio`
+   - **SDK**: Docker
+   - **Hardware**: CPU Basic (gratuito)
+   - **Visibility**: Public
+3. Faça upload dos arquivos da pasta `backend/`:
+   - `app.py`
+   - `ai_engine.py`
+   - `srt_processor.py`
+   - `requirements.txt`
+   - `Dockerfile`
+4. Aguarde o build (pode levar 3-5 min)
+5. Copie a URL do Space: `https://SEU-USUARIO-halley-criativos-studio.hf.space`
+
+### 2. Frontend (Cloudflare Pages via GitHub)
+
+1. Crie um repositório no GitHub com os arquivos da pasta `frontend/`
+2. **IMPORTANTE**: Edite `frontend/js/app.js` linha 13 e coloque a URL do seu HF Space:
+   ```javascript
+   API_BASE: 'https://SEU-USUARIO-halley-criativos-studio.hf.space',
