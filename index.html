@@ -9,186 +9,201 @@
 <body>
     <header class="header">
         <div class="header-content">
-            <h1 class="logo">🎬 Halley Criativos Studio</h1>
-            <span class="version-badge">v7.0</span>
-            <span class="status-dot" id="statusDot"></span>
+            <h1 class="logo">
+                <span class="logo-icon">🚀</span>
+                Halley Criativos Studio
+            </h1>
+            <span class="version-badge">v8.0</span>
         </div>
     </header>
 
-    <main class="main-container">
-        <div class="tabs">
-            <button class="tab active" data-tab="creative" onclick="switchTab('creative')">🎯 Gerador de Criativos</button>
-            <button class="tab" data-tab="editor" onclick="switchTab('editor')">✂️ Editor Automático</button>
-        </div>
+    <nav class="tabs">
+        <button class="tab active" data-tab="tab1" onclick="switchTab('tab1')">
+            ✨ Gerador de Criativos
+        </button>
+        <button class="tab" data-tab="tab2" onclick="switchTab('tab2')">
+            🎬 Editor Automático
+        </button>
+    </nav>
 
-        <!-- ==================== ABA 1 ==================== -->
-        <div id="tab-creative" class="tab-content active">
-            <div class="step-container">
+    <main class="container">
+
+        <!-- ============================================ -->
+        <!-- ABA 1 — GERADOR DE CRIATIVOS                -->
+        <!-- ============================================ -->
+        <section id="tab1" class="tab-content active">
+
+            <div class="card">
                 <h3>1. Envie seus arquivos de referência</h3>
-                <div class="upload-zone" id="creativeUploadZone">
-                    <span class="upload-icon">📄</span>
+                <div class="upload-zone" id="uploadZone1"
+                     ondrop="handleDrop(event, 'fileInput1')"
+                     ondragover="event.preventDefault(); this.classList.add('drag-over')"
+                     ondragleave="this.classList.remove('drag-over')">
+                    <div class="upload-icon">📄</div>
                     <p><strong>Arraste arquivos .srt ou .txt aqui</strong></p>
-                    <p>ou clique para selecionar</p>
-                    <input type="file" id="creativeFiles" multiple accept=".srt,.txt" hidden>
+                    <p class="upload-hint">ou clique para selecionar</p>
+                    <input type="file" id="fileInput1" multiple accept=".srt,.txt"
+                           onchange="updateFileList('fileInput1', 'fileList1')" hidden>
                 </div>
-                <div id="creativeFileList" class="file-list"></div>
+                <div id="fileList1" class="file-list"></div>
             </div>
 
-            <div class="step-container">
+            <div class="card">
                 <h3>2. Informações do produto</h3>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Nome do Produto/Serviço *</label>
-                        <input type="text" id="produto" placeholder="Ex: VitaMax Pro, Curso de Tráfego">
+                        <label for="produto1">Nome do Produto/Serviço *</label>
+                        <input type="text" id="produto1" placeholder="Ex: VitaMax Pro, Curso de Tráfego Pago...">
                     </div>
                     <div class="form-group">
-                        <label>Público-Alvo *</label>
-                        <input type="text" id="publicoAlvo" placeholder="Ex: Mulheres 35-55 com insônia">
+                        <label for="publico1">Público-Alvo *</label>
+                        <input type="text" id="publico1" placeholder="Ex: Mulheres 30-50 anos com insônia...">
                     </div>
                     <div class="form-group">
-                        <label>Tom de Voz</label>
-                        <select id="tomVoz">
-                            <option value="profissional">Profissional</option>
-                            <option value="casual">Casual/Conversacional</option>
-                            <option value="urgente">Urgente/Direto</option>
-                            <option value="emocional">Emocional/Storytelling</option>
-                            <option value="cientifico">Científico/Autoritário</option>
-                            <option value="provocativo">Provocativo/Polêmico</option>
+                        <label for="tom1">Tom de Voz</label>
+                        <input type="text" id="tom1" value="profissional" placeholder="profissional, coloquial, urgente...">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>3. Configurações</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="tipo1">Tipo de Criativo</label>
+                        <select id="tipo1">
+                            <option value="video">🎬 Vídeo (Roteiro + Storyboard + Prompts)</option>
+                            <option value="image">🖼️ Imagem (Copy + Layout + Prompts)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="variacoes1">Variações</label>
+                        <input type="number" id="variacoes1" value="3" min="1" max="10">
+                    </div>
+                </div>
+                <p class="hint">
+                    <strong>Modo Vídeo:</strong> Gera roteiros completos (Hook → Corpo → CTA) + Prompts Nano Banana + Veo 3 + Avaliação do Diretor Criativo<br>
+                    <strong>Modo Imagem:</strong> Gera copy para formatos (Feed, Story, Banner) + Prompts Nano Banana + Veo 3 + Avaliação do Diretor
+                </p>
+            </div>
+
+            <button class="btn-primary btn-generate" id="btnGenerate1" onclick="generateCreative()">
+                🚀 Gerar Criativos
+            </button>
+
+            <div id="loading1" class="loading" style="display:none">
+                <div class="spinner"></div>
+                <p>Gerando criativos com IA... Isso pode levar 30-90 segundos.</p>
+            </div>
+
+            <div id="results1" class="results-container"></div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- ABA 2 — EDITOR AUTOMÁTICO                   -->
+        <!-- ============================================ -->
+        <section id="tab2" class="tab-content">
+
+            <div class="card">
+                <h3>1. Envie vídeos e legendas</h3>
+                <div class="upload-zone" id="uploadZone2"
+                     ondrop="handleDrop(event, 'fileInput2')"
+                     ondragover="event.preventDefault(); this.classList.add('drag-over')"
+                     ondragleave="this.classList.remove('drag-over')">
+                    <div class="upload-icon">🎬</div>
+                    <p><strong>Arraste vídeos (.mp4, .mov) e legendas (.srt) aqui</strong></p>
+                    <p class="upload-hint">Pareamento flexível: nomes similares ou automático se houver 1 de cada</p>
+                    <input type="file" id="fileInput2" multiple accept=".mp4,.mov,.avi,.mkv,.webm,.srt"
+                           onchange="updateFileList('fileInput2', 'fileList2')" hidden>
+                </div>
+                <div id="fileList2" class="file-list"></div>
+                <button class="btn-secondary" id="btnUpload2" onclick="uploadEditorFiles()" style="display:none; margin-top: 12px;">
+                    📤 Enviar Arquivos
+                </button>
+                <div id="uploadStatus2" class="upload-status"></div>
+            </div>
+
+            <div class="card">
+                <h3>2. Informações do produto (opcional, melhora os cortes)</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="produto2">Produto</label>
+                        <input type="text" id="produto2" placeholder="Ex: VitaMax Pro">
+                    </div>
+                    <div class="form-group">
+                        <label for="publico2">Público-Alvo</label>
+                        <input type="text" id="publico2" placeholder="Ex: Mulheres 30-50 anos">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>3. Configurações de corte</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="duration2">Duração alvo (segundos)</label>
+                        <input type="number" id="duration2" value="30" min="5" max="180">
+                    </div>
+                    <div class="form-group">
+                        <label for="variations2">Variações</label>
+                        <input type="number" id="variations2" value="1" min="1" max="5">
+                    </div>
+                    <div class="form-group">
+                        <label for="mode2">Modo</label>
+                        <select id="mode2">
+                            <option value="individual">Individual (1 vídeo = 1 corte)</option>
                         </select>
                     </div>
                 </div>
             </div>
 
-            <div class="step-container">
-                <h3>3. Configurações</h3>
-                <div class="config-row">
-                    <div class="config-item">
-                        <label>Tipo de Criativo</label>
-                        <div class="toggle-group">
-                            <button class="toggle-btn active" data-value="video" onclick="setTipo('video')">🎬 Vídeo</button>
-                            <button class="toggle-btn" data-value="image" onclick="setTipo('image')">🖼️ Imagem</button>
-                        </div>
-                    </div>
-                    <div class="config-item">
-                        <label>Variações</label>
-                        <div class="stepper">
-                            <button onclick="stepVariacoes(-1)">−</button>
-                            <span id="variacoesDisplay">3</span>
-                            <button onclick="stepVariacoes(1)">+</button>
-                        </div>
-                    </div>
-                </div>
-                <p class="hint" id="tipoHint">
-                    <strong>Modo Vídeo:</strong> Gera roteiros completos (Hook → Corpo → CTA) + Storyboard + Avaliação do Diretor Criativo
-                </p>
-            </div>
-
-            <button class="btn-primary" id="btnGenerate" onclick="generateCreatives()">
-                🚀 Gerar Criativos com Avaliação
-            </button>
-
-            <div id="creativeResults" class="results-container"></div>
-        </div>
-
-        <!-- ==================== ABA 2 ==================== -->
-        <div id="tab-editor" class="tab-content">
-            <div class="step-container">
-                <h3>1. Envie vídeos e legendas</h3>
-                <div class="upload-zone" id="editorUploadZone">
-                    <span class="upload-icon">🎬</span>
-                    <p><strong>Arraste vídeos (.mp4, .mov) e legendas (.srt) aqui</strong></p>
-                    <p>Pareamento flexível: nomes similares ou automático se houver 1 de cada</p>
-                    <input type="file" id="editorFiles" multiple accept=".mp4,.mov,.avi,.mkv,.webm,.srt" hidden>
-                </div>
-                <div id="editorFileList" class="file-list">
-                </div>
-                <div id="editorPairs" class="pairs-container"></div>
-            </div>
-
-            <div class="step-container">
-                <h3>2. Informações do produto (opcional, melhora os cortes)</h3>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Produto</label>
-                        <input type="text" id="editorProduto" placeholder="Ex: VitaMax Pro">
-                    </div>
-                    <div class="form-group">
-                        <label>Público-Alvo</label>
-                        <input type="text" id="editorPublico" placeholder="Ex: Mulheres 35-55">
-                    </div>
-                </div>
-            </div>
-
-            <div class="step-container">
-                <h3>3. Configurações de corte</h3>
-                <div class="config-row">
-                    <div class="config-item">
-                        <label>Duração alvo (segundos)</label>
-                        <div class="stepper">
-                            <button onclick="stepDuration(-5)">−5</button>
-                            <span id="durationDisplay">30</span>
-                            <button onclick="stepDuration(5)">+5</button>
-                        </div>
-                    </div>
-                    <div class="config-item">
-                        <label>Variações</label>
-                        <div class="stepper">
-                            <button onclick="stepEditorVar(-1)">−</button>
-                            <span id="editorVarDisplay">1</span>
-                            <button onclick="stepEditorVar(1)">+</button>
-                        </div>
-                    </div>
-                    <div class="config-item">
-                        <label>Modo</label>
-                        <div class="toggle-group">
-                            <button class="toggle-btn active" data-value="individual" onclick="setEditorMode('individual')">Individual</button>
-                            <button class="toggle-btn" data-value="todos" onclick="setEditorMode('todos')">Mixar Todos</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="step-container">
+            <div class="card">
                 <h3>4. Legenda no vídeo</h3>
-                <div class="config-row">
-                    <div class="config-item">
+                <div class="subtitle-controls">
+                    <div class="subtitle-toggle">
                         <label>Legenda</label>
                         <div class="toggle-group">
-                            <button class="toggle-btn active" data-value="sem_legenda" onclick="setSubtitle('sem_legenda')">Sem Legenda</button>
-                            <button class="toggle-btn" data-value="com_legenda" onclick="setSubtitle('com_legenda')">Com Legenda</button>
+                            <button class="toggle-btn active" data-value="sem_legenda" onclick="setSubtitle(this)">Sem legenda</button>
+                            <button class="toggle-btn" data-value="com_legenda" onclick="setSubtitle(this)">Com legenda</button>
                         </div>
                     </div>
-                    <div class="config-item subtitle-styles" id="subtitleStylesContainer" style="display:none;">
-                        <label>Estilo da Legenda</label>
-                        <div class="toggle-group subtitle-style-group">
-                            <button class="toggle-btn active" data-value="branca" onclick="setSubtitleStyle('branca')">
-                                <span class="style-preview style-branca">Aa</span> Branca
+                    <div id="subtitleStyles" class="subtitle-styles" style="display:none">
+                        <label>Estilo da legenda</label>
+                        <div class="style-options">
+                            <button class="style-btn active" data-style="branca" onclick="setSubtitleStyle(this)">
+                                <span class="style-preview style-branca">Texto</span>
+                                <span>Branca Clássica</span>
                             </button>
-                            <button class="toggle-btn" data-value="amarela" onclick="setSubtitleStyle('amarela')">
-                                <span class="style-preview style-amarela">Aa</span> Amarela
+                            <button class="style-btn" data-style="amarela" onclick="setSubtitleStyle(this)">
+                                <span class="style-preview style-amarela">Texto</span>
+                                <span>Amarela Destaque</span>
                             </button>
-                            <button class="toggle-btn" data-value="tiktok" onclick="setSubtitleStyle('tiktok')">
-                                <span class="style-preview style-tiktok">Aa</span> TikTok
+                            <button class="style-btn" data-style="tiktok" onclick="setSubtitleStyle(this)">
+                                <span class="style-preview style-tiktok"><span class="highlight-word">Texto</span></span>
+                                <span>TikTok Style</span>
                             </button>
                         </div>
                     </div>
                 </div>
-                <p class="hint" id="subtitleHint">Sem legenda: vídeo limpo. Com legenda: texto sobreposto no vídeo final.</p>
+                <p class="hint">Sem legenda: vídeo limpo. Com legenda: texto sobreposto no vídeo final.</p>
             </div>
 
-            <div class="editor-actions">
-                <button class="btn-secondary" id="btnUploadEditor" onclick="uploadEditorFiles()">📁 Enviar Arquivos</button>
-                <button class="btn-primary" id="btnGenerateCuts" onclick="generateEditorCuts()" disabled>✂️ Gerar Cortes Automáticos</button>
+            <button class="btn-primary btn-generate" id="btnGenerate2" onclick="generateEditorCuts()" style="display:none">
+                ✂️ Gerar Cortes Inteligentes
+            </button>
+
+            <div id="loading2" class="loading" style="display:none">
+                <div class="spinner"></div>
+                <p>Analisando conteúdo e gerando cortes com IA... Pode levar 30-120 segundos.</p>
             </div>
 
-            <div id="editorResults" class="results-container"></div>
-        </div>
+            <div id="results2" class="results-container"></div>
+        </section>
+
     </main>
 
-    <div class="toast" id="toast"></div>
-
     <footer class="footer">
-        <p>Halley Criativos Studio v7.0 — Motor IA com Diretor Criativo</p>
+        <p>Halley Criativos Studio v8.0 — Motor de IA com Avaliação Híbrida e Correção Iterativa</p>
     </footer>
 
     <script src="js/app.js"></script>
