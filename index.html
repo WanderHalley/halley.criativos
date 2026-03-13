@@ -101,3 +101,96 @@
                     <input type="file" id="editorFiles" multiple accept=".mp4,.mov,.avi,.mkv,.webm,.srt" hidden>
                 </div>
                 <div id="editorFileList" class="file-list">
+                </div>
+                <div id="editorPairs" class="pairs-container"></div>
+            </div>
+
+            <div class="step-container">
+                <h3>2. Informações do produto (opcional, melhora os cortes)</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Produto</label>
+                        <input type="text" id="editorProduto" placeholder="Ex: VitaMax Pro">
+                    </div>
+                    <div class="form-group">
+                        <label>Público-Alvo</label>
+                        <input type="text" id="editorPublico" placeholder="Ex: Mulheres 35-55">
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-container">
+                <h3>3. Configurações de corte</h3>
+                <div class="config-row">
+                    <div class="config-item">
+                        <label>Duração alvo (segundos)</label>
+                        <div class="stepper">
+                            <button onclick="stepDuration(-5)">−5</button>
+                            <span id="durationDisplay">30</span>
+                            <button onclick="stepDuration(5)">+5</button>
+                        </div>
+                    </div>
+                    <div class="config-item">
+                        <label>Variações</label>
+                        <div class="stepper">
+                            <button onclick="stepEditorVar(-1)">−</button>
+                            <span id="editorVarDisplay">1</span>
+                            <button onclick="stepEditorVar(1)">+</button>
+                        </div>
+                    </div>
+                    <div class="config-item">
+                        <label>Modo</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" data-value="individual" onclick="setEditorMode('individual')">Individual</button>
+                            <button class="toggle-btn" data-value="todos" onclick="setEditorMode('todos')">Mixar Todos</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-container">
+                <h3>4. Legenda no vídeo</h3>
+                <div class="config-row">
+                    <div class="config-item">
+                        <label>Legenda</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" data-value="sem_legenda" onclick="setSubtitle('sem_legenda')">Sem Legenda</button>
+                            <button class="toggle-btn" data-value="com_legenda" onclick="setSubtitle('com_legenda')">Com Legenda</button>
+                        </div>
+                    </div>
+                    <div class="config-item subtitle-styles" id="subtitleStylesContainer" style="display:none;">
+                        <label>Estilo da Legenda</label>
+                        <div class="toggle-group subtitle-style-group">
+                            <button class="toggle-btn active" data-value="branca" onclick="setSubtitleStyle('branca')">
+                                <span class="style-preview style-branca">Aa</span> Branca
+                            </button>
+                            <button class="toggle-btn" data-value="amarela" onclick="setSubtitleStyle('amarela')">
+                                <span class="style-preview style-amarela">Aa</span> Amarela
+                            </button>
+                            <button class="toggle-btn" data-value="tiktok" onclick="setSubtitleStyle('tiktok')">
+                                <span class="style-preview style-tiktok">Aa</span> TikTok
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <p class="hint" id="subtitleHint">Sem legenda: vídeo limpo. Com legenda: texto sobreposto no vídeo final.</p>
+            </div>
+
+            <div class="editor-actions">
+                <button class="btn-secondary" id="btnUploadEditor" onclick="uploadEditorFiles()">📁 Enviar Arquivos</button>
+                <button class="btn-primary" id="btnGenerateCuts" onclick="generateEditorCuts()" disabled>✂️ Gerar Cortes Automáticos</button>
+            </div>
+
+            <div id="editorResults" class="results-container"></div>
+        </div>
+    </main>
+
+    <div class="toast" id="toast"></div>
+
+    <footer class="footer">
+        <p>Halley Criativos Studio v7.0 — Motor IA com Diretor Criativo</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
