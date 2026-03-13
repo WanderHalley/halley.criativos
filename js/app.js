@@ -340,10 +340,13 @@ async function uploadEditorFiles() {
     }
 }
 
+// ============================================================
+// Na função generateEditorCuts, GUARDAR o output_id:
+// ============================================================
 async function generateEditorCuts() {
     if (!STATE.editorSessionId) { showToast('Faça upload primeiro', 'error'); return; }
 
-    const fd = new FormData();
+    var fd = new FormData();
     fd.append('session_id', STATE.editorSessionId);
     fd.append('target_duration', STATE.editorDuration);
     fd.append('variations', STATE.editorVariations);
@@ -354,11 +357,13 @@ async function generateEditorCuts() {
     document.getElementById('editorResults').innerHTML = '';
 
     try {
-        const res = await fetch(CONFIG.API_BASE + '/api/v2/editor/generate', {method: 'POST', body: fd});
-        const data = await res.json();
+        var res = await fetch(CONFIG.API_BASE + '/api/v2/editor/generate', {method: 'POST', body: fd});
+        var data = await res.json();
         if (data.status === 'success') {
             renderEditorResults(data);
             showToast(data.total_results + ' resultado(s)!', 'success');
+        } else {
+            showToast('Erro na geração', 'error');
         }
     } catch (err) {
         showToast('Erro: ' + err.message, 'error');
@@ -368,54 +373,75 @@ async function generateEditorCuts() {
     }
 }
 
+// ============================================================
+// renderEditorResults — FIX COMPLETO DO BUG DE DOWNLOAD
+// ============================================================
 function renderEditorResults(data) {
-    var c = document.getElementById('editorResults');
-    var h = '<div class="results-header"><h3>✂️ Resultados do Editor</h3></div>';
+    var container = document.getElementById('editorResults');
+    var html = '<div class="results-header"><h3>✂️ Resultados do Editor</h3></div>';
 
-    data.results.forEach(r => {
-        // ===== FIX DO BUG DE DOWNLOAD =====
-        // Monta a URL limpa sem template literal que adicionava espaços
-        var downloadBtn = '';
-        if (r.download_url) {
-            var cleanUrl = CONFIG.API_BASE + r.download_url.trim();
-            downloadBtn = '<a href="' + cleanUrl + '" class="btn-download" download>⬇️ Download MP4</a>';
+    data.results.forEach(function(r) {
+        html += '<div class="result-card">';
+        html += '<div class="result-header">';
+
+        var title = r.source_video ? '🎬 ' + esc(r.source_video) : '🎬 Mix Multi-Vídeo';
+        html += '<h4>' + title + ' — Variação #' + r.variation + '</h4>';
+
+        // ===== FIX CRÍTICO: URL de download =====
+        if (r.download_url && !r.error) {
+            // Garantir URL limpa sem espaços
+            var dlUrl = (CONFIG.API_BASE + r.download_url).replace(/\s+/g, '');
+            html += '<a href="' + dlUrl + '" class="btn-download" target="_blank" rel="noopener" download="' + esc(r.filename || 'video.mp4') + '">⬇️ Download MP4</a>';
         }
+        html += '</div>';
 
-        h += '<div class="result-card">';
-        h += '<div class="result-header">';
-        h += '<h4>' + (r.source_video ? '🎬 ' + esc(r.source_video) : '🎬 Mix Multi-Vídeo') + ' — Variação #' + r.variation + '</h4>';
-        h += downloadBtn;
-        h += '</div>';
-
+        // Erro
         if (r.error) {
-            h += '<div class="error-inline">⚠️ ' + esc(r.error) + '</div>';
+            html += '<div class="error-inline">⚠️ ' + esc(r.error) + '</div>';
         }
 
-        h += '<p>⏱ Duração: ' + (r.total_duration ? r.total_duration.toFixed(1) + 's' : 'N/A') + ' | Segmentos: ' + (r.segment_count || 'N/A') + '</p>';
+        // Info
+        if (r.file_size) {
+            html += '<p>⏱ Duração: ' + (r.total_duration ? r.total_duration.toFixed(1) + 's' : 'N/A');
+            html += ' | Segmentos: ' + (r.segment_count || 'N/A');
+            html += ' | Tamanho: ' + (r.file_size / 1024 / 1024).toFixed(1) + ' MB</p>';
+        } else if (r.total_duration) {
+            html += '<p>⏱ Duração: ' + r.total_duration.toFixed(1) + 's | Segmentos: ' + (r.segment_count || 'N/A') + '</p>';
+        }
 
-        h += '<div class="structure-breakdown">';
-        (r.structure || []).forEach(s => {
-            var role = (s.role || 'BODY').toUpperCase();
-            var icon = role === 'HOOK' ? '🎣' : role === 'CTA' ? '🎯' : '📝';
-            var cls = role === 'HOOK' ? 'segment-hook' : role === 'CTA' ? 'segment-cta' : 'segment-body';
+        // Estrutura
+        if (r.structure && r.structure.length) {
+            html += '<div class="structure-breakdown">';
+            r.structure.forEach(function(s) {
+                var role = (s.role || 'BODY').toUpperCase();
+                var icon = role === 'HOOK' ? '🎣' : role === 'CTA' ? '🎯' : '📝';
+                var cls = role === 'HOOK' ? 'segment-hook' : role === 'CTA' ? 'segment-cta' : 'segment-body';
 
-            h += '<div class="segment-item ' + cls + '">';
-            h += '<div class="segment-role">' + icon + ' ' + role + '</div>';
-            h += '<div class="segment-text">' + esc(s.text || '') + '</div>';
-            h += '<div class="segment-meta">';
-            if (s.source_video) h += '📁 ' + esc(s.source_video) + ' | ';
-            if (s.start !== undefined) h += s.start.toFixed(1) + 's → ' + s.end.toFixed(1) + 's | ';
-            h += 'Score: ' + (s.score || 0);
-            if (s.triggers && s.triggers.length) {
-                h += ' | ' + s.triggers.map(t => '<span class="trigger-badge-sm">' + esc(t) + '</span>').join(' ');
-            }
-            h += '</div></div>';
-        });
-        h += '</div></div>';
+                html += '<div class="segment-item ' + cls + '">';
+                html += '<div class="segment-role">' + icon + ' ' + role + '</div>';
+                html += '<div class="segment-text">' + esc(s.text || '') + '</div>';
+                html += '<div class="segment-meta">';
+                if (s.source_video) html += '📁 ' + esc(s.source_video) + ' | ';
+                if (s.start !== undefined && s.end !== undefined) {
+                    html += s.start.toFixed(1) + 's → ' + s.end.toFixed(1) + 's | ';
+                }
+                html += 'Score: ' + (s.score || 0);
+                if (s.triggers && s.triggers.length) {
+                    s.triggers.forEach(function(t) {
+                        html += ' <span class="trigger-badge-sm">' + esc(t) + '</span>';
+                    });
+                }
+                html += '</div></div>';
+            });
+            html += '</div>';
+        }
+
+        html += '</div>';
     });
 
-    c.innerHTML = h;
+    container.innerHTML = html;
 }
+
 
 // ============================================================
 // CLIPBOARD
