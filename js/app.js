@@ -1,21 +1,16 @@
 /**
- * HALLEY CRIATIVOS STUDIO — Frontend v5.0
- * Interface para geração de criativos persuasivos de nível ultra-sênior
+ * HALLEY CRIATIVOS STUDIO — Frontend v6.0
+ * Bug fix: download URLs | Prompts rendering melhorado
  */
 
-// ============================================================
-// CONFIGURAÇÃO
-// ============================================================
 const CONFIG = {
     API_BASE: 'https://wanderhalleylee-criativo-studio-backend.hf.space',
 };
 
 const STATE = {
-    // Aba 1
     creativeType: 'video',
     variations: 3,
     creativeFiles: [],
-    // Aba 2
     editorMode: 'individual',
     editorDuration: 30,
     editorVariations: 1,
@@ -24,18 +19,18 @@ const STATE = {
 };
 
 // ============================================================
-// INICIALIZAÇÃO
+// INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-    checkBackendHealth();
-    initUploadZones();
+    checkHealth();
+    initUploads();
 });
 
-async function checkBackendHealth() {
+async function checkHealth() {
     const el = document.getElementById('headerStatus');
     try {
-        const res = await fetch(`${CONFIG.API_BASE}/health`, { signal: AbortSignal.timeout(10000) });
-        if (res.ok) {
+        const r = await fetch(CONFIG.API_BASE + '/health', {signal: AbortSignal.timeout(10000)});
+        if (r.ok) {
             el.innerHTML = '<span class="status-dot online"></span><span>IA Online</span>';
         } else {
             el.innerHTML = '<span class="status-dot offline"></span><span>IA Offline</span>';
@@ -51,147 +46,87 @@ async function checkBackendHealth() {
 function switchTab(tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-    document.getElementById(`tab-${tab}`).classList.add('active');
+    document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
 }
 
 // ============================================================
-// UPLOAD ZONES
+// UPLOADS
 // ============================================================
-function initUploadZones() {
-    // Aba 1 - Criativos
-    const cZone = document.getElementById('creativeUploadZone');
-    const cInput = document.getElementById('creativeFileInput');
-    
-    cZone.addEventListener('click', () => cInput.click());
-    cZone.addEventListener('dragover', e => { e.preventDefault(); cZone.classList.add('drag-over'); });
-    cZone.addEventListener('dragleave', () => cZone.classList.remove('drag-over'));
-    cZone.addEventListener('drop', e => {
-        e.preventDefault();
-        cZone.classList.remove('drag-over');
-        handleCreativeFiles(e.dataTransfer.files);
-    });
-    cInput.addEventListener('change', e => handleCreativeFiles(e.target.files));
+function initUploads() {
+    setupZone('creativeUploadZone', 'creativeFileInput', handleCreativeFiles);
+    setupZone('editorUploadZone', 'editorFileInput', handleEditorFiles);
+}
 
-    // Aba 2 - Editor
-    const eZone = document.getElementById('editorUploadZone');
-    const eInput = document.getElementById('editorFileInput');
-    
-    eZone.addEventListener('click', () => eInput.click());
-    eZone.addEventListener('dragover', e => { e.preventDefault(); eZone.classList.add('drag-over'); });
-    eZone.addEventListener('dragleave', () => eZone.classList.remove('drag-over'));
-    eZone.addEventListener('drop', e => {
-        e.preventDefault();
-        eZone.classList.remove('drag-over');
-        handleEditorFiles(e.dataTransfer.files);
-    });
-    eInput.addEventListener('change', e => handleEditorFiles(e.target.files));
+function setupZone(zoneId, inputId, handler) {
+    const zone = document.getElementById(zoneId);
+    const input = document.getElementById(inputId);
+    zone.addEventListener('click', () => input.click());
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); handler(e.dataTransfer.files); });
+    input.addEventListener('change', e => handler(e.target.files));
 }
 
 function handleCreativeFiles(fileList) {
-    const validExts = ['.srt', '.txt'];
-    const newFiles = Array.from(fileList).filter(f => {
-        const ext = '.' + f.name.split('.').pop().toLowerCase();
-        return validExts.includes(ext);
-    });
-
-    if (newFiles.length === 0) {
-        showToast('Envie apenas arquivos .srt ou .txt', 'error');
-        return;
-    }
-
-    STATE.creativeFiles = [...STATE.creativeFiles, ...newFiles];
-    renderCreativeFileList();
-}
-
-function renderCreativeFileList() {
-    const el = document.getElementById('creativeFileList');
-    if (STATE.creativeFiles.length === 0) {
-        el.innerHTML = '';
-        return;
-    }
-    el.innerHTML = STATE.creativeFiles.map((f, i) => `
-        <div class="file-item">
-            <span>📄 ${escapeHtml(f.name)} (${(f.size / 1024).toFixed(1)} KB)</span>
-            <button class="btn-remove" onclick="removeCreativeFile(${i})">✕</button>
-        </div>
-    `).join('');
-}
-
-function removeCreativeFile(index) {
-    STATE.creativeFiles.splice(index, 1);
-    renderCreativeFileList();
+    const valid = Array.from(fileList).filter(f => /\.(srt|txt)$/i.test(f.name));
+    if (!valid.length) { showToast('Envie apenas .srt ou .txt', 'error'); return; }
+    STATE.creativeFiles = [...STATE.creativeFiles, ...valid];
+    renderFileList('creativeFileList', STATE.creativeFiles, 'creative');
 }
 
 function handleEditorFiles(fileList) {
-    const validExts = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.srt'];
-    const newFiles = Array.from(fileList).filter(f => {
-        const ext = '.' + f.name.split('.').pop().toLowerCase();
-        return validExts.includes(ext);
-    });
-
-    STATE.editorFiles = [...STATE.editorFiles, ...newFiles];
-    renderEditorFileList();
+    const valid = Array.from(fileList).filter(f => /\.(mp4|mov|avi|mkv|webm|srt)$/i.test(f.name));
+    STATE.editorFiles = [...STATE.editorFiles, ...valid];
+    renderFileList('editorFileList', STATE.editorFiles, 'editor');
     document.getElementById('btnUploadEditor').disabled = STATE.editorFiles.length === 0;
 }
 
-function renderEditorFileList() {
-    const el = document.getElementById('editorFileList');
-    if (STATE.editorFiles.length === 0) {
-        el.innerHTML = '';
-        return;
+function renderFileList(containerId, files, type) {
+    const el = document.getElementById(containerId);
+    if (!files.length) { el.innerHTML = ''; return; }
+    el.innerHTML = files.map((f, i) =>
+        '<div class="file-item"><span>' + (f.name.endsWith('.srt') || f.name.endsWith('.txt') ? '📄' : '🎬') +
+        ' ' + esc(f.name) + ' (' + (f.size / 1024).toFixed(1) + ' KB)</span>' +
+        '<button class="btn-remove" onclick="removeFile(\'' + type + '\',' + i + ')">✕</button></div>'
+    ).join('');
+}
+
+function removeFile(type, idx) {
+    if (type === 'creative') {
+        STATE.creativeFiles.splice(idx, 1);
+        renderFileList('creativeFileList', STATE.creativeFiles, 'creative');
+    } else {
+        STATE.editorFiles.splice(idx, 1);
+        renderFileList('editorFileList', STATE.editorFiles, 'editor');
+        document.getElementById('btnUploadEditor').disabled = STATE.editorFiles.length === 0;
     }
-
-    const videos = STATE.editorFiles.filter(f => !f.name.toLowerCase().endsWith('.srt'));
-    const srts = STATE.editorFiles.filter(f => f.name.toLowerCase().endsWith('.srt'));
-
-    el.innerHTML = `
-        <div class="file-summary">
-            <span>🎬 ${videos.length} vídeo(s)</span>
-            <span>📄 ${srts.length} legenda(s)</span>
-        </div>
-    ` + STATE.editorFiles.map((f, i) => `
-        <div class="file-item">
-            <span>${f.name.endsWith('.srt') ? '📄' : '🎬'} ${escapeHtml(f.name)} (${(f.size / 1024 / 1024).toFixed(1)} MB)</span>
-            <button class="btn-remove" onclick="removeEditorFile(${i})">✕</button>
-        </div>
-    `).join('');
-}
-
-function removeEditorFile(index) {
-    STATE.editorFiles.splice(index, 1);
-    renderEditorFileList();
-    document.getElementById('btnUploadEditor').disabled = STATE.editorFiles.length === 0;
 }
 
 // ============================================================
-// CONFIGURAÇÕES UI
+// CONFIG UI
 // ============================================================
 function setCreativeType(type) {
     STATE.creativeType = type;
     document.getElementById('btnTypeVideo').classList.toggle('active', type === 'video');
     document.getElementById('btnTypeImage').classList.toggle('active', type === 'image');
-    
-    const desc = document.getElementById('typeDescription');
-    if (type === 'video') {
-        desc.innerHTML = '<strong>Modo Vídeo:</strong> Gera roteiros completos (Hook → Corpo → CTA) + Storyboard com prompts Nano Banana (imagem) e Veo 3 (animação)';
-    } else {
-        desc.innerHTML = '<strong>Modo Imagem:</strong> Gera copies persuasivas (Headline + Sub + CTA) + Prompts Nano Banana para Feed, Story e Banner';
-    }
+    document.getElementById('typeDescription').innerHTML = type === 'video'
+        ? '<strong>Modo Vídeo:</strong> Roteiros completos (Hook→Corpo→CTA) + Storyboard + Prompts Nano Banana Pro + Prompts Veo 3'
+        : '<strong>Modo Imagem:</strong> Copies persuasivas + Prompts Nano Banana Pro para Feed (1:1), Story (9:16) e Banner (16:9)';
 }
 
-function adjustVariations(delta) {
-    STATE.variations = Math.max(1, Math.min(10, STATE.variations + delta));
+function adjustVariations(d) {
+    STATE.variations = Math.max(1, Math.min(10, STATE.variations + d));
     document.getElementById('variationCount').textContent = STATE.variations;
 }
 
-function adjustDuration(delta) {
-    STATE.editorDuration = Math.max(10, Math.min(120, STATE.editorDuration + delta));
+function adjustDuration(d) {
+    STATE.editorDuration = Math.max(10, Math.min(120, STATE.editorDuration + d));
     document.getElementById('durationValue').textContent = STATE.editorDuration;
 }
 
-function adjustEditorVariations(delta) {
-    STATE.editorVariations = Math.max(1, Math.min(5, STATE.editorVariations + delta));
+function adjustEditorVariations(d) {
+    STATE.editorVariations = Math.max(1, Math.min(5, STATE.editorVariations + d));
     document.getElementById('editorVariationCount').textContent = STATE.editorVariations;
 }
 
@@ -205,69 +140,36 @@ function setEditorMode(mode) {
 // ABA 1: GERAR CRIATIVOS
 // ============================================================
 async function generateCreatives() {
-    // Validações
-    if (STATE.creativeFiles.length === 0) {
-        showToast('Envie pelo menos um arquivo .srt ou .txt', 'error');
-        return;
-    }
+    if (!STATE.creativeFiles.length) { showToast('Envie pelo menos um arquivo', 'error'); return; }
     const produto = document.getElementById('productName').value.trim();
-    if (!produto) {
-        showToast('Preencha o nome do produto', 'error');
-        return;
-    }
+    if (!produto) { showToast('Preencha o nome do produto', 'error'); return; }
     const publico = document.getElementById('targetAudience').value.trim();
-    if (!publico) {
-        showToast('Preencha o público-alvo', 'error');
-        return;
-    }
+    if (!publico) { showToast('Preencha o público-alvo', 'error'); return; }
 
-    const tomVoz = document.getElementById('voiceTone').value;
+    const fd = new FormData();
+    STATE.creativeFiles.forEach(f => fd.append('files', f));
+    fd.append('tipo', STATE.creativeType);
+    fd.append('variacoes', STATE.variations);
+    fd.append('produto', produto);
+    fd.append('publico_alvo', publico);
+    fd.append('tom_voz', document.getElementById('voiceTone').value);
 
-    // Montar FormData
-    const formData = new FormData();
-    STATE.creativeFiles.forEach(f => formData.append('files', f));
-    formData.append('tipo', STATE.creativeType);
-    formData.append('variacoes', STATE.variations);
-    formData.append('produto', produto);
-    formData.append('publico_alvo', publico);
-    formData.append('tom_voz', tomVoz);
-
-    // UI loading
     document.getElementById('btnGenerate').disabled = true;
     document.getElementById('creativeLoading').style.display = 'block';
     document.getElementById('creativeResults').innerHTML = '';
 
     try {
-        const res = await fetch(`${CONFIG.API_BASE}/api/v1/creative/generate`, {
-            method: 'POST',
-            body: formData,
-        });
-
+        const res = await fetch(CONFIG.API_BASE + '/api/v1/creative/generate', {method: 'POST', body: fd});
         const data = await res.json();
-
-        if (!res.ok) {
-            throw new Error(data.detail || 'Erro no servidor');
-        }
-
+        if (!res.ok) throw new Error(data.detail || 'Erro no servidor');
         if (data.status === 'success') {
-            if (STATE.creativeType === 'video') {
-                renderVideoResults(data);
-            } else {
-                renderImageResults(data);
-            }
-            showToast(`${data.total_variacoes} criativos gerados com sucesso!`, 'success');
-        } else {
-            throw new Error('Resposta inválida do servidor');
+            STATE.creativeType === 'video' ? renderVideoResults(data) : renderImageResults(data);
+            showToast(data.total_variacoes + ' criativos gerados!', 'success');
         }
     } catch (err) {
-        showToast(`Erro: ${err.message}`, 'error');
-        document.getElementById('creativeResults').innerHTML = `
-            <div class="error-card">
-                <h3>❌ Erro ao gerar criativos</h3>
-                <p>${escapeHtml(err.message)}</p>
-                <p class="error-hint">Verifique se o backend está online e o HF_TOKEN está configurado.</p>
-            </div>
-        `;
+        showToast('Erro: ' + err.message, 'error');
+        document.getElementById('creativeResults').innerHTML =
+            '<div class="error-card"><h3>❌ Erro</h3><p>' + esc(err.message) + '</p></div>';
     } finally {
         document.getElementById('btnGenerate').disabled = false;
         document.getElementById('creativeLoading').style.display = 'none';
@@ -275,210 +177,163 @@ async function generateCreatives() {
 }
 
 // ============================================================
-// RENDERIZAÇÃO — VÍDEO
+// RENDER — VÍDEO
 // ============================================================
 function renderVideoResults(data) {
-    const container = document.getElementById('creativeResults');
-    let html = `
-        <div class="results-header">
-            <h3>🎬 Criativos de Vídeo — ${data.produto}</h3>
-            <p>${data.total_variacoes} variações | ${data.total_palavras_base} palavras analisadas | Tom: ${data.tom_voz}</p>
-        </div>
-    `;
+    const c = document.getElementById('creativeResults');
+    let h = '<div class="results-header"><h3>🎬 Criativos de Vídeo — ' + esc(data.produto) + '</h3>' +
+        '<p>' + data.total_variacoes + ' variações | ' + data.total_palavras_base + ' palavras | Tom: ' + esc(data.tom_voz) + '</p></div>';
 
     data.resultados.forEach((r, idx) => {
-        const roteiro = r.roteiro || {};
-        const hook = roteiro.hook || {};
-        const corpo = roteiro.corpo || [];
-        const cta = roteiro.cta || {};
-        const storyboard = r.storyboard || [];
+        const rot = r.roteiro || {};
+        const hook = rot.hook || {};
+        const corpo = rot.corpo || [];
+        const cta = rot.cta || {};
+        const sb = r.storyboard || [];
 
-        html += `
-        <div class="result-card">
-            <div class="result-header">
-                <h4>Variação #${r.variacao} — ${escapeHtml(r.framework)}</h4>
-                <span class="badge">${escapeHtml(r.framework_descricao || '')}</span>
-            </div>
-            <p class="angle"><strong>Ângulo:</strong> ${escapeHtml(r.angulo_criativo || '')}</p>
-            <p class="duration">⏱ Duração estimada: ${escapeHtml(r.duracao_total_estimada || '30s')}</p>
-            
-            <!-- ROTEIRO -->
-            <div class="script-section">
-                <div class="script-block hook-block">
-                    <div class="block-label">🎣 HOOK</div>
-                    <div class="block-text">${escapeHtml(hook.texto || '')}</div>
-                    <div class="block-visual">🎥 ${escapeHtml(hook.instrucao_visual || '')}</div>
-                    <div class="block-time">${escapeHtml(hook.duracao_estimada || '')}</div>
-                </div>
+        h += '<div class="result-card">';
+        h += '<div class="result-header"><h4>Variação #' + r.variacao + ' — ' + esc(r.framework) + '</h4>';
+        h += '<span class="badge">' + esc(r.framework_descricao || '') + '</span></div>';
+        h += '<p class="angle"><strong>Ângulo:</strong> ' + esc(r.angulo_criativo || '') + '</p>';
+        h += '<p class="duration">⏱ ' + esc(r.duracao_total_estimada || '30s') + '</p>';
 
-                ${corpo.map((c, i) => `
-                <div class="script-block body-block">
-                    <div class="block-label">📝 CORPO ${i + 1}</div>
-                    <div class="block-text">${escapeHtml(c.texto || '')}</div>
-                    <div class="block-visual">🎥 ${escapeHtml(c.instrucao_visual || '')}</div>
-                    <div class="block-time">${escapeHtml(c.duracao_estimada || '')}</div>
-                </div>
-                `).join('')}
+        // Roteiro
+        h += '<div class="script-section">';
+        h += renderBlock('🎣 HOOK', hook, 'hook');
+        corpo.forEach((c, i) => { h += renderBlock('📝 CORPO ' + (i + 1), c, 'body'); });
+        h += renderBlock('🎯 CTA', cta, 'cta');
+        h += '</div>';
 
-                <div class="script-block cta-block">
-                    <div class="block-label">🎯 CTA</div>
-                    <div class="block-text">${escapeHtml(cta.texto || '')}</div>
-                    <div class="block-visual">🎥 ${escapeHtml(cta.instrucao_visual || '')}</div>
-                    <div class="block-time">${escapeHtml(cta.duracao_estimada || '')}</div>
-                </div>
-            </div>
+        // Gatilhos
+        if (r.gatilhos_usados && r.gatilhos_usados.length) {
+            h += '<div class="triggers-row"><strong>Gatilhos:</strong> ' +
+                r.gatilhos_usados.map(g => '<span class="trigger-badge">' + esc(g) + '</span>').join(' ') + '</div>';
+        }
 
-            <!-- GATILHOS -->
-            ${r.gatilhos_usados && r.gatilhos_usados.length > 0 ? `
-            <div class="triggers-row">
-                <strong>Gatilhos:</strong> ${r.gatilhos_usados.map(g => `<span class="trigger-badge">${escapeHtml(g)}</span>`).join(' ')}
-            </div>
-            ` : ''}
+        // Storyboard
+        if (sb.length) {
+            h += '<div class="storyboard-section"><h5>📋 Storyboard + Prompts Profissionais</h5>';
+            sb.forEach(s => {
+                h += '<div class="storyboard-scene">';
+                h += '<div class="scene-header">' + esc(s.cena) + ' — ' + esc(s.duracao || '') + '</div>';
+                h += '<div class="scene-visual">' + esc(s.descricao_visual || '') + '</div>';
+                h += '<div class="prompt-group">';
+                h += renderPrompt('🖼️ Nano Banana Pro (Imagem)', s.prompt_nano_banana || '');
+                h += renderPrompt('🎬 Veo 3 (Vídeo)', s.prompt_veo3 || '');
+                h += '</div></div>';
+            });
+            h += '</div>';
+        }
 
-            <!-- STORYBOARD -->
-            ${storyboard.length > 0 ? `
-            <div class="storyboard-section">
-                <h5>📋 Storyboard + Prompts</h5>
-                ${storyboard.map(s => `
-                <div class="storyboard-scene">
-                    <div class="scene-header">${escapeHtml(s.cena)}</div>
-                    <div class="scene-visual">${escapeHtml(s.descricao_visual || '')}</div>
-                    <div class="prompt-group">
-                        <div class="prompt-item">
-                            <strong>🖼️ Nano Banana (imagem):</strong>
-                            <div class="prompt-text">${escapeHtml(s.prompt_nano_banana || '')}</div>
-                            <button class="btn-copy" onclick="copyText(this, '${escapeForAttr(s.prompt_nano_banana || '')}')">📋 Copiar</button>
-                        </div>
-                        <div class="prompt-item">
-                            <strong>🎬 Veo 3 (vídeo):</strong>
-                            <div class="prompt-text">${escapeHtml(s.prompt_veo3 || '')}</div>
-                            <button class="btn-copy" onclick="copyText(this, '${escapeForAttr(s.prompt_veo3 || '')}')">📋 Copiar</button>
-                        </div>
-                    </div>
-                </div>
-                `).join('')}
-            </div>
-            ` : ''}
-
-            <!-- BOTÃO COPIAR TUDO -->
-            <button class="btn-copy-all" onclick="copyFullScript(${idx}, 'video')">📋 Copiar Roteiro Completo</button>
-        </div>
-        `;
+        h += '<button class="btn-copy-all" onclick="copyVideoScript(' + idx + ')">📋 Copiar Roteiro Completo</button>';
+        h += '</div>';
     });
 
-    container.innerHTML = html;
+    c.innerHTML = h;
+    window._videoResults = data.resultados;
+}
 
-    // Armazenar dados para cópia
-    window._lastVideoResults = data.resultados;
+function renderBlock(label, block, type) {
+    if (!block || !block.texto) return '';
+    return '<div class="script-block ' + type + '-block">' +
+        '<div class="block-label">' + label + '</div>' +
+        '<div class="block-text">' + esc(block.texto) + '</div>' +
+        '<div class="block-visual">🎥 ' + esc(block.instrucao_visual || '') + '</div>' +
+        '<div class="block-time">' + esc(block.duracao || block.duracao_estimada || '') + '</div></div>';
+}
+
+function renderPrompt(label, text) {
+    if (!text) return '';
+    return '<div class="prompt-item"><strong>' + label + ':</strong>' +
+        '<div class="prompt-text">' + esc(text) + '</div>' +
+        '<button class="btn-copy" onclick="copyToClipboard(this)">📋 Copiar</button></div>';
 }
 
 // ============================================================
-// RENDERIZAÇÃO — IMAGEM
+// RENDER — IMAGEM
 // ============================================================
 function renderImageResults(data) {
-    const container = document.getElementById('creativeResults');
-    let html = `
-        <div class="results-header">
-            <h3>🖼️ Criativos de Imagem — ${data.produto}</h3>
-            <p>${data.total_variacoes} variações | ${data.total_palavras_base} palavras analisadas | Tom: ${data.tom_voz}</p>
-        </div>
-    `;
+    const c = document.getElementById('creativeResults');
+    let h = '<div class="results-header"><h3>🖼️ Criativos de Imagem — ' + esc(data.produto) + '</h3>' +
+        '<p>' + data.total_variacoes + ' variações | ' + data.total_palavras_base + ' palavras | Tom: ' + esc(data.tom_voz) + '</p></div>';
 
     data.resultados.forEach((r, idx) => {
         const copy = r.copy || {};
-        const formatos = r.formatos || {};
+        const fmts = r.formatos || {};
 
-        html += `
-        <div class="result-card">
-            <div class="result-header">
-                <h4>Variação #${r.variacao} — Ângulo: ${escapeHtml(r.angulo || '')}</h4>
-            </div>
-            <p class="concept"><strong>Conceito:</strong> ${escapeHtml(r.conceito_visual || '')}</p>
+        h += '<div class="result-card">';
+        h += '<div class="result-header"><h4>Variação #' + r.variacao + ' — ' + esc(r.angulo || '') + '</h4></div>';
+        h += '<p class="concept"><strong>Conceito:</strong> ' + esc(r.conceito_visual || '') + '</p>';
 
-            <!-- COPY -->
-            <div class="copy-section">
-                <div class="copy-headline">${escapeHtml(copy.headline || '')}</div>
-                <div class="copy-subheadline">${escapeHtml(copy.sub_headline || '')}</div>
-                <div class="copy-cta">${escapeHtml(copy.cta_texto || '')}</div>
-                ${copy.texto_apoio ? `<div class="copy-support">${escapeHtml(copy.texto_apoio)}</div>` : ''}
-            </div>
+        // Copy preview
+        h += '<div class="copy-section">';
+        h += '<div class="copy-headline">' + esc(copy.headline || '') + '</div>';
+        h += '<div class="copy-subheadline">' + esc(copy.sub_headline || '') + '</div>';
+        h += '<div class="copy-cta">' + esc(copy.cta_texto || '') + '</div>';
+        if (copy.texto_apoio) h += '<div class="copy-support">' + esc(copy.texto_apoio) + '</div>';
+        h += '</div>';
 
-            <!-- FORMATOS -->
-            ${Object.entries(formatos).map(([format, fdata]) => `
-            <div class="format-section">
-                <h5>${format === 'feed' ? '📐 Feed (1:1)' : format === 'story' ? '📱 Story (9:16)' : '🖥️ Banner (16:9)'}</h5>
-                <p class="format-layout">${escapeHtml(fdata.descricao_layout || '')}</p>
-                <div class="prompt-item">
-                    <strong>🖼️ Nano Banana:</strong>
-                    <div class="prompt-text">${escapeHtml(fdata.prompt_nano_banana || '')}</div>
-                    <button class="btn-copy" onclick="copyText(this, '${escapeForAttr(fdata.prompt_nano_banana || '')}')">📋 Copiar</button>
-                </div>
-            </div>
-            `).join('')}
+        // Formatos
+        var fmtLabels = {feed: '📐 Feed (1:1)', story: '📱 Story (9:16)', banner: '🖥️ Banner (16:9)'};
+        Object.keys(fmtLabels).forEach(fmt => {
+            var fd = fmts[fmt];
+            if (!fd) return;
+            h += '<div class="format-section"><h5>' + fmtLabels[fmt] + '</h5>';
+            h += '<p class="format-layout">' + esc(fd.layout || fd.descricao_layout || '') + '</p>';
+            h += renderPrompt('🖼️ Nano Banana Pro', fd.prompt_nano_banana || '');
+            h += '</div>';
+        });
 
-            <!-- GATILHOS -->
-            ${r.gatilhos_usados && r.gatilhos_usados.length > 0 ? `
-            <div class="triggers-row">
-                <strong>Gatilhos:</strong> ${r.gatilhos_usados.map(g => `<span class="trigger-badge">${escapeHtml(g)}</span>`).join(' ')}
-            </div>
-            ` : ''}
+        // Gatilhos
+        if (r.gatilhos_usados && r.gatilhos_usados.length) {
+            h += '<div class="triggers-row"><strong>Gatilhos:</strong> ' +
+                r.gatilhos_usados.map(g => '<span class="trigger-badge">' + esc(g) + '</span>').join(' ') + '</div>';
+        }
 
-            <button class="btn-copy-all" onclick="copyFullScript(${idx}, 'image')">📋 Copiar Tudo</button>
-        </div>
-        `;
+        h += '<button class="btn-copy-all" onclick="copyImageScript(' + idx + ')">📋 Copiar Tudo</button>';
+        h += '</div>';
     });
 
-    container.innerHTML = html;
-    window._lastImageResults = data.resultados;
+    c.innerHTML = h;
+    window._imageResults = data.resultados;
 }
 
 // ============================================================
 // ABA 2: EDITOR
 // ============================================================
 async function uploadEditorFiles() {
-    if (STATE.editorFiles.length === 0) return;
-
-    const formData = new FormData();
-    STATE.editorFiles.forEach(f => formData.append('files', f));
+    if (!STATE.editorFiles.length) return;
+    const fd = new FormData();
+    STATE.editorFiles.forEach(f => fd.append('files', f));
 
     document.getElementById('btnUploadEditor').disabled = true;
     document.getElementById('editorLoading').style.display = 'block';
 
     try {
-        const res = await fetch(`${CONFIG.API_BASE}/api/v2/editor/upload`, {
-            method: 'POST',
-            body: formData,
-        });
+        const res = await fetch(CONFIG.API_BASE + '/api/v2/editor/upload', {method: 'POST', body: fd});
         const data = await res.json();
-
         if (data.status === 'success') {
             STATE.editorSessionId = data.session_id;
             document.getElementById('btnGenerateEditor').disabled = false;
-
-            // Mostrar pares
-            const pairList = document.getElementById('editorPairList');
-            if (data.pairs.length > 0) {
-                pairList.innerHTML = '<h4>✅ Pares detectados:</h4>' +
-                    data.pairs.map(p => `
-                        <div class="pair-item">
-                            <span>🎬 ${escapeHtml(p.video)} ↔ 📄 ${escapeHtml(p.srt)}</span>
-                            <span class="pair-segments">${p.segments} segmentos</span>
-                        </div>
-                    `).join('');
+            var pl = document.getElementById('editorPairList');
+            var html = '';
+            if (data.pairs.length) {
+                html += '<h4>✅ Pares detectados:</h4>';
+                data.pairs.forEach(p => {
+                    html += '<div class="pair-item"><span>🎬 ' + esc(p.video) + ' ↔ 📄 ' + esc(p.srt) + '</span><span class="pair-segments">' + p.segments + ' segmentos</span></div>';
+                });
             }
-            if (data.rejected.length > 0) {
-                pairList.innerHTML += '<h4>⚠️ Rejeitados:</h4>' +
-                    data.rejected.map(r => `
-                        <div class="pair-item rejected">
-                            <span>❌ ${escapeHtml(r.filename)}: ${escapeHtml(r.reason)}</span>
-                        </div>
-                    `).join('');
+            if (data.rejected.length) {
+                html += '<h4>⚠️ Rejeitados:</h4>';
+                data.rejected.forEach(r => {
+                    html += '<div class="pair-item rejected"><span>❌ ' + esc(r.filename) + ': ' + esc(r.reason) + '</span></div>';
+                });
             }
-
-            showToast(`Upload concluído: ${data.pairs.length} par(es) válido(s)`, 'success');
+            pl.innerHTML = html;
+            showToast(data.pairs.length + ' par(es) válido(s)', 'success');
         }
     } catch (err) {
-        showToast(`Erro no upload: ${err.message}`, 'error');
+        showToast('Erro: ' + err.message, 'error');
     } finally {
         document.getElementById('btnUploadEditor').disabled = false;
         document.getElementById('editorLoading').style.display = 'none';
@@ -486,34 +341,27 @@ async function uploadEditorFiles() {
 }
 
 async function generateEditorCuts() {
-    if (!STATE.editorSessionId) {
-        showToast('Faça upload dos arquivos primeiro', 'error');
-        return;
-    }
+    if (!STATE.editorSessionId) { showToast('Faça upload primeiro', 'error'); return; }
 
-    const formData = new FormData();
-    formData.append('session_id', STATE.editorSessionId);
-    formData.append('target_duration', STATE.editorDuration);
-    formData.append('variations', STATE.editorVariations);
-    formData.append('mode', STATE.editorMode);
+    const fd = new FormData();
+    fd.append('session_id', STATE.editorSessionId);
+    fd.append('target_duration', STATE.editorDuration);
+    fd.append('variations', STATE.editorVariations);
+    fd.append('mode', STATE.editorMode);
 
     document.getElementById('btnGenerateEditor').disabled = true;
     document.getElementById('editorLoading').style.display = 'block';
     document.getElementById('editorResults').innerHTML = '';
 
     try {
-        const res = await fetch(`${CONFIG.API_BASE}/api/v2/editor/generate`, {
-            method: 'POST',
-            body: formData,
-        });
+        const res = await fetch(CONFIG.API_BASE + '/api/v2/editor/generate', {method: 'POST', body: fd});
         const data = await res.json();
-
         if (data.status === 'success') {
             renderEditorResults(data);
-            showToast(`${data.total_results} resultado(s) gerado(s)!`, 'success');
+            showToast(data.total_results + ' resultado(s)!', 'success');
         }
     } catch (err) {
-        showToast(`Erro: ${err.message}`, 'error');
+        showToast('Erro: ' + err.message, 'error');
     } finally {
         document.getElementById('btnGenerateEditor').disabled = false;
         document.getElementById('editorLoading').style.display = 'none';
@@ -521,158 +369,138 @@ async function generateEditorCuts() {
 }
 
 function renderEditorResults(data) {
-    const container = document.getElementById('editorResults');
-    let html = `<div class="results-header"><h3>✂️ Resultados do Editor</h3></div>`;
+    var c = document.getElementById('editorResults');
+    var h = '<div class="results-header"><h3>✂️ Resultados do Editor</h3></div>';
 
     data.results.forEach(r => {
-        html += `
-        <div class="result-card">
-            <div class="result-header">
-                <h4>${r.source_video ? '🎬 ' + escapeHtml(r.source_video) : '🎬 Mix Multi-Vídeo'} — Variação #${r.variation}</h4>
-                ${r.download_url ? `<a href="${CONFIG.API_BASE}
-                ${r.download_url}" class="btn-download" target="_blank">⬇️ Download MP4</a>` : ''}
-            </div>
-            ${r.error ? `<div class="error-inline">⚠️ ${escapeHtml(r.error)}</div>` : ''}
-            <p>⏱ Duração: ${r.total_duration ? r.total_duration.toFixed(1) + 's' : 'N/A'} | Segmentos: ${r.segment_count || 'N/A'}</p>
-            
-            <div class="structure-breakdown">
-                ${(r.structure || []).map(s => `
-                <div class="segment-item segment-${s.role ? s.role.toLowerCase() : 'body'}">
-                    <div class="segment-role">${s.role === 'HOOK' ? '🎣' : s.role === 'CTA' ? '🎯' : '📝'} ${escapeHtml(s.role || 'BODY')}</div>
-                    <div class="segment-text">${escapeHtml(s.text || '')}</div>
-                    <div class="segment-meta">
-                        ${s.source_video ? `📁 ${escapeHtml(s.source_video)} | ` : ''}
-                        ${s.start !== undefined ? `${s.start.toFixed(1)}s → ${s.end.toFixed(1)}s | ` : ''}
-                        Score: ${s.score || 0}
-                        ${s.triggers && s.triggers.length > 0 ? ' | ' + s.triggers.map(t => `<span class="trigger-badge-sm">${escapeHtml(t)}</span>`).join(' ') : ''}
-                    </div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
-        `;
+        // ===== FIX DO BUG DE DOWNLOAD =====
+        // Monta a URL limpa sem template literal que adicionava espaços
+        var downloadBtn = '';
+        if (r.download_url) {
+            var cleanUrl = CONFIG.API_BASE + r.download_url.trim();
+            downloadBtn = '<a href="' + cleanUrl + '" class="btn-download" download>⬇️ Download MP4</a>';
+        }
+
+        h += '<div class="result-card">';
+        h += '<div class="result-header">';
+        h += '<h4>' + (r.source_video ? '🎬 ' + esc(r.source_video) : '🎬 Mix Multi-Vídeo') + ' — Variação #' + r.variation + '</h4>';
+        h += downloadBtn;
+        h += '</div>';
+
+        if (r.error) {
+            h += '<div class="error-inline">⚠️ ' + esc(r.error) + '</div>';
+        }
+
+        h += '<p>⏱ Duração: ' + (r.total_duration ? r.total_duration.toFixed(1) + 's' : 'N/A') + ' | Segmentos: ' + (r.segment_count || 'N/A') + '</p>';
+
+        h += '<div class="structure-breakdown">';
+        (r.structure || []).forEach(s => {
+            var role = (s.role || 'BODY').toUpperCase();
+            var icon = role === 'HOOK' ? '🎣' : role === 'CTA' ? '🎯' : '📝';
+            var cls = role === 'HOOK' ? 'segment-hook' : role === 'CTA' ? 'segment-cta' : 'segment-body';
+
+            h += '<div class="segment-item ' + cls + '">';
+            h += '<div class="segment-role">' + icon + ' ' + role + '</div>';
+            h += '<div class="segment-text">' + esc(s.text || '') + '</div>';
+            h += '<div class="segment-meta">';
+            if (s.source_video) h += '📁 ' + esc(s.source_video) + ' | ';
+            if (s.start !== undefined) h += s.start.toFixed(1) + 's → ' + s.end.toFixed(1) + 's | ';
+            h += 'Score: ' + (s.score || 0);
+            if (s.triggers && s.triggers.length) {
+                h += ' | ' + s.triggers.map(t => '<span class="trigger-badge-sm">' + esc(t) + '</span>').join(' ');
+            }
+            h += '</div></div>';
+        });
+        h += '</div></div>';
     });
 
-    container.innerHTML = html;
+    c.innerHTML = h;
 }
 
 // ============================================================
-// UTILITÁRIOS
+// CLIPBOARD
 // ============================================================
-function escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = String(str);
-    return div.innerHTML;
-}
-
-function escapeForAttr(str) {
-    if (!str) return '';
-    return String(str)
-        .replace(/\\/g, '\\\\')
-        .replace(/'/g, "\\'")
-        .replace(/"/g, '\\"')
-        .replace(/\n/g, '\\n')
-        .replace(/\r/g, '');
-}
-
-function copyText(btn, text) {
-    const decoded = text.replace(/\\n/g, '\n').replace(/\\'/g, "'").replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-    navigator.clipboard.writeText(decoded).then(() => {
-        const original = btn.textContent;
+function copyToClipboard(btn) {
+    var textEl = btn.previousElementSibling;
+    if (!textEl) return;
+    var text = textEl.textContent || textEl.innerText;
+    navigator.clipboard.writeText(text).then(() => {
         btn.textContent = '✅ Copiado!';
-        setTimeout(() => { btn.textContent = original; }, 2000);
+        setTimeout(() => { btn.textContent = '📋 Copiar'; }, 2000);
     }).catch(() => {
-        // Fallback
-        const ta = document.createElement('textarea');
-        ta.value = decoded;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        const original = btn.textContent;
+        fallbackCopy(text);
         btn.textContent = '✅ Copiado!';
-        setTimeout(() => { btn.textContent = original; }, 2000);
+        setTimeout(() => { btn.textContent = '📋 Copiar'; }, 2000);
     });
 }
 
-function copyFullScript(index, type) {
-    let text = '';
-    
-    if (type === 'video' && window._lastVideoResults) {
-        const r = window._lastVideoResults[index];
-        if (!r) return;
-        const roteiro = r.roteiro || {};
-        text = `=== VARIAÇÃO #${r.variacao} — ${r.framework} ===\n`;
-        text += `Ângulo: ${r.angulo_criativo || ''}\n`;
-        text += `Duração: ${r.duracao_total_estimada || ''}\n\n`;
-        
-        if (roteiro.hook) {
-            text += `🎣 HOOK:\n${roteiro.hook.texto || ''}\n`;
-            text += `Visual: ${roteiro.hook.instrucao_visual || ''}\n\n`;
-        }
-        (roteiro.corpo || []).forEach((c, i) => {
-            text += `📝 CORPO ${i + 1}:\n${c.texto || ''}\n`;
-            text += `Visual: ${c.instrucao_visual || ''}\n\n`;
-        });
-        if (roteiro.cta) {
-            text += `🎯 CTA:\n${roteiro.cta.texto || ''}\n`;
-            text += `Visual: ${roteiro.cta.instrucao_visual || ''}\n\n`;
-        }
-        if (r.gatilhos_usados) {
-            text += `Gatilhos: ${r.gatilhos_usados.join(', ')}\n\n`;
-        }
-        (r.storyboard || []).forEach(s => {
-            text += `--- ${s.cena} ---\n`;
-            text += `Nano Banana: ${s.prompt_nano_banana || ''}\n`;
-            text += `Veo 3: ${s.prompt_veo3 || ''}\n\n`;
-        });
-    } else if (type === 'image' && window._lastImageResults) {
-        const r = window._lastImageResults[index];
-        if (!r) return;
-        const copy = r.copy || {};
-        text = `=== VARIAÇÃO #${r.variacao} — ${r.angulo} ===\n`;
-        text += `Conceito: ${r.conceito_visual || ''}\n\n`;
-        text += `HEADLINE: ${copy.headline || ''}\n`;
-        text += `SUB-HEADLINE: ${copy.sub_headline || ''}\n`;
-        text += `CTA: ${copy.cta_texto || ''}\n`;
-        if (copy.texto_apoio) text += `APOIO: ${copy.texto_apoio}\n`;
-        text += '\n';
-        
-        Object.entries(r.formatos || {}).forEach(([format, fdata]) => {
-            text += `--- ${format.toUpperCase()} ---\n`;
-            text += `Layout: ${fdata.descricao_layout || ''}\n`;
-            text += `Nano Banana: ${fdata.prompt_nano_banana || ''}\n\n`;
-        });
-        if (r.gatilhos_usados) {
-            text += `Gatilhos: ${r.gatilhos_usados.join(', ')}\n`;
-        }
-    }
-
-    if (text) {
-        navigator.clipboard.writeText(text).then(() => {
-            showToast('Roteiro completo copiado!', 'success');
-        }).catch(() => {
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            showToast('Roteiro completo copiado!', 'success');
-        });
-    }
+function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
 }
 
-function showToast(message, type = 'info') {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.textContent = message;
-    container.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.classList.add('toast-fade');
-        setTimeout(() => toast.remove(), 300);
-    }, 4000);
+function copyVideoScript(idx) {
+    if (!window._videoResults || !window._videoResults[idx]) return;
+    var r = window._videoResults[idx];
+    var rot = r.roteiro || {};
+    var t = '=== VARIAÇÃO #' + r.variacao + ' — ' + r.framework + ' ===\n';
+    t += 'Ângulo: ' + (r.angulo_criativo || '') + '\n';
+    t += 'Duração: ' + (r.duracao_total_estimada || '') + '\n\n';
+    if (rot.hook) t += '🎣 HOOK:\n' + rot.hook.texto + '\nVisual: ' + (rot.hook.instrucao_visual || '') + '\n\n';
+    (rot.corpo || []).forEach((c, i) => {
+        t += '📝 CORPO ' + (i + 1) + ':\n' + c.texto + '\nVisual: ' + (c.instrucao_visual || '') + '\n\n';
+    });
+    if (rot.cta) t += '🎯 CTA:\n' + rot.cta.texto + '\nVisual: ' + (rot.cta.instrucao_visual || '') + '\n\n';
+    if (r.gatilhos_usados) t += 'Gatilhos: ' + r.gatilhos_usados.join(', ') + '\n\n';
+    (r.storyboard || []).forEach(s => {
+        t += '--- ' + s.cena + ' ---\n';
+        t += 'Nano Banana: ' + (s.prompt_nano_banana || '') + '\n';
+        t += 'Veo 3: ' + (s.prompt_veo3 || '') + '\n\n';
+    });
+    navigator.clipboard.writeText(t).then(() => showToast('Roteiro copiado!', 'success')).catch(() => { fallbackCopy(t); showToast('Roteiro copiado!', 'success'); });
+}
+
+function copyImageScript(idx) {
+    if (!window._imageResults || !window._imageResults[idx]) return;
+    var r = window._imageResults[idx];
+    var copy = r.copy || {};
+    var t = '=== VARIAÇÃO #' + r.variacao + ' — ' + r.angulo + ' ===\n';
+    t += 'Conceito: ' + (r.conceito_visual || '') + '\n\n';
+    t += 'HEADLINE: ' + (copy.headline || '') + '\n';
+    t += 'SUB: ' + (copy.sub_headline || '') + '\n';
+    t += 'CTA: ' + (copy.cta_texto || '') + '\n';
+    if (copy.texto_apoio) t += 'APOIO: ' + copy.texto_apoio + '\n';
+    t += '\n';
+    Object.keys(r.formatos || {}).forEach(fmt => {
+        var fd = r.formatos[fmt];
+        t += '--- ' + fmt.toUpperCase() + ' ---\n';
+        t += 'Layout: ' + (fd.layout || fd.descricao_layout || '') + '\n';
+        t += 'Nano Banana: ' + (fd.prompt_nano_banana || '') + '\n\n';
+    });
+    navigator.clipboard.writeText(t).then(() => showToast('Copy copiada!', 'success')).catch(() => { fallbackCopy(t); showToast('Copy copiada!', 'success'); });
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function esc(s) {
+    if (!s) return '';
+    var d = document.createElement('div');
+    d.textContent = String(s);
+    return d.innerHTML;
+}
+
+function showToast(msg, type) {
+    var c = document.getElementById('toastContainer');
+    var t = document.createElement('div');
+    t.className = 'toast toast-' + (type || 'info');
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => { t.classList.add('toast-fade'); setTimeout(() => t.remove(), 300); }, 4000);
 }
