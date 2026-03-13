@@ -700,6 +700,7 @@ function renderEditorResults(data) {
 }
 
 function renderEditorDirectorEvaluation(evaluation, parentId, idx, resultData, fullData) {
+    const correctBtnId = `correctCutBtn_${idx}`;
     const nota = evaluation.nota_geral || 0;
     const colorClass = nota >= 80 ? 'rating-high' : nota >= 60 ? 'rating-mid' : 'rating-low';
     const criterios = evaluation.criterios || {};
