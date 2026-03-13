@@ -1,532 +1,753 @@
-/**
- * HALLEY CRIATIVOS STUDIO — Frontend v6.0
- * Bug fix: download URLs | Prompts rendering melhorado
- */
+/* ============================================================
+   HALLEY CRIATIVOS STUDIO — Frontend v7.0
+   Melhorias: Rating Diretor Criativo, legendas, pareamento flexível
+   ============================================================ */
 
 const CONFIG = {
     API_BASE: 'https://wanderhalleylee-criativo-studio-backend.hf.space',
+    MAX_FILE_SIZE: 500 * 1024 * 1024,
 };
 
 const STATE = {
-    creativeType: 'video',
-    variations: 3,
+    // Aba 1
     creativeFiles: [],
-    editorMode: 'individual',
-    editorDuration: 30,
-    editorVariations: 1,
+    tipo: 'video',
+    variacoes: 3,
+    // Aba 2
     editorFiles: [],
     editorSessionId: null,
+    editorPairs: [],
+    editorDuration: 30,
+    editorVariations: 1,
+    editorMode: 'individual',
+    subtitleEnabled: 'sem_legenda',
+    subtitleStyle: 'branca',
 };
 
-// ============================================================
-// INIT
-// ============================================================
+/* ============================================================
+   INIT
+   ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
     checkHealth();
-    initUploads();
+    setupUploadZone('creativeUploadZone', 'creativeFiles', handleCreativeFiles);
+    setupUploadZone('editorUploadZone', 'editorFiles', handleEditorFiles);
 });
 
-async function checkHealth() {
-    const el = document.getElementById('headerStatus');
-    try {
-        const r = await fetch(CONFIG.API_BASE + '/health', {signal: AbortSignal.timeout(10000)});
-        if (r.ok) {
-            el.innerHTML = '<span class="status-dot online"></span><span>IA Online</span>';
-        } else {
-            el.innerHTML = '<span class="status-dot offline"></span><span>IA Offline</span>';
-        }
-    } catch {
-        el.innerHTML = '<span class="status-dot offline"></span><span>Sem conexão</span>';
-    }
+function checkHealth() {
+    const dot = document.getElementById('statusDot');
+    fetch(CONFIG.API_BASE + '/')
+        .then(r => r.json())
+        .then(d => {
+            dot.className = 'status-dot online';
+            dot.title = 'Backend online v' + (d.version || '?');
+        })
+        .catch(() => {
+            dot.className = 'status-dot offline';
+            dot.title = 'Backend offline';
+        });
 }
 
-// ============================================================
-// TABS
-// ============================================================
+/* ============================================================
+   TABS
+   ============================================================ */
 function switchTab(tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+    document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
     document.getElementById('tab-' + tab).classList.add('active');
 }
 
-// ============================================================
-// UPLOADS
-// ============================================================
-function initUploads() {
-    setupZone('creativeUploadZone', 'creativeFileInput', handleCreativeFiles);
-    setupZone('editorUploadZone', 'editorFileInput', handleEditorFiles);
+/* ============================================================
+   UPLOAD ZONES
+   ============================================================ */
+function setupUploadZone(zoneId, inputId, handler) {
+    var zone = document.getElementById(zoneId);
+    var input = document.getElementById(inputId);
+    if (!zone || !input) return;
+
+    zone.addEventListener('click', function () { input.click(); });
+    input.addEventListener('change', function () { handler(Array.from(input.files)); });
+
+    zone.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        zone.classList.add('dragover');
+    });
+    zone.addEventListener('dragleave', function () {
+        zone.classList.remove('dragover');
+    });
+    zone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        handler(Array.from(e.dataTransfer.files));
+    });
 }
 
-function setupZone(zoneId, inputId, handler) {
-    const zone = document.getElementById(zoneId);
-    const input = document.getElementById(inputId);
-    zone.addEventListener('click', () => input.click());
-    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); handler(e.dataTransfer.files); });
-    input.addEventListener('change', e => handler(e.target.files));
+function handleCreativeFiles(files) {
+    var valid = files.filter(function (f) {
+        return f.name.match(/\.(srt|txt)$/i) && f.size <= CONFIG.MAX_FILE_SIZE;
+    });
+    STATE.creativeFiles = valid;
+    renderFileList('creativeFileList', valid);
 }
 
-function handleCreativeFiles(fileList) {
-    const valid = Array.from(fileList).filter(f => /\.(srt|txt)$/i.test(f.name));
-    if (!valid.length) { showToast('Envie apenas .srt ou .txt', 'error'); return; }
-    STATE.creativeFiles = [...STATE.creativeFiles, ...valid];
-    renderFileList('creativeFileList', STATE.creativeFiles, 'creative');
+function handleEditorFiles(files) {
+    var valid = files.filter(function (f) {
+        return f.name.match(/\.(mp4|mov|avi|mkv|webm|srt)$/i) && f.size <= CONFIG.MAX_FILE_SIZE;
+    });
+    STATE.editorFiles = valid;
+    renderFileList('editorFileList', valid);
 }
 
-function handleEditorFiles(fileList) {
-    const valid = Array.from(fileList).filter(f => /\.(mp4|mov|avi|mkv|webm|srt)$/i.test(f.name));
-    STATE.editorFiles = [...STATE.editorFiles, ...valid];
-    renderFileList('editorFileList', STATE.editorFiles, 'editor');
-    document.getElementById('btnUploadEditor').disabled = STATE.editorFiles.length === 0;
+function renderFileList(containerId, files) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+    if (files.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    var html = '';
+    for (var i = 0; i < files.length; i++) {
+        var f = files[i];
+        var size = (f.size / 1024).toFixed(1);
+        var icon = f.name.match(/\.(mp4|mov|avi|mkv|webm)$/i) ? '🎬' : '📄';
+        html += '<div class="file-item">' + icon + ' ' + escapeHtml(f.name) + ' (' + size + ' KB)</div>';
+    }
+    container.innerHTML = html;
 }
 
-function renderFileList(containerId, files, type) {
-    const el = document.getElementById(containerId);
-    if (!files.length) { el.innerHTML = ''; return; }
-    el.innerHTML = files.map((f, i) =>
-        '<div class="file-item"><span>' + (f.name.endsWith('.srt') || f.name.endsWith('.txt') ? '📄' : '🎬') +
-        ' ' + esc(f.name) + ' (' + (f.size / 1024).toFixed(1) + ' KB)</span>' +
-        '<button class="btn-remove" onclick="removeFile(\'' + type + '\',' + i + ')">✕</button></div>'
-    ).join('');
-}
-
-function removeFile(type, idx) {
-    if (type === 'creative') {
-        STATE.creativeFiles.splice(idx, 1);
-        renderFileList('creativeFileList', STATE.creativeFiles, 'creative');
+/* ============================================================
+   ABA 1 — CONTROLES
+   ============================================================ */
+function setTipo(t) {
+    STATE.tipo = t;
+    document.querySelectorAll('#tab-creative .config-item:first-child .toggle-btn').forEach(function (b) {
+        b.classList.toggle('active', b.dataset.value === t);
+    });
+    var hint = document.getElementById('tipoHint');
+    if (t === 'video') {
+        hint.innerHTML = '<strong>Modo Vídeo:</strong> Gera roteiros completos (Hook → Corpo → CTA) + Storyboard + Avaliação do Diretor Criativo';
     } else {
-        STATE.editorFiles.splice(idx, 1);
-        renderFileList('editorFileList', STATE.editorFiles, 'editor');
-        document.getElementById('btnUploadEditor').disabled = STATE.editorFiles.length === 0;
+        hint.innerHTML = '<strong>Modo Imagem:</strong> Gera copies para Feed, Story e Banner + Prompts Nano Banana Pro + Avaliação do Diretor Criativo';
     }
 }
 
-// ============================================================
-// CONFIG UI
-// ============================================================
-function setCreativeType(type) {
-    STATE.creativeType = type;
-    document.getElementById('btnTypeVideo').classList.toggle('active', type === 'video');
-    document.getElementById('btnTypeImage').classList.toggle('active', type === 'image');
-    document.getElementById('typeDescription').innerHTML = type === 'video'
-        ? '<strong>Modo Vídeo:</strong> Roteiros completos (Hook→Corpo→CTA) + Storyboard + Prompts Nano Banana Pro + Prompts Veo 3'
-        : '<strong>Modo Imagem:</strong> Copies persuasivas + Prompts Nano Banana Pro para Feed (1:1), Story (9:16) e Banner (16:9)';
+function stepVariacoes(delta) {
+    STATE.variacoes = Math.max(1, Math.min(10, STATE.variacoes + delta));
+    document.getElementById('variacoesDisplay').textContent = STATE.variacoes;
 }
 
-function adjustVariations(d) {
-    STATE.variations = Math.max(1, Math.min(10, STATE.variations + d));
-    document.getElementById('variationCount').textContent = STATE.variations;
+/* ============================================================
+   ABA 2 — CONTROLES
+   ============================================================ */
+function stepDuration(delta) {
+    STATE.editorDuration = Math.max(5, Math.min(120, STATE.editorDuration + delta));
+    document.getElementById('durationDisplay').textContent = STATE.editorDuration;
 }
 
-function adjustDuration(d) {
-    STATE.editorDuration = Math.max(10, Math.min(120, STATE.editorDuration + d));
-    document.getElementById('durationValue').textContent = STATE.editorDuration;
-}
-
-function adjustEditorVariations(d) {
-    STATE.editorVariations = Math.max(1, Math.min(5, STATE.editorVariations + d));
-    document.getElementById('editorVariationCount').textContent = STATE.editorVariations;
+function stepEditorVar(delta) {
+    STATE.editorVariations = Math.max(1, Math.min(5, STATE.editorVariations + delta));
+    document.getElementById('editorVarDisplay').textContent = STATE.editorVariations;
 }
 
 function setEditorMode(mode) {
     STATE.editorMode = mode;
-    document.getElementById('btnModeIndividual').classList.toggle('active', mode === 'individual');
-    document.getElementById('btnModeTodos').classList.toggle('active', mode === 'todos');
+    document.querySelectorAll('#tab-editor .config-row:first-of-type .config-item:last-child .toggle-btn').forEach(function (b) {
+        b.classList.toggle('active', b.dataset.value === mode);
+    });
 }
 
-// ============================================================
-// ABA 1: GERAR CRIATIVOS
-// ============================================================
-async function generateCreatives() {
-    if (!STATE.creativeFiles.length) { showToast('Envie pelo menos um arquivo', 'error'); return; }
-    const produto = document.getElementById('productName').value.trim();
-    if (!produto) { showToast('Preencha o nome do produto', 'error'); return; }
-    const publico = document.getElementById('targetAudience').value.trim();
-    if (!publico) { showToast('Preencha o público-alvo', 'error'); return; }
+function setSubtitle(value) {
+    STATE.subtitleEnabled = value;
+    // Toggle botões
+    var btns = document.querySelectorAll('#tab-editor .step-container:nth-child(4) .config-item:first-child .toggle-btn');
+    btns.forEach(function (b) { b.classList.toggle('active', b.dataset.value === value); });
 
-    const fd = new FormData();
-    STATE.creativeFiles.forEach(f => fd.append('files', f));
-    fd.append('tipo', STATE.creativeType);
-    fd.append('variacoes', STATE.variations);
+    // Mostrar/ocultar estilos
+    var stylesContainer = document.getElementById('subtitleStylesContainer');
+    var hint = document.getElementById('subtitleHint');
+    if (value === 'com_legenda') {
+        stylesContainer.style.display = 'block';
+        hint.innerHTML = '<strong>Com legenda:</strong> O texto do SRT será sobreposto no vídeo final no estilo escolhido.';
+    } else {
+        stylesContainer.style.display = 'none';
+        hint.innerHTML = 'Sem legenda: vídeo limpo, sem texto sobreposto.';
+    }
+}
+
+function setSubtitleStyle(style) {
+    STATE.subtitleStyle = style;
+    document.querySelectorAll('.subtitle-style-group .toggle-btn').forEach(function (b) {
+        b.classList.toggle('active', b.dataset.value === style);
+    });
+
+    var descs = {
+        branca: '<strong>Branca Clássica:</strong> Texto branco com sombra, posição inferior. Estilo profissional/clean.',
+        amarela: '<strong>Amarela Destaque:</strong> Texto amarelo com outline preto. Chamativo, ótimo para ads.',
+        tiktok: '<strong>TikTok Palavra por Palavra:</strong> Cada palavra aparece destacada no centro. Estilo viral.'
+    };
+    document.getElementById('subtitleHint').innerHTML = descs[style] || '';
+}
+
+/* ============================================================
+   ABA 1 — GERAR CRIATIVOS
+   ============================================================ */
+function generateCreatives() {
+    if (STATE.creativeFiles.length === 0) {
+        showToast('Envie pelo menos 1 arquivo .srt ou .txt', 'error');
+        return;
+    }
+    var produto = document.getElementById('produto').value.trim();
+    var publico = document.getElementById('publicoAlvo').value.trim();
+    if (!produto || !publico) {
+        showToast('Preencha Produto e Público-Alvo', 'error');
+        return;
+    }
+
+    var btn = document.getElementById('btnGenerate');
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Gerando criativos + avaliação do Diretor Criativo...';
+
+    var fd = new FormData();
+    for (var i = 0; i < STATE.creativeFiles.length; i++) {
+        fd.append('files', STATE.creativeFiles[i]);
+    }
+    fd.append('tipo', STATE.tipo);
+    fd.append('variacoes', STATE.variacoes);
     fd.append('produto', produto);
     fd.append('publico_alvo', publico);
-    fd.append('tom_voz', document.getElementById('voiceTone').value);
+    fd.append('tom_voz', document.getElementById('tomVoz').value);
 
-    document.getElementById('btnGenerate').disabled = true;
-    document.getElementById('creativeLoading').style.display = 'block';
-    document.getElementById('creativeResults').innerHTML = '';
-
-    try {
-        const res = await fetch(CONFIG.API_BASE + '/api/v1/creative/generate', {method: 'POST', body: fd});
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || 'Erro no servidor');
-        if (data.status === 'success') {
-            STATE.creativeType === 'video' ? renderVideoResults(data) : renderImageResults(data);
-            showToast(data.total_variacoes + ' criativos gerados!', 'success');
-        }
-    } catch (err) {
-        showToast('Erro: ' + err.message, 'error');
-        document.getElementById('creativeResults').innerHTML =
-            '<div class="error-card"><h3>❌ Erro</h3><p>' + esc(err.message) + '</p></div>';
-    } finally {
-        document.getElementById('btnGenerate').disabled = false;
-        document.getElementById('creativeLoading').style.display = 'none';
-    }
-}
-
-// ============================================================
-// RENDER — VÍDEO
-// ============================================================
-function renderVideoResults(data) {
-    const c = document.getElementById('creativeResults');
-    let h = '<div class="results-header"><h3>🎬 Criativos de Vídeo — ' + esc(data.produto) + '</h3>' +
-        '<p>' + data.total_variacoes + ' variações | ' + data.total_palavras_base + ' palavras | Tom: ' + esc(data.tom_voz) + '</p></div>';
-
-    data.resultados.forEach((r, idx) => {
-        const rot = r.roteiro || {};
-        const hook = rot.hook || {};
-        const corpo = rot.corpo || [];
-        const cta = rot.cta || {};
-        const sb = r.storyboard || [];
-
-        h += '<div class="result-card">';
-        h += '<div class="result-header"><h4>Variação #' + r.variacao + ' — ' + esc(r.framework) + '</h4>';
-        h += '<span class="badge">' + esc(r.framework_descricao || '') + '</span></div>';
-        h += '<p class="angle"><strong>Ângulo:</strong> ' + esc(r.angulo_criativo || '') + '</p>';
-        h += '<p class="duration">⏱ ' + esc(r.duracao_total_estimada || '30s') + '</p>';
-
-        // Roteiro
-        h += '<div class="script-section">';
-        h += renderBlock('🎣 HOOK', hook, 'hook');
-        corpo.forEach((c, i) => { h += renderBlock('📝 CORPO ' + (i + 1), c, 'body'); });
-        h += renderBlock('🎯 CTA', cta, 'cta');
-        h += '</div>';
-
-        // Gatilhos
-        if (r.gatilhos_usados && r.gatilhos_usados.length) {
-            h += '<div class="triggers-row"><strong>Gatilhos:</strong> ' +
-                r.gatilhos_usados.map(g => '<span class="trigger-badge">' + esc(g) + '</span>').join(' ') + '</div>';
-        }
-
-        // Storyboard
-        if (sb.length) {
-            h += '<div class="storyboard-section"><h5>📋 Storyboard + Prompts Profissionais</h5>';
-            sb.forEach(s => {
-                h += '<div class="storyboard-scene">';
-                h += '<div class="scene-header">' + esc(s.cena) + ' — ' + esc(s.duracao || '') + '</div>';
-                h += '<div class="scene-visual">' + esc(s.descricao_visual || '') + '</div>';
-                h += '<div class="prompt-group">';
-                h += renderPrompt('🖼️ Nano Banana Pro (Imagem)', s.prompt_nano_banana || '');
-                h += renderPrompt('🎬 Veo 3 (Vídeo)', s.prompt_veo3 || '');
-                h += '</div></div>';
-            });
-            h += '</div>';
-        }
-
-        h += '<button class="btn-copy-all" onclick="copyVideoScript(' + idx + ')">📋 Copiar Roteiro Completo</button>';
-        h += '</div>';
-    });
-
-    c.innerHTML = h;
-    window._videoResults = data.resultados;
-}
-
-function renderBlock(label, block, type) {
-    if (!block || !block.texto) return '';
-    return '<div class="script-block ' + type + '-block">' +
-        '<div class="block-label">' + label + '</div>' +
-        '<div class="block-text">' + esc(block.texto) + '</div>' +
-        '<div class="block-visual">🎥 ' + esc(block.instrucao_visual || '') + '</div>' +
-        '<div class="block-time">' + esc(block.duracao || block.duracao_estimada || '') + '</div></div>';
-}
-
-function renderPrompt(label, text) {
-    if (!text) return '';
-    return '<div class="prompt-item"><strong>' + label + ':</strong>' +
-        '<div class="prompt-text">' + esc(text) + '</div>' +
-        '<button class="btn-copy" onclick="copyToClipboard(this)">📋 Copiar</button></div>';
-}
-
-// ============================================================
-// RENDER — IMAGEM
-// ============================================================
-function renderImageResults(data) {
-    const c = document.getElementById('creativeResults');
-    let h = '<div class="results-header"><h3>🖼️ Criativos de Imagem — ' + esc(data.produto) + '</h3>' +
-        '<p>' + data.total_variacoes + ' variações | ' + data.total_palavras_base + ' palavras | Tom: ' + esc(data.tom_voz) + '</p></div>';
-
-    data.resultados.forEach((r, idx) => {
-        const copy = r.copy || {};
-        const fmts = r.formatos || {};
-
-        h += '<div class="result-card">';
-        h += '<div class="result-header"><h4>Variação #' + r.variacao + ' — ' + esc(r.angulo || '') + '</h4></div>';
-        h += '<p class="concept"><strong>Conceito:</strong> ' + esc(r.conceito_visual || '') + '</p>';
-
-        // Copy preview
-        h += '<div class="copy-section">';
-        h += '<div class="copy-headline">' + esc(copy.headline || '') + '</div>';
-        h += '<div class="copy-subheadline">' + esc(copy.sub_headline || '') + '</div>';
-        h += '<div class="copy-cta">' + esc(copy.cta_texto || '') + '</div>';
-        if (copy.texto_apoio) h += '<div class="copy-support">' + esc(copy.texto_apoio) + '</div>';
-        h += '</div>';
-
-        // Formatos
-        var fmtLabels = {feed: '📐 Feed (1:1)', story: '📱 Story (9:16)', banner: '🖥️ Banner (16:9)'};
-        Object.keys(fmtLabels).forEach(fmt => {
-            var fd = fmts[fmt];
-            if (!fd) return;
-            h += '<div class="format-section"><h5>' + fmtLabels[fmt] + '</h5>';
-            h += '<p class="format-layout">' + esc(fd.layout || fd.descricao_layout || '') + '</p>';
-            h += renderPrompt('🖼️ Nano Banana Pro', fd.prompt_nano_banana || '');
-            h += '</div>';
+    fetch(CONFIG.API_BASE + '/api/v1/creative/generate', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            btn.disabled = false;
+            btn.innerHTML = '🚀 Gerar Criativos com Avaliação';
+            if (data.status === 'success') {
+                renderCreativeResults(data);
+                showToast('Criativos gerados com sucesso!', 'success');
+            } else {
+                showToast('Erro: ' + (data.detail || 'falha'), 'error');
+            }
+        })
+        .catch(function (e) {
+            btn.disabled = false;
+            btn.innerHTML = '🚀 Gerar Criativos com Avaliação';
+            showToast('Erro de conexão: ' + e.message, 'error');
         });
-
-        // Gatilhos
-        if (r.gatilhos_usados && r.gatilhos_usados.length) {
-            h += '<div class="triggers-row"><strong>Gatilhos:</strong> ' +
-                r.gatilhos_usados.map(g => '<span class="trigger-badge">' + esc(g) + '</span>').join(' ') + '</div>';
-        }
-
-        h += '<button class="btn-copy-all" onclick="copyImageScript(' + idx + ')">📋 Copiar Tudo</button>';
-        h += '</div>';
-    });
-
-    c.innerHTML = h;
-    window._imageResults = data.resultados;
 }
 
-// ============================================================
-// ABA 2: EDITOR
-// ============================================================
-async function uploadEditorFiles() {
-    if (!STATE.editorFiles.length) return;
-    const fd = new FormData();
-    STATE.editorFiles.forEach(f => fd.append('files', f));
-
-    document.getElementById('btnUploadEditor').disabled = true;
-    document.getElementById('editorLoading').style.display = 'block';
-
-    try {
-        const res = await fetch(CONFIG.API_BASE + '/api/v2/editor/upload', {method: 'POST', body: fd});
-        const data = await res.json();
-        if (data.status === 'success') {
-            STATE.editorSessionId = data.session_id;
-            document.getElementById('btnGenerateEditor').disabled = false;
-            var pl = document.getElementById('editorPairList');
-            var html = '';
-            if (data.pairs.length) {
-                html += '<h4>✅ Pares detectados:</h4>';
-                data.pairs.forEach(p => {
-                    html += '<div class="pair-item"><span>🎬 ' + esc(p.video) + ' ↔ 📄 ' + esc(p.srt) + '</span><span class="pair-segments">' + p.segments + ' segmentos</span></div>';
-                });
-            }
-            if (data.rejected.length) {
-                html += '<h4>⚠️ Rejeitados:</h4>';
-                data.rejected.forEach(r => {
-                    html += '<div class="pair-item rejected"><span>❌ ' + esc(r.filename) + ': ' + esc(r.reason) + '</span></div>';
-                });
-            }
-            pl.innerHTML = html;
-            showToast(data.pairs.length + ' par(es) válido(s)', 'success');
-        }
-    } catch (err) {
-        showToast('Erro: ' + err.message, 'error');
-    } finally {
-        document.getElementById('btnUploadEditor').disabled = false;
-        document.getElementById('editorLoading').style.display = 'none';
+/* ============================================================
+   ABA 1 — RENDERIZAR RESULTADOS
+   ============================================================ */
+function renderCreativeResults(data) {
+    var container = document.getElementById('creativeResults');
+    var results = data.resultados || [];
+    if (results.length === 0) {
+        container.innerHTML = '<p class="empty">Nenhum resultado gerado.</p>';
+        return;
     }
+
+    var html = '<h3>Resultados (' + results.length + ' variações)</h3>';
+    for (var i = 0; i < results.length; i++) {
+        var r = results[i];
+        if (data.tipo === 'video') {
+            html += renderVideoCreative(r);
+        } else {
+            html += renderImageCreative(r);
+        }
+    }
+    container.innerHTML = html;
 }
 
-// ============================================================
-// Na função generateEditorCuts, GUARDAR o output_id:
-// ============================================================
-async function generateEditorCuts() {
-    if (!STATE.editorSessionId) { showToast('Faça upload primeiro', 'error'); return; }
+function renderVideoCreative(r) {
+    var roteiro = r.roteiro || {};
+    var hook = roteiro.hook || {};
+    var corpo = roteiro.corpo || [];
+    var cta = roteiro.cta || {};
+    var eval_data = r.avaliacao_diretor || null;
+
+    var html = '<div class="result-card">';
+    html += '<div class="card-header">';
+    html += '<div class="card-title">🎬 Variação #' + r.variacao + ' — ' + escapeHtml(r.framework || '') + '</div>';
+    if (eval_data) {
+        html += renderRatingBadge(eval_data.nota_geral);
+    }
+    html += '</div>';
+    html += '<div class="card-meta">';
+    html += '<span>Framework: ' + escapeHtml(r.framework_descricao || '') + '</span>';
+    html += '<span>Ângulo: ' + escapeHtml(r.angulo_criativo || '') + '</span>';
+    html += '<span>Duração: ' + escapeHtml(r.duracao_total_estimada || '') + '</span>';
+    html += '</div>';
+
+    // Roteiro
+    html += '<div class="script-block">';
+    html += '<div class="script-section hook-section"><div class="section-label">🎯 HOOK</div>';
+    html += '<div class="section-text">' + escapeHtml(hook.texto || '') + '</div>';
+    if (hook.instrucao_visual) html += '<div class="section-visual">📷 ' + escapeHtml(hook.instrucao_visual) + '</div>';
+    html += '<div class="section-duration">⏱️ ' + escapeHtml(hook.duracao || '') + '</div></div>';
+
+    for (var j = 0; j < corpo.length; j++) {
+        var c = corpo[j];
+        html += '<div class="script-section body-section"><div class="section-label">📝 CORPO ' + (j + 1) + '</div>';
+        html += '<div class="section-text">' + escapeHtml(c.texto || '') + '</div>';
+        if (c.instrucao_visual) html += '<div class="section-visual">📷 ' + escapeHtml(c.instrucao_visual) + '</div>';
+        html += '<div class="section-duration">⏱️ ' + escapeHtml(c.duracao || '') + '</div></div>';
+    }
+
+    html += '<div class="script-section cta-section"><div class="section-label">🔥 CTA</div>';
+    html += '<div class="section-text">' + escapeHtml(cta.texto || '') + '</div>';
+    if (cta.instrucao_visual) html += '<div class="section-visual">📷 ' + escapeHtml(cta.instrucao_visual) + '</div>';
+    html += '<div class="section-duration">⏱️ ' + escapeHtml(cta.duracao || '') + '</div></div>';
+    html += '</div>';
+
+    // Gatilhos
+    var gatilhos = r.gatilhos_usados || [];
+    if (gatilhos.length > 0) {
+        html += '<div class="triggers">';
+        for (var g = 0; g < gatilhos.length; g++) {
+            html += '<span class="trigger-badge">' + escapeHtml(gatilhos[g]) + '</span>';
+        }
+        html += '</div>';
+    }
+
+    // Avaliação do Diretor Criativo
+    if (eval_data) {
+        html += renderDirectorEvaluation(eval_data);
+    }
+
+    // Storyboard
+    var storyboard = r.storyboard || [];
+    if (storyboard.length > 0) {
+        html += '<details class="storyboard-details"><summary>🎨 Storyboard + Prompts (' + storyboard.length + ' cenas)</summary>';
+        html += '<div class="storyboard">';
+        for (var s = 0; s < storyboard.length; s++) {
+            var scene = storyboard[s];
+            html += '<div class="storyboard-scene">';
+            html += '<div class="scene-header">' + escapeHtml(scene.cena) + ' — ' + escapeHtml(scene.duracao || '') + '</div>';
+            html += '<div class="scene-text">' + escapeHtml(scene.texto_narrado || '') + '</div>';
+            html += '<div class="scene-visual">' + escapeHtml(scene.descricao_visual || '') + '</div>';
+            if (scene.prompt_nano_banana) {
+                html += '<div class="prompt-block"><strong>🍌 Nano Banana:</strong><pre>' + escapeHtml(scene.prompt_nano_banana) + '</pre>';
+                html += '<button class="btn-copy" onclick="copyText(this, \'' + escapeForAttr(scene.prompt_nano_banana) + '\')">📋 Copiar</button></div>';
+            }
+            if (scene.prompt_veo3) {
+                html += '<div class="prompt-block"><strong>🎥 Veo 3:</strong><pre>' + escapeHtml(scene.prompt_veo3) + '</pre>';
+                html += '<button class="btn-copy" onclick="copyText(this, \'' + escapeForAttr(scene.prompt_veo3) + '\')">📋 Copiar</button></div>';
+            }
+            html += '</div>';
+        }
+        html += '</div></details>';
+    }
+
+    // Botão copiar roteiro
+    html += '<div class="card-actions">';
+    html += '<button class="btn-secondary" onclick="copyFullScript(' + r.variacao + ', \'video\')">📋 Copiar Roteiro Completo</button>';
+    html += '</div>';
+
+    html += '</div>';
+    return html;
+}
+
+function renderImageCreative(r) {
+    var copy = r.copy || {};
+    var formatos = r.formatos || {};
+    var eval_data = r.avaliacao_diretor || null;
+
+    var html = '<div class="result-card">';
+    html += '<div class="card-header">';
+    html += '<div class="card-title">🖼️ Variação #' + r.variacao + ' — Ângulo: ' + escapeHtml(r.angulo || '') + '</div>';
+    if (eval_data) {
+        html += renderRatingBadge(eval_data.nota_geral);
+    }
+    html += '</div>';
+
+    html += '<div class="copy-block">';
+    html += '<div class="copy-headline">' + escapeHtml(copy.headline || '') + '</div>';
+    html += '<div class="copy-sub">' + escapeHtml(copy.sub_headline || '') + '</div>';
+    html += '<div class="copy-cta">' + escapeHtml(copy.cta_texto || '') + '</div>';
+    if (copy.texto_apoio) html += '<div class="copy-support">' + escapeHtml(copy.texto_apoio) + '</div>';
+    html += '</div>';
+
+    // Gatilhos
+    var gatilhos = r.gatilhos_usados || [];
+    if (gatilhos.length > 0) {
+        html += '<div class="triggers">';
+        for (var g = 0; g < gatilhos.length; g++) {
+            html += '<span class="trigger-badge">' + escapeHtml(gatilhos[g]) + '</span>';
+        }
+        html += '</div>';
+    }
+
+    // Avaliação do Diretor Criativo
+    if (eval_data) {
+        html += renderDirectorEvaluation(eval_data);
+    }
+
+    // Formatos
+    var fmtNames = { feed: 'Feed 1:1', story: 'Story 9:16', banner: 'Banner 16:9' };
+    var fmtKeys = ['feed', 'story', 'banner'];
+    html += '<details class="storyboard-details"><summary>🎨 Formatos + Prompts Nano Banana</summary>';
+    for (var fi = 0; fi < fmtKeys.length; fi++) {
+        var fk = fmtKeys[fi];
+        var fmt = formatos[fk] || {};
+        html += '<div class="format-block">';
+        html += '<div class="format-header">' + (fmtNames[fk] || fk) + '</div>';
+        if (fmt.layout) html += '<div class="format-layout">Layout: ' + escapeHtml(fmt.layout) + '</div>';
+        if (fmt.prompt_nano_banana) {
+            html += '<div class="prompt-block"><strong>🍌 Prompt:</strong><pre>' + escapeHtml(fmt.prompt_nano_banana) + '</pre>';
+            html += '<button class="btn-copy" onclick="copyText(this, \'' + escapeForAttr(fmt.prompt_nano_banana) + '\')">📋 Copiar</button></div>';
+        }
+        html += '</div>';
+    }
+    html += '</details>';
+
+    html += '<div class="card-actions">';
+    html += '<button class="btn-secondary" onclick="copyFullScript(' + r.variacao + ', \'image\')">📋 Copiar Copy Completa</button>';
+    html += '</div>';
+
+    html += '</div>';
+    return html;
+}
+
+/* ============================================================
+   RATING BADGE & DIRECTOR EVALUATION
+   ============================================================ */
+function renderRatingBadge(nota) {
+    var colorClass = 'rating-low';
+    if (nota >= 70) colorClass = 'rating-high';
+    else if (nota >= 40) colorClass = 'rating-mid';
+    return '<div class="rating-badge ' + colorClass + '">' + nota + '%</div>';
+}
+
+function renderDirectorEvaluation(eval_data) {
+    if (!eval_data) return '';
+
+    var nota = eval_data.nota_geral || 0;
+    var criterios = eval_data.criterios || {};
+    var veredito = eval_data.veredito || '';
+    var melhorias = eval_data.melhorias || [];
+
+    var colorClass = 'rating-low';
+    if (nota >= 70) colorClass = 'rating-high';
+    else if (nota >= 40) colorClass = 'rating-mid';
+
+    var html = '<div class="director-evaluation">';
+    html += '<div class="director-header">';
+    html += '<span class="director-icon">🎬</span>';
+    html += '<span class="director-title">Avaliação do Diretor Criativo</span>';
+    html += '<div class="director-score ' + colorClass + '">' + nota + '%</div>';
+    html += '</div>';
+
+    // Barras de critérios
+    var criterioNames = {
+        hook_power: '🎯 Hook Power',
+        especificidade: '🔬 Especificidade',
+        coerencia: '🔗 Coerência',
+        corpo_persuasivo: '💪 Corpo Persuasivo',
+        cta_clarity: '🔥 CTA Clarity',
+        originalidade: '✨ Originalidade'
+    };
+
+    html += '<div class="criteria-bars">';
+    var keys = ['hook_power', 'especificidade', 'coerencia', 'corpo_persuasivo', 'cta_clarity', 'originalidade'];
+    for (var ci = 0; ci < keys.length; ci++) {
+        var key = keys[ci];
+        var val = criterios[key] || 0;
+        var barColor = val >= 70 ? '#10b981' : val >= 40 ? '#f59e0b' : '#ef4444';
+        html += '<div class="criteria-row">';
+        html += '<span class="criteria-label">' + (criterioNames[key] || key) + '</span>';
+        html += '<div class="criteria-bar-bg"><div class="criteria-bar-fill" style="width:' + val + '%;background:' + barColor + '"></div></div>';
+        html += '<span class="criteria-value">' + val + '</span>';
+        html += '</div>';
+    }
+    html += '</div>';
+
+    // Veredito
+    if (veredito) {
+        html += '<div class="director-verdict">"' + escapeHtml(veredito) + '"</div>';
+    }
+
+    // Melhorias
+    if (melhorias.length > 0) {
+        html += '<div class="director-improvements"><strong>Melhorias sugeridas:</strong>';
+        for (var mi = 0; mi < melhorias.length; mi++) {
+            html += '<div class="improvement-item">→ ' + escapeHtml(melhorias[mi]) + '</div>';
+        }
+        html += '</div>';
+    }
+
+    html += '</div>';
+    return html;
+}
+
+/* ============================================================
+   ABA 2 — UPLOAD
+   ============================================================ */
+function uploadEditorFiles() {
+    if (STATE.editorFiles.length === 0) {
+        showToast('Selecione vídeos e/ou SRTs primeiro', 'error');
+        return;
+    }
+
+    var btn = document.getElementById('btnUploadEditor');
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Enviando...';
+
+    var fd = new FormData();
+    for (var i = 0; i < STATE.editorFiles.length; i++) {
+        fd.append('files', STATE.editorFiles[i]);
+    }
+
+    fetch(CONFIG.API_BASE + '/api/v2/editor/upload', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            btn.disabled = false;
+            btn.innerHTML = '📁 Enviar Arquivos';
+            if (data.status === 'success') {
+                STATE.editorSessionId = data.session_id;
+                STATE.editorPairs = data.pairs || [];
+                renderEditorPairs(data);
+                document.getElementById('btnGenerateCuts').disabled = false;
+                showToast('Arquivos enviados! ' + STATE.editorPairs.length + ' par(es) encontrado(s)', 'success');
+            } else {
+                showToast('Erro: ' + (data.detail || 'falha no upload'), 'error');
+            }
+        })
+        .catch(function (e) {
+            btn.disabled = false;
+            btn.innerHTML = '📁 Enviar Arquivos';
+            showToast('Erro de conexão: ' + e.message, 'error');
+        });
+}
+
+function renderEditorPairs(data) {
+    var container = document.getElementById('editorPairs');
+    var pairs = data.pairs || [];
+    var rejected = data.rejected || [];
+
+    var html = '';
+    for (var i = 0; i < pairs.length; i++) {
+        var p = pairs[i];
+        var srtInfo = p.srt ? ('+ ' + p.srt + ' (' + p.segments + ' segs)') : '(sem SRT)';
+        html += '<div class="pair-item pair-ok">✅ ' + escapeHtml(p.video) + ' ' + escapeHtml(srtInfo) + '</div>';
+    }
+    for (var j = 0; j < rejected.length; j++) {
+        var r = rejected[j];
+        html += '<div class="pair-item pair-rejected">❌ ' + escapeHtml(r.filename) + ': ' + escapeHtml(r.reason) + '</div>';
+    }
+    container.innerHTML = html;
+}
+
+/* ============================================================
+   ABA 2 — GERAR CORTES
+   ============================================================ */
+function generateEditorCuts() {
+    if (!STATE.editorSessionId) {
+        showToast('Envie os arquivos primeiro', 'error');
+        return;
+    }
+
+    var btn = document.getElementById('btnGenerateCuts');
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Gerando cortes com IA + avaliação...';
 
     var fd = new FormData();
     fd.append('session_id', STATE.editorSessionId);
     fd.append('target_duration', STATE.editorDuration);
     fd.append('variations', STATE.editorVariations);
     fd.append('mode', STATE.editorMode);
+    fd.append('subtitle_enabled', STATE.subtitleEnabled);
+    fd.append('subtitle_style', STATE.subtitleStyle);
+    fd.append('produto', document.getElementById('editorProduto').value.trim());
+    fd.append('publico_alvo', document.getElementById('editorPublico').value.trim());
 
-    document.getElementById('btnGenerateEditor').disabled = true;
-    document.getElementById('editorLoading').style.display = 'block';
-    document.getElementById('editorResults').innerHTML = '';
-
-    try {
-        var res = await fetch(CONFIG.API_BASE + '/api/v2/editor/generate', {method: 'POST', body: fd});
-        var data = await res.json();
-        if (data.status === 'success') {
-            renderEditorResults(data);
-            showToast(data.total_results + ' resultado(s)!', 'success');
-        } else {
-            showToast('Erro na geração', 'error');
-        }
-    } catch (err) {
-        showToast('Erro: ' + err.message, 'error');
-    } finally {
-        document.getElementById('btnGenerateEditor').disabled = false;
-        document.getElementById('editorLoading').style.display = 'none';
-    }
+    fetch(CONFIG.API_BASE + '/api/v2/editor/generate', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            btn.disabled = false;
+            btn.innerHTML = '✂️ Gerar Cortes Automáticos';
+            if (data.status === 'success') {
+                renderEditorResults(data);
+                showToast('Cortes gerados! ' + data.total_results + ' resultado(s)', 'success');
+            } else {
+                showToast('Erro: ' + (data.detail || 'falha na geração'), 'error');
+            }
+        })
+        .catch(function (e) {
+            btn.disabled = false;
+            btn.innerHTML = '✂️ Gerar Cortes Automáticos';
+            showToast('Erro de conexão: ' + e.message, 'error');
+        });
 }
 
-// ============================================================
-// renderEditorResults — FIX COMPLETO DO BUG DE DOWNLOAD
-// ============================================================
+/* ============================================================
+   ABA 2 — RENDERIZAR RESULTADOS
+   ============================================================ */
 function renderEditorResults(data) {
     var container = document.getElementById('editorResults');
-    var html = '<div class="results-header"><h3>✂️ Resultados do Editor</h3></div>';
+    var results = data.results || [];
 
-    data.results.forEach(function(r) {
+    if (results.length === 0) {
+        container.innerHTML = '<p class="empty">Nenhum resultado gerado.</p>';
+        return;
+    }
+
+    var html = '<h3>Resultados (' + results.length + ' corte(s))</h3>';
+
+    for (var i = 0; i < results.length; i++) {
+        var r = results[i];
         html += '<div class="result-card">';
-        html += '<div class="result-header">';
 
-        var title = r.source_video ? '🎬 ' + esc(r.source_video) : '🎬 Mix Multi-Vídeo';
-        html += '<h4>' + title + ' — Variação #' + r.variation + '</h4>';
-
-        // ===== FIX CRÍTICO: URL de download =====
-        if (r.download_url && !r.error) {
-            // Garantir URL limpa sem espaços
-            var dlUrl = (CONFIG.API_BASE + r.download_url).replace(/\s+/g, '');
-            html += '<a href="' + dlUrl + '" class="btn-download" target="_blank" rel="noopener" download="' + esc(r.filename || 'video.mp4') + '">⬇️ Download MP4</a>';
-        }
-        html += '</div>';
-
-        // Erro
         if (r.error) {
-            html += '<div class="error-inline">⚠️ ' + esc(r.error) + '</div>';
-        }
+            html += '<div class="card-header"><div class="card-title">❌ ' + escapeHtml(r.source_video || '') + ' — Variação ' + r.variation + '</div></div>';
+            html += '<div class="error-msg">' + escapeHtml(r.error) + '</div>';
 
-        // Info
-        if (r.file_size) {
-            html += '<p>⏱ Duração: ' + (r.total_duration ? r.total_duration.toFixed(1) + 's' : 'N/A');
-            html += ' | Segmentos: ' + (r.segment_count || 'N/A');
-            html += ' | Tamanho: ' + (r.file_size / 1024 / 1024).toFixed(1) + ' MB</p>';
-        } else if (r.total_duration) {
-            html += '<p>⏱ Duração: ' + r.total_duration.toFixed(1) + 's | Segmentos: ' + (r.segment_count || 'N/A') + '</p>';
-        }
+            // Mesmo com erro, mostrar avaliação se existir
+            if (r.avaliacao_diretor) {
+                html += renderDirectorEvaluation(r.avaliacao_diretor);
+            }
+        } else {
+            var eval_data = r.avaliacao_diretor || null;
 
-        // Estrutura
-        if (r.structure && r.structure.length) {
-            html += '<div class="structure-breakdown">';
-            r.structure.forEach(function(s) {
-                var role = (s.role || 'BODY').toUpperCase();
-                var icon = role === 'HOOK' ? '🎣' : role === 'CTA' ? '🎯' : '📝';
-                var cls = role === 'HOOK' ? 'segment-hook' : role === 'CTA' ? 'segment-cta' : 'segment-body';
-
-                html += '<div class="segment-item ' + cls + '">';
-                html += '<div class="segment-role">' + icon + ' ' + role + '</div>';
-                html += '<div class="segment-text">' + esc(s.text || '') + '</div>';
-                html += '<div class="segment-meta">';
-                if (s.source_video) html += '📁 ' + esc(s.source_video) + ' | ';
-                if (s.start !== undefined && s.end !== undefined) {
-                    html += s.start.toFixed(1) + 's → ' + s.end.toFixed(1) + 's | ';
-                }
-                html += 'Score: ' + (s.score || 0);
-                if (s.triggers && s.triggers.length) {
-                    s.triggers.forEach(function(t) {
-                        html += ' <span class="trigger-badge-sm">' + esc(t) + '</span>';
-                    });
-                }
-                html += '</div></div>';
-            });
+            html += '<div class="card-header">';
+            html += '<div class="card-title">✅ ' + escapeHtml(r.source_video || '') + ' — Variação ' + r.variation + '</div>';
+            if (eval_data) {
+                html += renderRatingBadge(eval_data.nota_geral);
+            }
             html += '</div>';
+
+            html += '<div class="card-meta">';
+            html += '<span>Duração: ' + (r.total_duration || 0).toFixed(1) + 's</span>';
+            html += '<span>Segmentos: ' + (r.segment_count || 0) + '</span>';
+            html += '<span>Tamanho: ' + ((r.file_size || 0) / 1024 / 1024).toFixed(1) + ' MB</span>';
+            if (r.planned_by) html += '<span>Planejado por: ' + escapeHtml(r.planned_by) + '</span>';
+            if (r.subtitle_style && r.subtitle_style !== 'sem_legenda') html += '<span>Legenda: ' + escapeHtml(r.subtitle_style) + '</span>';
+            html += '</div>';
+
+            if (r.ai_reasoning) {
+                html += '<div class="ai-reasoning">🤖 ' + escapeHtml(r.ai_reasoning) + '</div>';
+            }
+
+            // Download
+            if (r.download_url) {
+                var cleanUrl = CONFIG.API_BASE + r.download_url.replace(/\s+/g, '');
+                html += '<div class="download-section">';
+                html += '<a href="' + cleanUrl + '" download="' + escapeForAttr(r.filename || 'video.mp4') + '" class="btn-primary btn-download">⬇️ Download Vídeo</a>';
+                html += '</div>';
+            }
+
+            // Estrutura
+            var structure = r.structure || [];
+            if (structure.length > 0) {
+                html += '<details class="storyboard-details"><summary>📋 Estrutura de cortes (' + structure.length + ' segmentos)</summary>';
+                html += '<div class="storyboard">';
+                for (var si = 0; si < structure.length; si++) {
+                    var seg = structure[si];
+                    var roleClass = (seg.role || '').toLowerCase();
+                    html += '<div class="storyboard-scene segment-' + roleClass + '">';
+                    html += '<div class="scene-header">' + escapeHtml(seg.role || 'BODY');
+                    if (seg.start !== undefined) html += ' (' + seg.start.toFixed(1) + 's → ' + seg.end.toFixed(1) + 's)';
+                    if (seg.score) html += ' — Score: ' + seg.score;
+                    html += '</div>';
+                    html += '<div class="scene-text">' + escapeHtml(seg.text || '') + '</div>';
+                    var triggers = seg.triggers || [];
+                    if (triggers.length > 0) {
+                        html += '<div class="triggers">';
+                        for (var ti = 0; ti < triggers.length; ti++) {
+                            html += '<span class="trigger-badge">' + escapeHtml(triggers[ti]) + '</span>';
+                        }
+                        html += '</div>';
+                    }
+                    html += '</div>';
+                }
+                html += '</div></details>';
+            }
+
+            // Avaliação do Diretor Criativo
+            if (eval_data) {
+                html += renderDirectorEvaluation(eval_data);
+            }
         }
 
         html += '</div>';
-    });
+    }
 
     container.innerHTML = html;
 }
 
+/* ============================================================
+   UTILITÁRIOS
+   ============================================================ */
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 
-// ============================================================
-// CLIPBOARD
-// ============================================================
-function copyToClipboard(btn) {
-    var textEl = btn.previousElementSibling;
-    if (!textEl) return;
-    var text = textEl.textContent || textEl.innerText;
-    navigator.clipboard.writeText(text).then(() => {
-        btn.textContent = '✅ Copiado!';
-        setTimeout(() => { btn.textContent = '📋 Copiar'; }, 2000);
-    }).catch(() => {
-        fallbackCopy(text);
-        btn.textContent = '✅ Copiado!';
-        setTimeout(() => { btn.textContent = '📋 Copiar'; }, 2000);
+function escapeForAttr(str) {
+    if (!str) return '';
+    return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '');
+}
+
+function copyText(btn, text) {
+    var decoded = text.replace(/\\n/g, '\n').replace(/\\'/g, "'").replace(/\\\\/g, '\\');
+    navigator.clipboard.writeText(decoded).then(function () {
+        var original = btn.innerHTML;
+        btn.innerHTML = '✅ Copiado!';
+        setTimeout(function () { btn.innerHTML = original; }, 2000);
+    }).catch(function () {
+        var ta = document.createElement('textarea');
+        ta.value = decoded;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        var original = btn.innerHTML;
+        btn.innerHTML = '✅ Copiado!';
+        setTimeout(function () { btn.innerHTML = original; }, 2000);
     });
 }
 
-function fallbackCopy(text) {
-    var ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-}
+function copyFullScript(variacao, tipo) {
+    var results = document.getElementById('creativeResults');
+    if (!results) return;
 
-function copyVideoScript(idx) {
-    if (!window._videoResults || !window._videoResults[idx]) return;
-    var r = window._videoResults[idx];
-    var rot = r.roteiro || {};
-    var t = '=== VARIAÇÃO #' + r.variacao + ' — ' + r.framework + ' ===\n';
-    t += 'Ângulo: ' + (r.angulo_criativo || '') + '\n';
-    t += 'Duração: ' + (r.duracao_total_estimada || '') + '\n\n';
-    if (rot.hook) t += '🎣 HOOK:\n' + rot.hook.texto + '\nVisual: ' + (rot.hook.instrucao_visual || '') + '\n\n';
-    (rot.corpo || []).forEach((c, i) => {
-        t += '📝 CORPO ' + (i + 1) + ':\n' + c.texto + '\nVisual: ' + (c.instrucao_visual || '') + '\n\n';
+    var cards = results.querySelectorAll('.result-card');
+    var card = cards[variacao - 1];
+    if (!card) return;
+
+    var text = '';
+    if (tipo === 'video') {
+        var sections = card.querySelectorAll('.script-section');
+        for (var i = 0; i < sections.length; i++) {
+            var label = sections[i].querySelector('.section-label');
+            var txt = sections[i].querySelector('.section-text');
+            var vis = sections[i].querySelector('.section-visual');
+            if (label) text += label.textContent + '\n';
+            if (txt) text += txt.textContent + '\n';
+            if (vis) text += vis.textContent + '\n';
+            text += '\n';
+        }
+    } else {
+        var headline = card.querySelector('.copy-headline');
+        var sub = card.querySelector('.copy-sub');
+        var cta = card.querySelector('.copy-cta');
+        var support = card.querySelector('.copy-support');
+        if (headline) text += 'HEADLINE: ' + headline.textContent + '\n';
+        if (sub) text += 'SUB: ' + sub.textContent + '\n';
+        if (cta) text += 'CTA: ' + cta.textContent + '\n';
+        if (support) text += 'APOIO: ' + support.textContent + '\n';
+    }
+
+    navigator.clipboard.writeText(text.trim()).then(function () {
+        showToast('Roteiro copiado!', 'success');
+    }).catch(function () {
+        showToast('Erro ao copiar', 'error');
     });
-    if (rot.cta) t += '🎯 CTA:\n' + rot.cta.texto + '\nVisual: ' + (rot.cta.instrucao_visual || '') + '\n\n';
-    if (r.gatilhos_usados) t += 'Gatilhos: ' + r.gatilhos_usados.join(', ') + '\n\n';
-    (r.storyboard || []).forEach(s => {
-        t += '--- ' + s.cena + ' ---\n';
-        t += 'Nano Banana: ' + (s.prompt_nano_banana || '') + '\n';
-        t += 'Veo 3: ' + (s.prompt_veo3 || '') + '\n\n';
-    });
-    navigator.clipboard.writeText(t).then(() => showToast('Roteiro copiado!', 'success')).catch(() => { fallbackCopy(t); showToast('Roteiro copiado!', 'success'); });
 }
 
-function copyImageScript(idx) {
-    if (!window._imageResults || !window._imageResults[idx]) return;
-    var r = window._imageResults[idx];
-    var copy = r.copy || {};
-    var t = '=== VARIAÇÃO #' + r.variacao + ' — ' + r.angulo + ' ===\n';
-    t += 'Conceito: ' + (r.conceito_visual || '') + '\n\n';
-    t += 'HEADLINE: ' + (copy.headline || '') + '\n';
-    t += 'SUB: ' + (copy.sub_headline || '') + '\n';
-    t += 'CTA: ' + (copy.cta_texto || '') + '\n';
-    if (copy.texto_apoio) t += 'APOIO: ' + copy.texto_apoio + '\n';
-    t += '\n';
-    Object.keys(r.formatos || {}).forEach(fmt => {
-        var fd = r.formatos[fmt];
-        t += '--- ' + fmt.toUpperCase() + ' ---\n';
-        t += 'Layout: ' + (fd.layout || fd.descricao_layout || '') + '\n';
-        t += 'Nano Banana: ' + (fd.prompt_nano_banana || '') + '\n\n';
-    });
-    navigator.clipboard.writeText(t).then(() => showToast('Copy copiada!', 'success')).catch(() => { fallbackCopy(t); showToast('Copy copiada!', 'success'); });
-}
-
-// ============================================================
-// UTILS
-// ============================================================
-function esc(s) {
-    if (!s) return '';
-    var d = document.createElement('div');
-    d.textContent = String(s);
-    return d.innerHTML;
-}
-
-function showToast(msg, type) {
-    var c = document.getElementById('toastContainer');
-    var t = document.createElement('div');
-    t.className = 'toast toast-' + (type || 'info');
-    t.textContent = msg;
-    c.appendChild(t);
-    setTimeout(() => { t.classList.add('toast-fade'); setTimeout(() => t.remove(), 300); }, 4000);
+function showToast(message, type) {
+    var toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'toast toast-' + (type || 'info') + ' show';
+    setTimeout(function () { toast.className = 'toast'; }, 4000);
 }
