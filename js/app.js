@@ -166,6 +166,12 @@ function renderCreativeResults(data, tipo) {
     });
 
     container.innerHTML = html;
+
+    // Guardar dados para correção iterativa
+    results.forEach((r, idx) => {
+        window['creativeData_' + idx] = r;
+        window['evalData_' + idx] = r.avaliacao_diretor;
+    });
 }
 
 function renderVideoCreative(r) {
@@ -372,12 +378,6 @@ function renderDirectorEvaluation(evaluation, parentId, idx, produto, publico, t
 
     html += `</div>`;
 
-    // Guardar dados no DOM para uso na correção
-    html += `<script>
-        window['creativeData_${idx}'] = ${JSON.stringify(creativeData)};
-        window['evalData_${idx}'] = ${JSON.stringify(evaluation)};
-    </script>`;
-
     return html;
 }
 
@@ -385,10 +385,13 @@ function renderDirectorEvaluation(evaluation, parentId, idx, produto, publico, t
 // ABA 1 — CORREÇÃO ITERATIVA
 // ============================================================
 async function correctCreative(idx, produto, publico, tipo) {
-    const creativeData = window[`creativeData_${idx}`];
-    const evalData = window[`evalData_${idx}`];
+    const creativeData = window['creativeData_' + idx];
+    const evalData = window['evalData_' + idx];
 
-    if (!creativeData || !evalData) return;
+    if (!creativeData || !evalData) {
+        console.error('Dados não encontrados para correção idx=' + idx, creativeData, evalData);
+        return;
+    }
 
     const btnId = `correctBtn_${idx}`;
     const loadingId = `correctLoading_${idx}`;
@@ -745,9 +748,11 @@ function renderEditorDirectorEvaluation(evaluation, parentId, idx, resultData, f
     }
 
     // Botão Corrigir Cortes
-    html += `<button class="btn-correct" id="correctCutBtn_${idx}" onclick="correctEditorCut(${idx})">
-        🔄 Corrigir cortes com base no feedback
+       html += `<button class="btn-correct" id="${correctBtnId}"
+        onclick="correctCreative(${idx}, decodeURIComponent('${encodeURIComponent(produto)}'), decodeURIComponent('${encodeURIComponent(publico)}'), '${tipo}')">
+        🔄 Corrigir com base no feedback
     </button>`;
+
     html += `<div id="correctCutLoading_${idx}" class="correct-loading" style="display:none">
         <div class="spinner-small"></div> Corrigindo e regenerando vídeo...
     </div>`;
