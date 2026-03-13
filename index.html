@@ -3,220 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Halley Criativos Studio — IA de Vendas Sênior & Marketing</title>
+    <title>Halley Criativos Studio — IA de Vendas Ultra-Sênior</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-
+    <!-- HEADER -->
     <header class="header">
-        <div class="header-inner">
+        <div class="header-content">
             <div class="logo">
-                <div class="logo-icon">
-                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="20" cy="20" r="18" stroke="url(#grad1)" stroke-width="3"/>
-                        <path d="M14 26V14h4.5c2.5 0 4 1.5 4 3.5s-1.5 3.5-4 3.5H18V26h-4zm4.2-8c.8 0 1.3-.5 1.3-1.2s-.5-1.2-1.3-1.2H18v2.4h.2zM24 14h4v12h-4V14z" fill="url(#grad1)"/>
-                        <defs><linearGradient id="grad1" x1="0" y1="0" x2="40" y2="40"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
-                    </svg>
-                </div>
-                <div class="logo-text">
-                    <span class="logo-name">Halley Criativos</span>
-                    <span class="logo-sub">STUDIO</span>
+                <span class="logo-icon">🚀</span>
+                <div>
+                    <h1>Halley Criativos Studio</h1>
+                    <span class="tagline">IA Ultra-Sênior de Marketing Direto — v5.0</span>
                 </div>
             </div>
-            <div class="header-badge">
-                <span class="badge-dot"></span>
-                IA Especialista em Vendas Sênior & Direct Response
+            <div class="header-status" id="headerStatus">
+                <span class="status-dot"></span>
+                <span>Verificando...</span>
             </div>
         </div>
     </header>
 
-    <main class="main-app">
+    <!-- TABS -->
+    <nav class="tabs">
+        <button class="tab active" data-tab="creative" onclick="switchTab('creative')">
+            ✨ Gerador de Criativos
+        </button>
+        <button class="tab" data-tab="editor" onclick="switchTab('editor')">
+            ✂️ Editor Automático
+        </button>
+    </nav>
 
-        <div class="tabs-container">
-            <button class="tab active" data-tab="creative" onclick="switchTab('creative')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                Gerador de Criativos
-            </button>
-            <button class="tab" data-tab="editor" onclick="switchTab('editor')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-                Editor Automático
-            </button>
-        </div>
-
-        <!-- ========== ABA 1: GERADOR DE CRIATIVOS ========== -->
+    <!-- ABA 1: GERADOR DE CRIATIVOS -->
+    <main class="container">
         <section id="tab-creative" class="tab-content active">
-
-            <div class="editor-intro">
-                <h2>Gerador de Criativos com IA</h2>
-                <p>Suba SRT ou TXT + informe o produto e público → A IA gera roteiros, storyboards e prompts automaticamente</p>
+            <div class="section-header">
+                <h2>Gerador de Criativos Persuasivos</h2>
+                <p>Suba seus SRTs ou TXTs, preencha o produto e público, e a IA gera criativos de nível profissional.</p>
             </div>
 
-            <!-- UPLOAD -->
-            <div class="upload-section">
-                <div class="upload-zone" id="creative-upload-zone">
-                    <div class="upload-icon">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                    </div>
-                    <p class="upload-text">Arraste arquivos ou <span>clique para selecionar</span></p>
-                    <p class="upload-hint">Legendas (.srt, .vtt) ou Textos (.txt) — A IA extrai o conhecimento deles</p>
-                    <input type="file" id="creative-file-input" multiple accept=".srt,.vtt,.sub,.txt" style="display:none;">
+            <!-- UPLOAD DE ARQUIVOS -->
+            <div class="card">
+                <h3>1. Envie seus arquivos de referência</h3>
+                <div class="upload-zone" id="creativeUploadZone">
+                    <div class="upload-icon">📄</div>
+                    <p><strong>Arraste arquivos .srt ou .txt aqui</strong></p>
+                    <p class="upload-hint">ou clique para selecionar</p>
+                    <input type="file" id="creativeFileInput" multiple accept=".srt,.txt" hidden>
                 </div>
-
-                <div id="creative-file-list" class="file-list" style="display:none;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                        <h3>Arquivos Carregados</h3>
-                        <button class="btn-clear-files" onclick="clearCreativeFiles()">Limpar Tudo</button>
-                    </div>
-                    <div id="creative-file-pairs"></div>
-                </div>
+                <div class="file-list" id="creativeFileList"></div>
             </div>
 
-            <!-- DADOS DO PRODUTO + CONFIGURAÇÕES -->
-            <div id="creative-settings" class="editor-settings" style="display:none;">
-                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;color:var(--text-primary);">Dados do Produto & Configurações</h3>
-
-                <div class="form-grid" style="margin-bottom:24px;">
+            <!-- CAMPOS OBRIGATÓRIOS -->
+            <div class="card">
+                <h3>2. Informações do produto</h3>
+                <div class="form-grid">
                     <div class="form-group">
-                        <label for="produto">Nome do Produto / Serviço</label>
-                        <input type="text" id="produto" placeholder="Ex: Biovem Suplemento Natural, Curso de Marketing..." required>
+                        <label for="productName">Nome do Produto/Serviço *</label>
+                        <input type="text" id="productName" placeholder="Ex: VitaForce Pro, Método Emagreça Já, Consultoria Digital..." required>
                     </div>
                     <div class="form-group">
-                        <label for="publico">Público-Alvo</label>
-                        <input type="text" id="publico" placeholder="Ex: Mulheres 30-55 anos, Empreendedores digitais..." required>
+                        <label for="targetAudience">Público-Alvo *</label>
+                        <input type="text" id="targetAudience" placeholder="Ex: Mulheres 35-55 que querem emagrecer, Empreendedores digitais iniciantes..." required>
                     </div>
                     <div class="form-group">
-                        <label for="tom">Tom de Voz</label>
-                        <select id="tom">
-                            <option value="persuasivo e direto">Persuasivo e Direto</option>
-                            <option value="empático e acolhedor">Empático e Acolhedor</option>
-                            <option value="urgente e escasso">Urgente e Escasso</option>
-                            <option value="educativo e autoridade">Educativo e Autoridade</option>
-                            <option value="storytelling emocional">Storytelling Emocional</option>
-                            <option value="provocativo e disruptivo">Provocativo e Disruptivo</option>
+                        <label for="voiceTone">Tom de Voz</label>
+                        <select id="voiceTone">
+                            <option value="profissional">Profissional (técnico mas acessível)</option>
+                            <option value="casual">Casual (amigo que conta uma descoberta)</option>
+                            <option value="agressivo">Agressivo (urgente, provocativo)</option>
+                            <option value="educativo">Educativo (ensina e conecta)</option>
+                            <option value="emocional">Emocional (história, empatia)</option>
                         </select>
                     </div>
                 </div>
+            </div>
 
-                <div class="settings-grid">
-                    <div class="setting-group">
+            <!-- CONFIGURAÇÕES -->
+            <div class="card">
+                <h3>3. Configurações</h3>
+                <div class="config-row">
+                    <div class="config-group">
                         <label>Tipo de Criativo</label>
-                        <div class="mode-options">
-                            <button type="button" class="mode-btn active" data-ctype="video" onclick="selectCreativeType('video')">
-                                Vídeo
-                                <small>Roteiro + Storyboard + Nano Banana + Veo 3</small>
-                            </button>
-                            <button type="button" class="mode-btn" data-ctype="image" onclick="selectCreativeType('image')">
-                                Imagem
-                                <small>Copy persuasiva + Prompts Nano Banana</small>
-                            </button>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" id="btnTypeVideo" onclick="setCreativeType('video')">🎬 Vídeo</button>
+                            <button class="toggle-btn" id="btnTypeImage" onclick="setCreativeType('image')">🖼️ Imagem</button>
                         </div>
                     </div>
-
-                    <div class="setting-group">
+                    <div class="config-group">
                         <label>Variações</label>
                         <div class="stepper">
-                            <button type="button" class="stepper-btn" onclick="adjustVariations(-1, 'creative')">−</button>
-                            <div class="stepper-display"><span id="creative-variations">1</span></div>
-                            <button type="button" class="stepper-btn" onclick="adjustVariations(1, 'creative')">+</button>
+                            <button onclick="adjustVariations(-1)">−</button>
+                            <span id="variationCount">3</span>
+                            <button onclick="adjustVariations(1)">+</button>
                         </div>
                     </div>
                 </div>
-
-                <div class="mode-description">
-                    <div class="mode-desc-icon">ℹ️</div>
-                    <div id="creative-mode-desc">
-                        <strong>Vídeo:</strong> A IA lê seus SRTs/TXTs, combina com o produto e público informados, e gera roteiros completos. Cada cena tem: prompt Nano Banana (imagem) + prompt Veo 3 (animação).
-                    </div>
+                <div class="type-description" id="typeDescription">
+                    <strong>Modo Vídeo:</strong> Gera roteiros completos (Hook → Corpo → CTA) + Storyboard com prompts Nano Banana (imagem) e Veo 3 (animação)
                 </div>
-
-                <button class="btn-generate" id="btn-generate-creative" onclick="generateCreatives()">
-                    <span class="btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg></span>
-                    <span class="btn-text">Gerar Criativos com IA</span>
-                    <span class="btn-loading" style="display:none;"><div class="spinner"></div>Extraindo conhecimento e gerando...</span>
-                </button>
             </div>
 
-            <div id="creative-results" class="results-container"></div>
+            <!-- BOTÃO GERAR -->
+            <button class="btn-primary" id="btnGenerate" onclick="generateCreatives()">
+                🚀 Gerar Criativos Persuasivos
+            </button>
+
+            <!-- LOADING -->
+            <div class="loading" id="creativeLoading" style="display:none;">
+                <div class="spinner"></div>
+                <p>A IA está analisando seu conteúdo e gerando criativos ultra-persuasivos...</p>
+                <p class="loading-detail">Etapa 1: Extraindo conhecimento → Etapa 2: Validando coerência → Etapa 3: Criando</p>
+            </div>
+
+            <!-- RESULTADOS -->
+            <div id="creativeResults"></div>
         </section>
 
-        <!-- ========== ABA 2: EDITOR AUTOMÁTICO ========== -->
+        <!-- ABA 2: EDITOR AUTOMÁTICO -->
         <section id="tab-editor" class="tab-content">
-
-            <div class="editor-intro">
-                <h2>Editor Automático com IA</h2>
-                <p>Suba vídeos + SRTs pareados → IA analisa poder persuasivo → Corta e emenda com Gancho → Corpo → CTA</p>
+            <div class="section-header">
+                <h2>Editor Automático de Vídeo</h2>
+                <p>Envie vídeos + SRTs correspondentes. A IA analisa, classifica (Hook/Corpo/CTA) e monta novos vídeos.</p>
             </div>
 
-            <div class="upload-section">
-                <div class="upload-zone" id="upload-zone">
-                    <div class="upload-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-                    <p class="upload-text">Arraste arquivos ou <span>clique para selecionar</span></p>
-                    <p class="upload-hint">Vídeos (.mp4, .mov, .webm) + Legendas (.srt) — Cada vídeo PRECISA ter um SRT com o mesmo nome</p>
-                    <input type="file" id="file-input" multiple accept=".mp4,.mov,.webm,.avi,.mkv,.m4v,.srt,.vtt,.sub" style="display:none;">
+            <!-- UPLOAD EDITOR -->
+            <div class="card">
+                <h3>1. Envie vídeos e legendas</h3>
+                <div class="upload-zone" id="editorUploadZone">
+                    <div class="upload-icon">🎬</div>
+                    <p><strong>Arraste vídeos (.mp4, .mov) e legendas (.srt) aqui</strong></p>
+                    <p class="upload-hint">Cada vídeo deve ter um SRT com o mesmo nome</p>
+                    <input type="file" id="editorFileInput" multiple accept=".mp4,.mov,.avi,.mkv,.webm,.srt" hidden>
                 </div>
-
-                <div id="file-list" class="file-list" style="display:none;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                        <h3>Arquivos Carregados</h3>
-                        <button class="btn-clear-files" onclick="clearAllFiles()">Limpar Tudo</button>
-                    </div>
-                    <div id="file-pairs"></div>
-                    <div id="upload-status" style="margin-top:12px;"></div>
-                </div>
+                <div class="file-list" id="editorFileList"></div>
+                <div class="pair-list" id="editorPairList"></div>
             </div>
 
-            <div class="editor-settings" id="editor-settings" style="display:none;">
-                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;color:var(--text-primary);">Configurações de Corte</h3>
-                <div class="settings-grid">
-                    <div class="setting-group">
-                        <label>Modo de Corte</label>
-                        <div class="mode-options">
-                            <button type="button" class="mode-btn active" data-mode="individual" onclick="selectMode('individual')">Um de Cada<small>Corta cada vídeo separado</small></button>
-                            <button type="button" class="mode-btn" data-mode="todos" onclick="selectMode('todos')">Cortar Todos<small>Mistura todos os vídeos</small></button>
+            <!-- CONFIG EDITOR -->
+            <div class="card">
+                <h3>2. Configurações de corte</h3>
+                <div class="config-row">
+                    <div class="config-group">
+                        <label>Duração alvo (segundos)</label>
+                        <div class="stepper">
+                            <button onclick="adjustDuration(-5)">−5</button>
+                            <span id="durationValue">30</span>
+                            <button onclick="adjustDuration(5)">+5</button>
                         </div>
                     </div>
-                    <div class="setting-group">
-                        <label>Duração do Vídeo Final</label>
-                        <div class="duration-options">
-                            <button type="button" class="dur-btn" data-dur="30" onclick="selectDuration(30)">30s</button>
-                            <button type="button" class="dur-btn" data-dur="45" onclick="selectDuration(45)">45s</button>
-                            <button type="button" class="dur-btn active" data-dur="60" onclick="selectDuration(60)">60s</button>
-                            <button type="button" class="dur-btn" data-dur="90" onclick="selectDuration(90)">90s</button>
-                        </div>
-                    </div>
-                    <div class="setting-group">
+                    <div class="config-group">
                         <label>Variações</label>
                         <div class="stepper">
-                            <button type="button" class="stepper-btn" onclick="adjustVariations(-1, 'editor')">−</button>
-                            <div class="stepper-display"><span id="editor-variations">1</span></div>
-                            <button type="button" class="stepper-btn" onclick="adjustVariations(1, 'editor')">+</button>
+                            <button onclick="adjustEditorVariations(-1)">−</button>
+                            <span id="editorVariationCount">1</span>
+                            <button onclick="adjustEditorVariations(1)">+</button>
+                        </div>
+                    </div>
+                    <div class="config-group">
+                        <label>Modo</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" id="btnModeIndividual" onclick="setEditorMode('individual')">Individual</button>
+                            <button class="toggle-btn" id="btnModeTodos" onclick="setEditorMode('todos')">Mixar Todos</button>
                         </div>
                     </div>
                 </div>
-                <div class="mode-description" id="mode-description">
-                    <div class="mode-desc-icon">ℹ️</div>
-                    <div id="mode-desc-text"><strong>Modo "Um de Cada":</strong> Corta e emenda cada vídeo separadamente. 2 vídeos + 2 variações = 4 vídeos prontos.</div>
-                </div>
-                <button class="btn-generate" id="btn-generate-editor" onclick="generateEditorCuts()">
-                    <span class="btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg></span>
-                    <span class="btn-text">Cortar e Montar Vídeos</span>
-                    <span class="btn-loading" style="display:none;"><div class="spinner"></div>Analisando, cortando e montando...</span>
+            </div>
+
+            <!-- BOTÕES EDITOR -->
+            <div class="btn-row">
+                <button class="btn-secondary" id="btnUploadEditor" onclick="uploadEditorFiles()" disabled>
+                    📤 Enviar Arquivos
+                </button>
+                <button class="btn-primary" id="btnGenerateEditor" onclick="generateEditorCuts()" disabled>
+                    ✂️ Gerar Cortes Automáticos
                 </button>
             </div>
 
-            <div id="editor-results" class="results-container"></div>
-        </section>
+            <!-- LOADING EDITOR -->
+            <div class="loading" id="editorLoading" style="display:none;">
+                <div class="spinner"></div>
+                <p>Analisando vídeos e montando cortes inteligentes...</p>
+            </div>
 
+            <!-- RESULTADOS EDITOR -->
+            <div id="editorResults"></div>
+        </section>
     </main>
 
+    <!-- TOAST -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- FOOTER -->
     <footer class="footer">
-        <p>Halley Criativos Studio © 2026 — Powered by AI Machine Learning</p>
-        <p class="footer-sub">Especialista em Direct Response Marketing & Vendas Sênior</p>
+        <p>Halley Criativos Studio v5.0 — IA Ultra-Sênior de Marketing Direto</p>
     </footer>
 
-    <div id="toast" class="toast"></div>
     <script src="js/app.js"></script>
 </body>
 </html>
