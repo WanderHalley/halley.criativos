@@ -1,392 +1,678 @@
 /**
- * HALLEY CRIATIVOS STUDIO — Frontend v4.1
- * Aba 1: Upload SRT/TXT + produto/público/tom → IA gera criativos
- * Aba 2: Upload vídeo+SRT → corte real FFmpeg
+ * HALLEY CRIATIVOS STUDIO — Frontend v5.0
+ * Interface para geração de criativos persuasivos de nível ultra-sênior
  */
 
+// ============================================================
+// CONFIGURAÇÃO
+// ============================================================
 const CONFIG = {
     API_BASE: 'https://wanderhalleylee-criativo-studio-backend.hf.space',
 };
 
 const STATE = {
+    // Aba 1
     creativeType: 'video',
-    creativeVariations: 1,
+    variations: 3,
     creativeFiles: [],
-    editorVariations: 1,
-    editorDuration: 60,
+    // Aba 2
     editorMode: 'individual',
-    uploadedFiles: [],
-    sessionId: null,
+    editorDuration: 30,
+    editorVariations: 1,
+    editorFiles: [],
+    editorSessionId: null,
 };
 
-function switchTab(tab) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
-    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-    document.getElementById(`tab-${tab}`).classList.add('active');
-}
-
-function selectCreativeType(type) {
-    STATE.creativeType = type;
-    document.querySelectorAll('.mode-btn[data-ctype]').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.mode-btn[data-ctype="${type}"]`).classList.add('active');
-    const desc = document.getElementById('creative-mode-desc');
-    desc.innerHTML = type === 'video'
-        ? '<strong>Vídeo:</strong> Roteiro completo + storyboard. Cada cena: prompt Nano Banana (imagem) + prompt Veo 3 (animação).'
-        : '<strong>Imagem:</strong> Copy persuasiva (headline, subheadline, CTA) + prompts Nano Banana para Feed, Story e Banner.';
-}
-
-function adjustVariations(delta, ctx) {
-    const k = ctx === 'creative' ? 'creativeVariations' : 'editorVariations';
-    const id = ctx === 'creative' ? 'creative-variations' : 'editor-variations';
-    STATE[k] = Math.max(1, Math.min(10, STATE[k] + delta));
-    document.getElementById(id).textContent = STATE[k];
-}
-
-function selectDuration(d) {
-    STATE.editorDuration = d;
-    document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.dur-btn[data-dur="${d}"]`).classList.add('active');
-}
-function selectMode(m) {
-    STATE.editorMode = m;
-    document.querySelectorAll('.mode-btn[data-mode]').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.mode-btn[data-mode="${m}"]`).classList.add('active');
-    document.getElementById('mode-desc-text').innerHTML = m === 'individual'
-        ? '<strong>Modo "Um de Cada":</strong> Corta cada vídeo separadamente. 2 vídeos + 2 variações = 4 vídeos.'
-        : '<strong>Modo "Cortar Todos":</strong> Mistura trechos de todos os vídeos em um único MP4.';
-}
-
-function showToast(msg, type = 'success') {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.className = `toast ${type} show`;
-    setTimeout(() => t.className = 'toast', 3500);
-}
-function copyToClipboard(text, btn) {
-    navigator.clipboard.writeText(text).then(() => {
-        const o = btn.innerHTML; btn.innerHTML = '✓ Copiado!'; btn.classList.add('copied');
-        showToast('Copiado!');
-        setTimeout(() => { btn.innerHTML = o; btn.classList.remove('copied'); }, 2000);
-    }).catch(() => {
-        const ta = document.createElement('textarea'); ta.value = text;
-        document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-        document.body.removeChild(ta); showToast('Copiado!');
-    });
-}
-function setLoading(id, on) {
-    const btn = document.getElementById(id); if (!btn) return;
-    btn.disabled = on;
-    const t = btn.querySelector('.btn-text'), l = btn.querySelector('.btn-loading');
-    if (t) t.style.display = on ? 'none' : 'inline';
-    if (l) l.style.display = on ? 'flex' : 'none';
-}
-function escapeHtml(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
-
 // ============================================================
-// ABA 1 — UPLOAD SRT/TXT
+// INICIALIZAÇÃO
 // ============================================================
-const cuz = document.getElementById('creative-upload-zone');
-const cfi = document.getElementById('creative-file-input');
-cuz.addEventListener('click', () => cfi.click());
-cuz.addEventListener('dragover', e => { e.preventDefault(); cuz.classList.add('dragover'); });
-cuz.addEventListener('dragleave', () => cuz.classList.remove('dragover'));
-cuz.addEventListener('drop', e => { e.preventDefault(); cuz.classList.remove('dragover'); handleCreativeFiles(e.dataTransfer.files); });
-cfi.addEventListener('change', e => handleCreativeFiles(e.target.files));
+document.addEventListener('DOMContentLoaded', () => {
+    checkBackendHealth();
+    initUploadZones();
+});
 
-function handleCreativeFiles(fl) {
-    const ok = Array.from(fl).filter(f => ['srt','vtt','sub','txt'].includes(f.name.split('.').pop().toLowerCase()));
-    if (!ok.length) { showToast('Envie apenas .srt, .vtt ou .txt', 'error'); return; }
-    STATE.creativeFiles = [...STATE.creativeFiles, ...ok];
-    renderCreativeFileList();
-}
-function clearCreativeFiles() {
-    STATE.creativeFiles = [];
-    document.getElementById('creative-file-list').style.display = 'none';
-    document.getElementById('creative-settings').style.display = 'none';
-    document.getElementById('creative-results').innerHTML = '';
-    cfi.value = ''; showToast('Arquivos removidos.');
-}
-function removeCreativeFile(i) {
-    STATE.creativeFiles.splice(i, 1);
-    if (!STATE.creativeFiles.length) { clearCreativeFiles(); return; }
-    renderCreativeFileList();
-}
-function renderCreativeFileList() {
-    const el = document.getElementById('creative-file-list'), pe = document.getElementById('creative-file-pairs');
-    if (!STATE.creativeFiles.length) { el.style.display = 'none'; return; }
-    el.style.display = 'block';
-    let h = '';
-    STATE.creativeFiles.forEach((f, i) => {
-        const ext = f.name.split('.').pop().toLowerCase();
-        h += `<div class="file-pair"><div class="file-pair-info"><span class="file-pair-icon">${ext === 'txt' ? '📄' : '📝'}</span>
-        <div><div class="file-pair-name">${escapeHtml(f.name)}</div><div class="file-pair-type">${ext.toUpperCase()} — ${(f.size/1024).toFixed(1)} KB</div></div></div>
-        <div style="display:flex;align-items:center;gap:8px;"><span class="file-pair-status paired">✅ Pronto</span>
-        <button class="file-pair-remove" onclick="removeCreativeFile(${i})">✕</button></div></div>`;
-    });
-    pe.innerHTML = h;
-    document.getElementById('creative-settings').style.display = 'block';
-}
-
-// ============================================================
-// ABA 1 — GERAR CRIATIVOS
-// ============================================================
-async function generateCreatives() {
-    if (!STATE.creativeFiles.length) { showToast('Suba pelo menos um SRT ou TXT!', 'error'); return; }
-    const produto = document.getElementById('produto').value.trim();
-    const publico = document.getElementById('publico').value.trim();
-    if (!produto) { showToast('Informe o nome do produto/serviço!', 'error'); document.getElementById('produto').focus(); return; }
-    if (!publico) { showToast('Informe o público-alvo!', 'error'); document.getElementById('publico').focus(); return; }
-
-    setLoading('btn-generate-creative', true);
-    const rEl = document.getElementById('creative-results');
-    rEl.innerHTML = `<div class="processing-overlay"><div class="processing-spinner"></div>
-        <div class="processing-text">A IA está extraindo conhecimento e gerando criativos...</div>
-        <div class="processing-sub">Produto: ${escapeHtml(produto)} | Público: ${escapeHtml(publico)}</div></div>`;
+async function checkBackendHealth() {
+    const el = document.getElementById('headerStatus');
     try {
-        const fd = new FormData();
-        STATE.creativeFiles.forEach(f => fd.append('files', f));
-        fd.append('produto', produto);
-        fd.append('publico_alvo', publico);
-        fd.append('tom_voz', document.getElementById('tom').value);
-        fd.append('tipo', STATE.creativeType);
-        fd.append('variacoes', STATE.creativeVariations);
-
-        const res = await fetch(`${CONFIG.API_BASE}/api/v1/creative/generate`, { method: 'POST', body: fd });
-        if (!res.ok) { const err = await res.json(); throw new Error(err.detail || `Erro ${res.status}`); }
-        const data = await res.json();
-        if (STATE.creativeType === 'video') renderVideoResults(data);
-        else renderImageResults(data);
-        showToast(`${data.total_variacoes} variação(ões) gerada(s)!`);
-    } catch (err) { console.error(err); rEl.innerHTML = ''; showToast(err.message || 'Erro ao gerar criativos.', 'error'); }
-    finally { setLoading('btn-generate-creative', false); }
-}
-
-// ============================================================
-// ABA 1 — RENDER VÍDEO
-// ============================================================
-function renderVideoResults(data) {
-    const c = document.getElementById('creative-results'); c.innerHTML = '';
-
-    c.innerHTML = `<div class="result-card" style="margin-bottom:24px;">
-        <div class="result-header"><span class="result-badge">Briefing</span><span class="result-framework">${data.total_palavras_extraidas} palavras processadas</span></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px;">
-            <div class="copy-item"><div class="copy-item-label">Produto</div><div style="color:var(--text-primary);font-weight:600;">${escapeHtml(data.produto)}</div></div>
-            <div class="copy-item"><div class="copy-item-label">Público-Alvo</div><div style="color:var(--text-primary);font-weight:600;">${escapeHtml(data.publico_alvo)}</div></div>
-            <div class="copy-item"><div class="copy-item-label">Tom de Voz</div><div style="color:var(--text-primary);font-weight:600;">${escapeHtml(data.tom_voz)}</div></div>
-        </div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:12px;">Arquivos: ${data.arquivos_processados.map(f => escapeHtml(f)).join(', ')}</div></div>`;
-
-    data.variacoes.forEach(v => {
-        const card = document.createElement('div'); card.className = 'result-card';
-        let h = `<div class="result-header"><span class="result-badge">Variação ${v.variacao}</span><span class="result-framework">${escapeHtml(v.framework||'')}</span></div>
-        <div class="result-angle">${escapeHtml(v.angulo_criativo)}</div>`;
-        const rid = `roteiro-${v.variacao}`;
-        h += `<div class="roteiro-block"><div class="roteiro-title">Roteiro Completo</div><div class="roteiro-text" id="${rid}">${escapeHtml(v.roteiro_completo)}</div>
-        <button class="btn-copy" onclick="copyToClipboard(document.getElementById('${rid}').innerText,this)">Copiar Roteiro</button></div>`;
-        if (v.storyboard && v.storyboard.length) {
-            h += '<h3 style="font-size:16px;font-weight:700;margin:24px 0 16px;color:var(--text-primary)">Storyboard</h3>';
-            v.storyboard.forEach(sc => {
-                const nbId = `nb-${v.variacao}-${sc.cena}`, vId = `veo-${v.variacao}-${sc.cena}`;
-                h += `<div class="scene-card"><div class="scene-header"><div class="scene-phase"><div class="scene-number">${sc.cena}</div>
-                <span class="scene-phase-name">${escapeHtml(sc.fase||'')}</span></div><span class="scene-time">${escapeHtml(sc.tempo||'')}</span></div>
-                <div class="scene-objective">${escapeHtml(sc.objetivo_da_cena||'')}</div>
-                <div class="scene-section"><div class="scene-section-title">Narração</div><div class="scene-narration">${escapeHtml(sc['narração']||sc.narracao||'')}</div></div>
-                <div class="scene-section"><div class="scene-section-title">Visual</div><div class="scene-visual">${escapeHtml(sc['descrição_visual']||sc.descricao_visual||'')}</div></div>
-                <div class="scene-cut">${escapeHtml(sc.corte_sugerido||'')}</div>`;
-                if (sc.prompt_nano_banana) {
-                    h += `<div class="prompt-block"><div class="prompt-label">Prompt Nano Banana (Imagem)</div><div class="prompt-text" id="${nbId}">${escapeHtml(sc.prompt_nano_banana)}</div>
-                    <button class="btn-copy" onclick="copyToClipboard(document.getElementById('${nbId}').innerText,this)">Copiar</button></div>`;
-                }
-                if (sc.prompt_veo3) {
-                    h += `<div class="prompt-block" style="margin-top:8px;border-color:rgba(168,85,247,0.3);"><div class="prompt-label" style="color:var(--primary-light);">Prompt Veo 3 (Vídeo)</div><div class="prompt-text" id="${vId}">${escapeHtml(sc.prompt_veo3)}</div>
-                    <button class="btn-copy" onclick="copyToClipboard(document.getElementById('${vId}').innerText,this)">Copiar</button></div>`;
-                }
-                h += '</div>';
-            });
+        const res = await fetch(`${CONFIG.API_BASE}/health`, { signal: AbortSignal.timeout(10000) });
+        if (res.ok) {
+            el.innerHTML = '<span class="status-dot online"></span><span>IA Online</span>';
+        } else {
+            el.innerHTML = '<span class="status-dot offline"></span><span>IA Offline</span>';
         }
-        h += `<div style="margin-top:16px;font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">Modelo: ${escapeHtml(v.modelo_ia||'')}</div>`;
-        card.innerHTML = h; c.appendChild(card);
-    });
-    c.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// ============================================================
-// ABA 1 — RENDER IMAGEM
-// ============================================================
-function renderImageResults(data) {
-    const c = document.getElementById('creative-results'); c.innerHTML = '';
-
-    c.innerHTML = `<div class="result-card" style="margin-bottom:24px;">
-        <div class="result-header"><span class="result-badge">Briefing</span><span class="result-framework">${data.total_palavras_extraidas} palavras</span></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px;">
-            <div class="copy-item"><div class="copy-item-label">Produto</div><div style="color:var(--text-primary);font-weight:600;">${escapeHtml(data.produto)}</div></div>
-            <div class="copy-item"><div class="copy-item-label">Público</div><div style="color:var(--text-primary);font-weight:600;">${escapeHtml(data.publico_alvo)}</div></div>
-            <div class="copy-item"><div class="copy-item-label">Tom</div><div style="color:var(--text-primary);font-weight:600;">${escapeHtml(data.tom_voz)}</div></div>
-        </div></div>`;
-
-    data.variacoes.forEach(v => {
-        const card = document.createElement('div'); card.className = 'result-card';
-        let h = `<div class="result-header"><span class="result-badge">Variação ${v.variacao}</span></div>
-        <div class="result-angle">${escapeHtml(v.angulo_criativo)}</div>
-        <div class="image-copy-section">
-            <div class="copy-item"><div class="copy-item-label">Headline</div><div class="copy-item-headline">${escapeHtml(v.headline)}</div></div>
-            <div class="copy-item"><div class="copy-item-label">Subheadline</div><div class="copy-item-subheadline">${escapeHtml(v.subheadline)}</div></div>
-            <div class="copy-item"><div class="copy-item-label">CTA</div><div class="copy-item-cta">${escapeHtml(v.cta)}</div></div>
-            <div class="copy-item"><div class="copy-item-label">Conceito</div><div class="copy-item-subheadline">${escapeHtml(v.conceito)}</div></div>
-        </div><div class="format-prompts">`;
-        if (v.formatos) {
-            for (const [fk, fd] of Object.entries(v.formatos)) {
-                const pid = `ni-${v.variacao}-${fk}`;
-                h += `<div class="format-card"><div class="format-header"><span class="format-name">${escapeHtml(fd.formato||'')}</span><span class="format-res">${escapeHtml(fd.resolucao||'')}</span></div>
-                <div class="prompt-block"><div class="prompt-label">Prompt Nano Banana</div><div class="prompt-text" id="${pid}">${escapeHtml(fd.prompt_nano_banana||'')}</div>
-                <button class="btn-copy" onclick="copyToClipboard(document.getElementById('${pid}').innerText,this)">Copiar</button></div></div>`;
-            }
-        }
-        h += `</div><div style="margin-top:16px;font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">Modelo: ${escapeHtml(v.modelo_ia||'')}</div>`;
-        card.innerHTML = h; c.appendChild(card);
-    });
-    c.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// ============================================================
-// ABA 2 — EDITOR (INTACTO)
-// ============================================================
-const uz = document.getElementById('upload-zone'), fi = document.getElementById('file-input');
-uz.addEventListener('click', () => fi.click());
-uz.addEventListener('dragover', e => { e.preventDefault(); uz.classList.add('dragover'); });
-uz.addEventListener('dragleave', () => uz.classList.remove('dragover'));
-uz.addEventListener('drop', e => { e.preventDefault(); uz.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
-fi.addEventListener('change', e => handleFiles(e.target.files));
-
-function handleFiles(fl) { STATE.uploadedFiles = [...STATE.uploadedFiles, ...Array.from(fl)]; renderFileList(); }
-function clearAllFiles() {
-    STATE.uploadedFiles = []; STATE.sessionId = null;
-    document.getElementById('file-list').style.display = 'none';
-    document.getElementById('editor-settings').style.display = 'none';
-    document.getElementById('editor-results').innerHTML = '';
-    fi.value = ''; showToast('Arquivos removidos.');
-}
-function removeFile(i) { STATE.uploadedFiles.splice(i, 1); if (!STATE.uploadedFiles.length) { clearAllFiles(); return; } renderFileList(); }
-
-function renderFileList() {
-    const el = document.getElementById('file-list'), pe = document.getElementById('file-pairs'), st = document.getElementById('upload-status');
-    if (!STATE.uploadedFiles.length) { el.style.display = 'none'; return; }
-    el.style.display = 'block';
-    const vx = ['mp4','mov','webm','avi','mkv','m4v'], sx = ['srt','vtt','sub'];
-    const vs = [], ss = [];
-    STATE.uploadedFiles.forEach((f, i) => {
-        const ext = f.name.split('.').pop().toLowerCase(), base = f.name.replace(/\.[^.]+$/, '').toLowerCase();
-        if (vx.includes(ext)) vs.push({ file: f, idx: i, name: f.name, base });
-        else if (sx.includes(ext)) ss.push({ file: f, idx: i, name: f.name, base });
-    });
-    const sm = {}; ss.forEach(s => sm[s.base] = s);
-    let h = '', pc = 0;
-    vs.forEach(v => {
-        const p = sm[v.base]; if (p) pc++;
-        h += `<div class="file-pair"><div class="file-pair-info"><span class="file-pair-icon">🎬</span>
-        <div><div class="file-pair-name">${escapeHtml(v.name)}</div>
-        <div class="file-pair-type">${p ? '+ SRT: ' + escapeHtml(p.name) : 'SRT não encontrado'}</div></div></div>
-        <div style="display:flex;align-items:center;gap:8px;">
-        <span class="file-pair-status ${p ? 'paired' : 'missing'}">${p ? '✅ Par válido' : '❌ Será recusado'}</span>
-        <button class="file-pair-remove" onclick="removeFile(${v.idx})">✕</button></div></div>`;
-    });
-    pe.innerHTML = h;
-    if (pc > 0) {
-        st.innerHTML = `<span style="color:var(--success);font-weight:600;">${pc} par(es) válido(s)</span>
-        <br><button id="btn-upload-to-backend" class="btn-generate" style="margin-top:16px;" onclick="uploadToBackend()">
-        <span class="btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
-        <span class="btn-text">Enviar para IA</span>
-        <span class="btn-loading" style="display:none;"><div class="spinner"></div>Enviando...</span></button>`;
-    } else {
-        st.innerHTML = '<span style="color:var(--error);font-weight:600;">Nenhum par válido.</span>';
-        document.getElementById('editor-settings').style.display = 'none';
+    } catch {
+        el.innerHTML = '<span class="status-dot offline"></span><span>Sem conexão</span>';
     }
 }
 
-async function uploadToBackend() {
-    const btn = document.getElementById('btn-upload-to-backend');
-    btn.disabled = true; btn.querySelector('.btn-text').style.display = 'none'; btn.querySelector('.btn-loading').style.display = 'flex';
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+    document.getElementById(`tab-${tab}`).classList.add('active');
+}
+
+// ============================================================
+// UPLOAD ZONES
+// ============================================================
+function initUploadZones() {
+    // Aba 1 - Criativos
+    const cZone = document.getElementById('creativeUploadZone');
+    const cInput = document.getElementById('creativeFileInput');
+    
+    cZone.addEventListener('click', () => cInput.click());
+    cZone.addEventListener('dragover', e => { e.preventDefault(); cZone.classList.add('drag-over'); });
+    cZone.addEventListener('dragleave', () => cZone.classList.remove('drag-over'));
+    cZone.addEventListener('drop', e => {
+        e.preventDefault();
+        cZone.classList.remove('drag-over');
+        handleCreativeFiles(e.dataTransfer.files);
+    });
+    cInput.addEventListener('change', e => handleCreativeFiles(e.target.files));
+
+    // Aba 2 - Editor
+    const eZone = document.getElementById('editorUploadZone');
+    const eInput = document.getElementById('editorFileInput');
+    
+    eZone.addEventListener('click', () => eInput.click());
+    eZone.addEventListener('dragover', e => { e.preventDefault(); eZone.classList.add('drag-over'); });
+    eZone.addEventListener('dragleave', () => eZone.classList.remove('drag-over'));
+    eZone.addEventListener('drop', e => {
+        e.preventDefault();
+        eZone.classList.remove('drag-over');
+        handleEditorFiles(e.dataTransfer.files);
+    });
+    eInput.addEventListener('change', e => handleEditorFiles(e.target.files));
+}
+
+function handleCreativeFiles(fileList) {
+    const validExts = ['.srt', '.txt'];
+    const newFiles = Array.from(fileList).filter(f => {
+        const ext = '.' + f.name.split('.').pop().toLowerCase();
+        return validExts.includes(ext);
+    });
+
+    if (newFiles.length === 0) {
+        showToast('Envie apenas arquivos .srt ou .txt', 'error');
+        return;
+    }
+
+    STATE.creativeFiles = [...STATE.creativeFiles, ...newFiles];
+    renderCreativeFileList();
+}
+
+function renderCreativeFileList() {
+    const el = document.getElementById('creativeFileList');
+    if (STATE.creativeFiles.length === 0) {
+        el.innerHTML = '';
+        return;
+    }
+    el.innerHTML = STATE.creativeFiles.map((f, i) => `
+        <div class="file-item">
+            <span>📄 ${escapeHtml(f.name)} (${(f.size / 1024).toFixed(1)} KB)</span>
+            <button class="btn-remove" onclick="removeCreativeFile(${i})">✕</button>
+        </div>
+    `).join('');
+}
+
+function removeCreativeFile(index) {
+    STATE.creativeFiles.splice(index, 1);
+    renderCreativeFileList();
+}
+
+function handleEditorFiles(fileList) {
+    const validExts = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.srt'];
+    const newFiles = Array.from(fileList).filter(f => {
+        const ext = '.' + f.name.split('.').pop().toLowerCase();
+        return validExts.includes(ext);
+    });
+
+    STATE.editorFiles = [...STATE.editorFiles, ...newFiles];
+    renderEditorFileList();
+    document.getElementById('btnUploadEditor').disabled = STATE.editorFiles.length === 0;
+}
+
+function renderEditorFileList() {
+    const el = document.getElementById('editorFileList');
+    if (STATE.editorFiles.length === 0) {
+        el.innerHTML = '';
+        return;
+    }
+
+    const videos = STATE.editorFiles.filter(f => !f.name.toLowerCase().endsWith('.srt'));
+    const srts = STATE.editorFiles.filter(f => f.name.toLowerCase().endsWith('.srt'));
+
+    el.innerHTML = `
+        <div class="file-summary">
+            <span>🎬 ${videos.length} vídeo(s)</span>
+            <span>📄 ${srts.length} legenda(s)</span>
+        </div>
+    ` + STATE.editorFiles.map((f, i) => `
+        <div class="file-item">
+            <span>${f.name.endsWith('.srt') ? '📄' : '🎬'} ${escapeHtml(f.name)} (${(f.size / 1024 / 1024).toFixed(1)} MB)</span>
+            <button class="btn-remove" onclick="removeEditorFile(${i})">✕</button>
+        </div>
+    `).join('');
+}
+
+function removeEditorFile(index) {
+    STATE.editorFiles.splice(index, 1);
+    renderEditorFileList();
+    document.getElementById('btnUploadEditor').disabled = STATE.editorFiles.length === 0;
+}
+
+// ============================================================
+// CONFIGURAÇÕES UI
+// ============================================================
+function setCreativeType(type) {
+    STATE.creativeType = type;
+    document.getElementById('btnTypeVideo').classList.toggle('active', type === 'video');
+    document.getElementById('btnTypeImage').classList.toggle('active', type === 'image');
+    
+    const desc = document.getElementById('typeDescription');
+    if (type === 'video') {
+        desc.innerHTML = '<strong>Modo Vídeo:</strong> Gera roteiros completos (Hook → Corpo → CTA) + Storyboard com prompts Nano Banana (imagem) e Veo 3 (animação)';
+    } else {
+        desc.innerHTML = '<strong>Modo Imagem:</strong> Gera copies persuasivas (Headline + Sub + CTA) + Prompts Nano Banana para Feed, Story e Banner';
+    }
+}
+
+function adjustVariations(delta) {
+    STATE.variations = Math.max(1, Math.min(10, STATE.variations + delta));
+    document.getElementById('variationCount').textContent = STATE.variations;
+}
+
+function adjustDuration(delta) {
+    STATE.editorDuration = Math.max(10, Math.min(120, STATE.editorDuration + delta));
+    document.getElementById('durationValue').textContent = STATE.editorDuration;
+}
+
+function adjustEditorVariations(delta) {
+    STATE.editorVariations = Math.max(1, Math.min(5, STATE.editorVariations + delta));
+    document.getElementById('editorVariationCount').textContent = STATE.editorVariations;
+}
+
+function setEditorMode(mode) {
+    STATE.editorMode = mode;
+    document.getElementById('btnModeIndividual').classList.toggle('active', mode === 'individual');
+    document.getElementById('btnModeTodos').classList.toggle('active', mode === 'todos');
+}
+
+// ============================================================
+// ABA 1: GERAR CRIATIVOS
+// ============================================================
+async function generateCreatives() {
+    // Validações
+    if (STATE.creativeFiles.length === 0) {
+        showToast('Envie pelo menos um arquivo .srt ou .txt', 'error');
+        return;
+    }
+    const produto = document.getElementById('productName').value.trim();
+    if (!produto) {
+        showToast('Preencha o nome do produto', 'error');
+        return;
+    }
+    const publico = document.getElementById('targetAudience').value.trim();
+    if (!publico) {
+        showToast('Preencha o público-alvo', 'error');
+        return;
+    }
+
+    const tomVoz = document.getElementById('voiceTone').value;
+
+    // Montar FormData
+    const formData = new FormData();
+    STATE.creativeFiles.forEach(f => formData.append('files', f));
+    formData.append('tipo', STATE.creativeType);
+    formData.append('variacoes', STATE.variations);
+    formData.append('produto', produto);
+    formData.append('publico_alvo', publico);
+    formData.append('tom_voz', tomVoz);
+
+    // UI loading
+    document.getElementById('btnGenerate').disabled = true;
+    document.getElementById('creativeLoading').style.display = 'block';
+    document.getElementById('creativeResults').innerHTML = '';
+
     try {
-        const fd = new FormData(); STATE.uploadedFiles.forEach(f => fd.append('files', f));
-        const res = await fetch(`${CONFIG.API_BASE}/api/v2/editor/upload`, { method: 'POST', body: fd });
-        if (!res.ok) { const err = await res.json(); throw new Error(err.detail || `Erro ${res.status}`); }
+        const res = await fetch(`${CONFIG.API_BASE}/api/v1/creative/generate`, {
+            method: 'POST',
+            body: formData,
+        });
+
         const data = await res.json();
-        STATE.sessionId = data.session_id;
-        showToast(`${data.total_pairs} par(es) validado(s)!`);
-        document.getElementById('editor-settings').style.display = 'block';
-        document.getElementById('editor-settings').scrollIntoView({ behavior: 'smooth' });
-    } catch (err) { showToast(err.message || 'Erro.', 'error'); }
-    finally { btn.disabled = false; btn.querySelector('.btn-text').style.display = 'inline'; btn.querySelector('.btn-loading').style.display = 'none'; }
+
+        if (!res.ok) {
+            throw new Error(data.detail || 'Erro no servidor');
+        }
+
+        if (data.status === 'success') {
+            if (STATE.creativeType === 'video') {
+                renderVideoResults(data);
+            } else {
+                renderImageResults(data);
+            }
+            showToast(`${data.total_variacoes} criativos gerados com sucesso!`, 'success');
+        } else {
+            throw new Error('Resposta inválida do servidor');
+        }
+    } catch (err) {
+        showToast(`Erro: ${err.message}`, 'error');
+        document.getElementById('creativeResults').innerHTML = `
+            <div class="error-card">
+                <h3>❌ Erro ao gerar criativos</h3>
+                <p>${escapeHtml(err.message)}</p>
+                <p class="error-hint">Verifique se o backend está online e o HF_TOKEN está configurado.</p>
+            </div>
+        `;
+    } finally {
+        document.getElementById('btnGenerate').disabled = false;
+        document.getElementById('creativeLoading').style.display = 'none';
+    }
+}
+
+// ============================================================
+// RENDERIZAÇÃO — VÍDEO
+// ============================================================
+function renderVideoResults(data) {
+    const container = document.getElementById('creativeResults');
+    let html = `
+        <div class="results-header">
+            <h3>🎬 Criativos de Vídeo — ${data.produto}</h3>
+            <p>${data.total_variacoes} variações | ${data.total_palavras_base} palavras analisadas | Tom: ${data.tom_voz}</p>
+        </div>
+    `;
+
+    data.resultados.forEach((r, idx) => {
+        const roteiro = r.roteiro || {};
+        const hook = roteiro.hook || {};
+        const corpo = roteiro.corpo || [];
+        const cta = roteiro.cta || {};
+        const storyboard = r.storyboard || [];
+
+        html += `
+        <div class="result-card">
+            <div class="result-header">
+                <h4>Variação #${r.variacao} — ${escapeHtml(r.framework)}</h4>
+                <span class="badge">${escapeHtml(r.framework_descricao || '')}</span>
+            </div>
+            <p class="angle"><strong>Ângulo:</strong> ${escapeHtml(r.angulo_criativo || '')}</p>
+            <p class="duration">⏱ Duração estimada: ${escapeHtml(r.duracao_total_estimada || '30s')}</p>
+            
+            <!-- ROTEIRO -->
+            <div class="script-section">
+                <div class="script-block hook-block">
+                    <div class="block-label">🎣 HOOK</div>
+                    <div class="block-text">${escapeHtml(hook.texto || '')}</div>
+                    <div class="block-visual">🎥 ${escapeHtml(hook.instrucao_visual || '')}</div>
+                    <div class="block-time">${escapeHtml(hook.duracao_estimada || '')}</div>
+                </div>
+
+                ${corpo.map((c, i) => `
+                <div class="script-block body-block">
+                    <div class="block-label">📝 CORPO ${i + 1}</div>
+                    <div class="block-text">${escapeHtml(c.texto || '')}</div>
+                    <div class="block-visual">🎥 ${escapeHtml(c.instrucao_visual || '')}</div>
+                    <div class="block-time">${escapeHtml(c.duracao_estimada || '')}</div>
+                </div>
+                `).join('')}
+
+                <div class="script-block cta-block">
+                    <div class="block-label">🎯 CTA</div>
+                    <div class="block-text">${escapeHtml(cta.texto || '')}</div>
+                    <div class="block-visual">🎥 ${escapeHtml(cta.instrucao_visual || '')}</div>
+                    <div class="block-time">${escapeHtml(cta.duracao_estimada || '')}</div>
+                </div>
+            </div>
+
+            <!-- GATILHOS -->
+            ${r.gatilhos_usados && r.gatilhos_usados.length > 0 ? `
+            <div class="triggers-row">
+                <strong>Gatilhos:</strong> ${r.gatilhos_usados.map(g => `<span class="trigger-badge">${escapeHtml(g)}</span>`).join(' ')}
+            </div>
+            ` : ''}
+
+            <!-- STORYBOARD -->
+            ${storyboard.length > 0 ? `
+            <div class="storyboard-section">
+                <h5>📋 Storyboard + Prompts</h5>
+                ${storyboard.map(s => `
+                <div class="storyboard-scene">
+                    <div class="scene-header">${escapeHtml(s.cena)}</div>
+                    <div class="scene-visual">${escapeHtml(s.descricao_visual || '')}</div>
+                    <div class="prompt-group">
+                        <div class="prompt-item">
+                            <strong>🖼️ Nano Banana (imagem):</strong>
+                            <div class="prompt-text">${escapeHtml(s.prompt_nano_banana || '')}</div>
+                            <button class="btn-copy" onclick="copyText(this, '${escapeForAttr(s.prompt_nano_banana || '')}')">📋 Copiar</button>
+                        </div>
+                        <div class="prompt-item">
+                            <strong>🎬 Veo 3 (vídeo):</strong>
+                            <div class="prompt-text">${escapeHtml(s.prompt_veo3 || '')}</div>
+                            <button class="btn-copy" onclick="copyText(this, '${escapeForAttr(s.prompt_veo3 || '')}')">📋 Copiar</button>
+                        </div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+            ` : ''}
+
+            <!-- BOTÃO COPIAR TUDO -->
+            <button class="btn-copy-all" onclick="copyFullScript(${idx}, 'video')">📋 Copiar Roteiro Completo</button>
+        </div>
+        `;
+    });
+
+    container.innerHTML = html;
+
+    // Armazenar dados para cópia
+    window._lastVideoResults = data.resultados;
+}
+
+// ============================================================
+// RENDERIZAÇÃO — IMAGEM
+// ============================================================
+function renderImageResults(data) {
+    const container = document.getElementById('creativeResults');
+    let html = `
+        <div class="results-header">
+            <h3>🖼️ Criativos de Imagem — ${data.produto}</h3>
+            <p>${data.total_variacoes} variações | ${data.total_palavras_base} palavras analisadas | Tom: ${data.tom_voz}</p>
+        </div>
+    `;
+
+    data.resultados.forEach((r, idx) => {
+        const copy = r.copy || {};
+        const formatos = r.formatos || {};
+
+        html += `
+        <div class="result-card">
+            <div class="result-header">
+                <h4>Variação #${r.variacao} — Ângulo: ${escapeHtml(r.angulo || '')}</h4>
+            </div>
+            <p class="concept"><strong>Conceito:</strong> ${escapeHtml(r.conceito_visual || '')}</p>
+
+            <!-- COPY -->
+            <div class="copy-section">
+                <div class="copy-headline">${escapeHtml(copy.headline || '')}</div>
+                <div class="copy-subheadline">${escapeHtml(copy.sub_headline || '')}</div>
+                <div class="copy-cta">${escapeHtml(copy.cta_texto || '')}</div>
+                ${copy.texto_apoio ? `<div class="copy-support">${escapeHtml(copy.texto_apoio)}</div>` : ''}
+            </div>
+
+            <!-- FORMATOS -->
+            ${Object.entries(formatos).map(([format, fdata]) => `
+            <div class="format-section">
+                <h5>${format === 'feed' ? '📐 Feed (1:1)' : format === 'story' ? '📱 Story (9:16)' : '🖥️ Banner (16:9)'}</h5>
+                <p class="format-layout">${escapeHtml(fdata.descricao_layout || '')}</p>
+                <div class="prompt-item">
+                    <strong>🖼️ Nano Banana:</strong>
+                    <div class="prompt-text">${escapeHtml(fdata.prompt_nano_banana || '')}</div>
+                    <button class="btn-copy" onclick="copyText(this, '${escapeForAttr(fdata.prompt_nano_banana || '')}')">📋 Copiar</button>
+                </div>
+            </div>
+            `).join('')}
+
+            <!-- GATILHOS -->
+            ${r.gatilhos_usados && r.gatilhos_usados.length > 0 ? `
+            <div class="triggers-row">
+                <strong>Gatilhos:</strong> ${r.gatilhos_usados.map(g => `<span class="trigger-badge">${escapeHtml(g)}</span>`).join(' ')}
+            </div>
+            ` : ''}
+
+            <button class="btn-copy-all" onclick="copyFullScript(${idx}, 'image')">📋 Copiar Tudo</button>
+        </div>
+        `;
+    });
+
+    container.innerHTML = html;
+    window._lastImageResults = data.resultados;
+}
+
+// ============================================================
+// ABA 2: EDITOR
+// ============================================================
+async function uploadEditorFiles() {
+    if (STATE.editorFiles.length === 0) return;
+
+    const formData = new FormData();
+    STATE.editorFiles.forEach(f => formData.append('files', f));
+
+    document.getElementById('btnUploadEditor').disabled = true;
+    document.getElementById('editorLoading').style.display = 'block';
+
+    try {
+        const res = await fetch(`${CONFIG.API_BASE}/api/v2/editor/upload`, {
+            method: 'POST',
+            body: formData,
+        });
+        const data = await res.json();
+
+        if (data.status === 'success') {
+            STATE.editorSessionId = data.session_id;
+            document.getElementById('btnGenerateEditor').disabled = false;
+
+            // Mostrar pares
+            const pairList = document.getElementById('editorPairList');
+            if (data.pairs.length > 0) {
+                pairList.innerHTML = '<h4>✅ Pares detectados:</h4>' +
+                    data.pairs.map(p => `
+                        <div class="pair-item">
+                            <span>🎬 ${escapeHtml(p.video)} ↔ 📄 ${escapeHtml(p.srt)}</span>
+                            <span class="pair-segments">${p.segments} segmentos</span>
+                        </div>
+                    `).join('');
+            }
+            if (data.rejected.length > 0) {
+                pairList.innerHTML += '<h4>⚠️ Rejeitados:</h4>' +
+                    data.rejected.map(r => `
+                        <div class="pair-item rejected">
+                            <span>❌ ${escapeHtml(r.filename)}: ${escapeHtml(r.reason)}</span>
+                        </div>
+                    `).join('');
+            }
+
+            showToast(`Upload concluído: ${data.pairs.length} par(es) válido(s)`, 'success');
+        }
+    } catch (err) {
+        showToast(`Erro no upload: ${err.message}`, 'error');
+    } finally {
+        document.getElementById('btnUploadEditor').disabled = false;
+        document.getElementById('editorLoading').style.display = 'none';
+    }
 }
 
 async function generateEditorCuts() {
-    if (!STATE.sessionId) { showToast('Envie os arquivos primeiro.', 'error'); return; }
-    setLoading('btn-generate-editor', true);
-    const rEl = document.getElementById('editor-results');
-    rEl.innerHTML = `<div class="processing-overlay"><div class="processing-spinner"></div>
-    <div class="processing-text">Analisando, cortando e montando...</div>
-    <div class="processing-sub">Gancho → Corpo → CTA</div></div>`;
+    if (!STATE.editorSessionId) {
+        showToast('Faça upload dos arquivos primeiro', 'error');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('session_id', STATE.editorSessionId);
+    formData.append('target_duration', STATE.editorDuration);
+    formData.append('variations', STATE.editorVariations);
+    formData.append('mode', STATE.editorMode);
+
+    document.getElementById('btnGenerateEditor').disabled = true;
+    document.getElementById('editorLoading').style.display = 'block';
+    document.getElementById('editorResults').innerHTML = '';
+
     try {
-        const fd = new FormData();
-        fd.append('session_id', STATE.sessionId); fd.append('duracao', STATE.editorDuration);
-        fd.append('variacoes', STATE.editorVariations); fd.append('modo', STATE.editorMode);
-        const res = await fetch(`${CONFIG.API_BASE}/api/v2/editor/generate`, { method: 'POST', body: fd });
-        if (!res.ok) { const err = await res.json(); throw new Error(err.detail || `Erro ${res.status}`); }
+        const res = await fetch(`${CONFIG.API_BASE}/api/v2/editor/generate`, {
+            method: 'POST',
+            body: formData,
+        });
         const data = await res.json();
-        renderEditorResults(data); showToast(`${data.total_videos_gerados} vídeo(s) gerado(s)!`);
-    } catch (err) { rEl.innerHTML = ''; showToast(err.message || 'Erro.', 'error'); }
-    finally { setLoading('btn-generate-editor', false); }
+
+        if (data.status === 'success') {
+            renderEditorResults(data);
+            showToast(`${data.total_results} resultado(s) gerado(s)!`, 'success');
+        }
+    } catch (err) {
+        showToast(`Erro: ${err.message}`, 'error');
+    } finally {
+        document.getElementById('btnGenerateEditor').disabled = false;
+        document.getElementById('editorLoading').style.display = 'none';
+    }
 }
 
 function renderEditorResults(data) {
-    const c = document.getElementById('editor-results'); c.innerHTML = '';
-    data.resultados.forEach(r => {
-        const card = document.createElement('div'); card.className = 'variation-card';
-        const src = r.modo === 'todos' ? `Mix: ${r.source_videos.join(' + ')}` : `Fonte: ${r.source_video}`;
-        let h = `<div class="variation-header"><div><span class="result-badge">Variação ${r.variacao}</span>
-        <span class="video-source-label" style="margin-left:8px;">${escapeHtml(src)}</span></div>
-        <div class="variation-meta"><span class="meta-chip">Modo: <strong>${r.modo === 'todos' ? 'Cortar Todos' : 'Um de Cada'}</strong></span>
-        <span class="meta-chip">Alvo: <strong>${r.duracao_alvo}s</strong></span></div></div>`;
-        if (r.estrutura) {
-            const e = r.estrutura;
-            h += `<div class="structure-overview">
-            <div class="structure-phase gancho"><div class="structure-phase-name">Gancho</div><div class="structure-phase-stats">${e.duracao_gancho||0}s</div><div class="structure-phase-sub">${e.total_gancho||0} corte(s)</div></div>
-            <div class="structure-phase corpo"><div class="structure-phase-name">Corpo</div><div class="structure-phase-stats">${e.duracao_corpo||0}s</div><div class="structure-phase-sub">${e.total_corpo||0} corte(s)</div></div>
-            <div class="structure-phase cta"><div class="structure-phase-name">CTA</div><div class="structure-phase-stats">${e.duracao_cta||0}s</div><div class="structure-phase-sub">${e.total_cta||0} corte(s)</div></div></div>`;
-        }
-        if (r.video_gerado && r.download_url) {
-            h += `<a href="${CONFIG.API_BASE}${r.download_url}" class="btn-download" download>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Baixar ${escapeHtml(r.output_filename)}</a>`;
-        } else {
-            h += `<div style="padding:12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:8px;color:#ef4444;font-size:13px;font-weight:600;">⚠️ Erro ao gerar. Tente novamente.</div>`;
-        }
-        if (r.relatorio && r.relatorio.length) {
-            h += '<h3 style="font-size:15px;font-weight:700;margin:24px 0 16px;color:var(--text-primary);">Relatório</h3>';
-            r.relatorio.forEach(cut => {
-                const fc = cut.fase_estrutural.toLowerCase();
-                const lv = cut.score_persuasivo >= 60 ? 'high' : cut.score_persuasivo >= 30 ? 'mid' : 'low';
-                h += `<div class="cut-card fase-${fc}"><div class="cut-header"><div style="display:flex;align-items:center;gap:8px;">
-                <span class="cut-number">Corte #${cut.corte_numero}</span><span class="fase-badge ${fc}">${cut.fase_estrutural}</span></div>
-                <div class="cut-score"><div class="score-bar"><div class="score-fill ${lv}" style="width:${cut.score_persuasivo}%"></div></div>
-                <span class="score-value ${lv}">${cut.score_persuasivo}/100</span></div></div>
-                <div class="cut-timestamps">${cut.timestamp_inicio} → ${cut.timestamp_fim} (${cut.duracao_segundos}s)</div>
-                <div class="cut-text">"${escapeHtml(cut.fala)}"</div>
-                <div class="cut-reason">${escapeHtml(cut.motivo_selecao)}</div>`;
-                if (cut.gatilhos_ativados && cut.gatilhos_ativados.length) {
-                    h += '<div class="cut-triggers">';
-                    cut.gatilhos_ativados.forEach(g => h += `<span class="cut-trigger-tag">${g}</span>`);
-                    h += '</div>';
-                }
-                h += '</div>';
-            });
-        }
-        card.innerHTML = h; c.appendChild(card);
+    const container = document.getElementById('editorResults');
+    let html = `<div class="results-header"><h3>✂️ Resultados do Editor</h3></div>`;
+
+    data.results.forEach(r => {
+        html += `
+        <div class="result-card">
+            <div class="result-header">
+                <h4>${r.source_video ? '🎬 ' + escapeHtml(r.source_video) : '🎬 Mix Multi-Vídeo'} — Variação #${r.variation}</h4>
+                ${r.download_url ? `<a href="${CONFIG.API_BASE}
+                ${r.download_url}" class="btn-download" target="_blank">⬇️ Download MP4</a>` : ''}
+            </div>
+            ${r.error ? `<div class="error-inline">⚠️ ${escapeHtml(r.error)}</div>` : ''}
+            <p>⏱ Duração: ${r.total_duration ? r.total_duration.toFixed(1) + 's' : 'N/A'} | Segmentos: ${r.segment_count || 'N/A'}</p>
+            
+            <div class="structure-breakdown">
+                ${(r.structure || []).map(s => `
+                <div class="segment-item segment-${s.role ? s.role.toLowerCase() : 'body'}">
+                    <div class="segment-role">${s.role === 'HOOK' ? '🎣' : s.role === 'CTA' ? '🎯' : '📝'} ${escapeHtml(s.role || 'BODY')}</div>
+                    <div class="segment-text">${escapeHtml(s.text || '')}</div>
+                    <div class="segment-meta">
+                        ${s.source_video ? `📁 ${escapeHtml(s.source_video)} | ` : ''}
+                        ${s.start !== undefined ? `${s.start.toFixed(1)}s → ${s.end.toFixed(1)}s | ` : ''}
+                        Score: ${s.score || 0}
+                        ${s.triggers && s.triggers.length > 0 ? ' | ' + s.triggers.map(t => `<span class="trigger-badge-sm">${escapeHtml(t)}</span>`).join(' ') : ''}
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+        `;
     });
-    c.scrollIntoView({ behavior: 'smooth' });
+
+    container.innerHTML = html;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('%c Halley Criativos Studio v4.1', 'font-size:20px;font-weight:bold;color:#6366f1;');
-    fetch(`${CONFIG.API_BASE}/health`).then(r => r.json()).then(d => console.log('Backend:', d)).catch(() => console.warn('Backend offline'));
-});
+// ============================================================
+// UTILITÁRIOS
+// ============================================================
+function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+}
+
+function escapeForAttr(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"')
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '');
+}
+
+function copyText(btn, text) {
+    const decoded = text.replace(/\\n/g, '\n').replace(/\\'/g, "'").replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+    navigator.clipboard.writeText(decoded).then(() => {
+        const original = btn.textContent;
+        btn.textContent = '✅ Copiado!';
+        setTimeout(() => { btn.textContent = original; }, 2000);
+    }).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = decoded;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        const original = btn.textContent;
+        btn.textContent = '✅ Copiado!';
+        setTimeout(() => { btn.textContent = original; }, 2000);
+    });
+}
+
+function copyFullScript(index, type) {
+    let text = '';
+    
+    if (type === 'video' && window._lastVideoResults) {
+        const r = window._lastVideoResults[index];
+        if (!r) return;
+        const roteiro = r.roteiro || {};
+        text = `=== VARIAÇÃO #${r.variacao} — ${r.framework} ===\n`;
+        text += `Ângulo: ${r.angulo_criativo || ''}\n`;
+        text += `Duração: ${r.duracao_total_estimada || ''}\n\n`;
+        
+        if (roteiro.hook) {
+            text += `🎣 HOOK:\n${roteiro.hook.texto || ''}\n`;
+            text += `Visual: ${roteiro.hook.instrucao_visual || ''}\n\n`;
+        }
+        (roteiro.corpo || []).forEach((c, i) => {
+            text += `📝 CORPO ${i + 1}:\n${c.texto || ''}\n`;
+            text += `Visual: ${c.instrucao_visual || ''}\n\n`;
+        });
+        if (roteiro.cta) {
+            text += `🎯 CTA:\n${roteiro.cta.texto || ''}\n`;
+            text += `Visual: ${roteiro.cta.instrucao_visual || ''}\n\n`;
+        }
+        if (r.gatilhos_usados) {
+            text += `Gatilhos: ${r.gatilhos_usados.join(', ')}\n\n`;
+        }
+        (r.storyboard || []).forEach(s => {
+            text += `--- ${s.cena} ---\n`;
+            text += `Nano Banana: ${s.prompt_nano_banana || ''}\n`;
+            text += `Veo 3: ${s.prompt_veo3 || ''}\n\n`;
+        });
+    } else if (type === 'image' && window._lastImageResults) {
+        const r = window._lastImageResults[index];
+        if (!r) return;
+        const copy = r.copy || {};
+        text = `=== VARIAÇÃO #${r.variacao} — ${r.angulo} ===\n`;
+        text += `Conceito: ${r.conceito_visual || ''}\n\n`;
+        text += `HEADLINE: ${copy.headline || ''}\n`;
+        text += `SUB-HEADLINE: ${copy.sub_headline || ''}\n`;
+        text += `CTA: ${copy.cta_texto || ''}\n`;
+        if (copy.texto_apoio) text += `APOIO: ${copy.texto_apoio}\n`;
+        text += '\n';
+        
+        Object.entries(r.formatos || {}).forEach(([format, fdata]) => {
+            text += `--- ${format.toUpperCase()} ---\n`;
+            text += `Layout: ${fdata.descricao_layout || ''}\n`;
+            text += `Nano Banana: ${fdata.prompt_nano_banana || ''}\n\n`;
+        });
+        if (r.gatilhos_usados) {
+            text += `Gatilhos: ${r.gatilhos_usados.join(', ')}\n`;
+        }
+    }
+
+    if (text) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Roteiro completo copiado!', 'success');
+        }).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('Roteiro completo copiado!', 'success');
+        });
+    }
+}
+
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('toast-fade');
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
