@@ -1,21 +1,22 @@
 /**
- * HALLEY CRIATIVOS STUDIO — Frontend v8.0
+ * HALLEY CRIATIVOS STUDIO — Frontend v8.1
  * Diretor Criativo híbrido, Correção iterativa, Prompts Nano Banana/Veo3 com avaliação
+ * FIX v8.1: botão Corrigir funcional, correctBtnId definido, dados via window[], sem <script> inline
  */
 
 const API_BASE = "https://wanderhalleylee-criativo-studio-backend.hf.space";
 
-// ============================================================
+// ==============================================================
 // STATE
-// ============================================================
+// ==============================================================
 let editorSessionId = null;
 let editorOutputId = null;
 let subtitleEnabled = "sem_legenda";
 let subtitleStyle = "branca";
 
-// ============================================================
+// ==============================================================
 // TABS
-// ============================================================
+// ==============================================================
 function switchTab(tabId) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -23,9 +24,9 @@ function switchTab(tabId) {
     document.getElementById(tabId).classList.add('active');
 }
 
-// ============================================================
+// ==============================================================
 // FILE HANDLING
-// ============================================================
+// ==============================================================
 function handleDrop(e, inputId) {
     e.preventDefault();
     e.currentTarget.classList.remove('drag-over');
@@ -66,9 +67,9 @@ function updateFileList(inputId, listId) {
     }
 }
 
-// ============================================================
+// ==============================================================
 // SUBTITLE CONTROLS
-// ============================================================
+// ==============================================================
 function setSubtitle(btn) {
     btn.parentElement.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
@@ -82,9 +83,43 @@ function setSubtitleStyle(btn) {
     subtitleStyle = btn.dataset.style;
 }
 
-// ============================================================
+// ==============================================================
+// UTILITIES
+// ==============================================================
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function copyToClipboard(elementId) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    const text = el.innerText || el.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = el.closest('.prompt-block')?.querySelector('.btn-copy');
+        if (btn) {
+            const orig = btn.textContent;
+            btn.textContent = '✅ Copiado!';
+            setTimeout(() => { btn.textContent = orig; }, 2000);
+        }
+    });
+}
+
+function showError(containerId, message) {
+    document.getElementById(containerId).innerHTML = `<div class="error-msg">${escapeHtml(message)}</div>`;
+}
+
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(2) + ' MB';
+}
+
+// ==============================================================
 // ABA 1 — GERAR CRIATIVOS
-// ============================================================
+// ==============================================================
 async function generateCreative() {
     const files = document.getElementById('fileInput1').files;
     const produto = document.getElementById('produto1').value.trim();
@@ -135,7 +170,7 @@ function renderCreativeResults(data, tipo) {
 
     let html = `<div class="results-header">
         <h3>✅ ${results.length} criativo(s) gerado(s)</h3>
-        <p>Produto: <strong>${data.produto}</strong> | Público: <strong>${data.publico_alvo}</strong> | Palavras-base: ${data.total_palavras_base}</p>
+        <p>Produto: <strong>${escapeHtml(data.produto)}</strong> | Público: <strong>${escapeHtml(data.publico_alvo)}</strong> | Palavras-base: ${data.total_palavras_base}</p>
     </div>`;
 
     results.forEach((r, idx) => {
@@ -143,8 +178,8 @@ function renderCreativeResults(data, tipo) {
         html += `<div class="result-card" id="${varId}">`;
         html += `<div class="result-header">`;
         html += `<h4>Variação ${r.variacao || idx + 1}</h4>`;
-        if (r.framework) html += `<span class="badge badge-framework">${r.framework}</span>`;
-        if (r.angulo_criativo || r.angulo) html += `<span class="badge badge-angle">${r.angulo_criativo || r.angulo}</span>`;
+        if (r.framework) html += `<span class="badge badge-framework">${escapeHtml(r.framework)}</span>`;
+        if (r.angulo_criativo || r.angulo) html += `<span class="badge badge-angle">${escapeHtml(r.angulo_criativo || r.angulo)}</span>`;
         if (r._fallback) html += `<span class="badge badge-fallback">Fallback</span>`;
         html += `</div>`;
 
@@ -159,7 +194,7 @@ function renderCreativeResults(data, tipo) {
 
         // Avaliação do Diretor
         if (r.avaliacao_diretor) {
-            html += renderDirectorEvaluation(r.avaliacao_diretor, varId, idx, data.produto, data.publico_alvo, tipo, r);
+            html += renderDirectorEvaluation(r.avaliacao_diretor, varId, idx, data.produto, data.publico_alvo, tipo);
         }
 
         html += `</div>`;
@@ -167,7 +202,7 @@ function renderCreativeResults(data, tipo) {
 
     container.innerHTML = html;
 
-    // Guardar dados para correção iterativa
+    // FIX v8.1: Guardar dados para correção iterativa DEPOIS de inserir HTML
     results.forEach((r, idx) => {
         window['creativeData_' + idx] = r;
         window['evalData_' + idx] = r.avaliacao_diretor;
@@ -180,27 +215,27 @@ function renderVideoCreative(r) {
 
     if (roteiro.hook) {
         html += `<div class="segment segment-hook">
-            <div class="segment-label">🎯 HOOK (${roteiro.hook.duracao || '3-5s'})</div>
-            <div class="segment-text">${roteiro.hook.texto || ''}</div>
-            ${roteiro.hook.visual ? `<div class="segment-visual">🎥 ${roteiro.hook.visual}</div>` : ''}
+            <div class="segment-label">🎯 HOOK (${escapeHtml(roteiro.hook.duracao || '3-5s')})</div>
+            <div class="segment-text">${escapeHtml(roteiro.hook.texto || '')}</div>
+            ${roteiro.hook.visual ? `<div class="segment-visual">🎥 ${escapeHtml(roteiro.hook.visual)}</div>` : ''}
         </div>`;
     }
 
     if (roteiro.corpo && roteiro.corpo.length) {
         roteiro.corpo.forEach((c, i) => {
             html += `<div class="segment segment-body">
-                <div class="segment-label">📝 CORPO ${i + 1} (${c.duracao || '5-8s'})</div>
-                <div class="segment-text">${c.texto || ''}</div>
-                ${c.visual ? `<div class="segment-visual">🎥 ${c.visual}</div>` : ''}
+                <div class="segment-label">📝 CORPO ${i + 1} (${escapeHtml(c.duracao || '5-8s')})</div>
+                <div class="segment-text">${escapeHtml(c.texto || '')}</div>
+                ${c.visual ? `<div class="segment-visual">🎥 ${escapeHtml(c.visual)}</div>` : ''}
             </div>`;
         });
     }
 
     if (roteiro.cta) {
         html += `<div class="segment segment-cta">
-            <div class="segment-label">🔥 CTA (${roteiro.cta.duracao || '3-5s'})</div>
-            <div class="segment-text">${roteiro.cta.texto || ''}</div>
-            ${roteiro.cta.visual ? `<div class="segment-visual">🎥 ${roteiro.cta.visual}</div>` : ''}
+            <div class="segment-label">🔥 CTA (${escapeHtml(roteiro.cta.duracao || '3-5s')})</div>
+            <div class="segment-text">${escapeHtml(roteiro.cta.texto || '')}</div>
+            ${roteiro.cta.visual ? `<div class="segment-visual">🎥 ${escapeHtml(roteiro.cta.visual)}</div>` : ''}
         </div>`;
     }
 
@@ -212,13 +247,13 @@ function renderImageCreative(r) {
     const copy = r.copy || {};
     let html = `<div class="creative-content">
         <div class="image-copy-block">
-            ${r.formato ? `<div class="format-badge">${r.formato} (${r.ratio || ''})</div>` : ''}
-            <div class="copy-headline">${copy.headline || ''}</div>
-            <div class="copy-sub">${copy.sub_headline || ''}</div>
-            <div class="copy-cta-text">${copy.cta_texto || ''}</div>
-            ${copy.texto_apoio ? `<div class="copy-support">${copy.texto_apoio}</div>` : ''}
+            ${r.formato ? `<div class="format-badge">${escapeHtml(r.formato)} (${escapeHtml(r.ratio || '')})</div>` : ''}
+            <div class="copy-headline">${escapeHtml(copy.headline || '')}</div>
+            <div class="copy-sub">${escapeHtml(copy.sub_headline || '')}</div>
+            <div class="copy-cta-text">${escapeHtml(copy.cta_texto || '')}</div>
+            ${copy.texto_apoio ? `<div class="copy-support">${escapeHtml(copy.texto_apoio)}</div>` : ''}
         </div>
-        ${r.conceito_visual ? `<div class="concept-visual">🎨 Conceito: ${r.conceito_visual}</div>` : ''}
+        ${r.conceito_visual ? `<div class="concept-visual">🎨 Conceito: ${escapeHtml(r.conceito_visual)}</div>` : ''}
     </div>`;
     return html;
 }
@@ -264,16 +299,25 @@ function renderPromptSection(r, idx, produto) {
 }
 
 function renderPromptEvaluation(evaluation, blockId, promptText, tipoPrompt, produto, idx) {
+    if (!evaluation || !evaluation.nota_geral) return '';
+
     const nota = evaluation.nota_geral || 0;
-    const colorClass = nota >= 80 ? 'rating-high' : nota >= 60 ? 'rating-mid' : 'rating-low';
     const criterios = evaluation.criterios || {};
+    const veredito = evaluation.veredito || '';
+    const melhorias = evaluation.melhorias || [];
+
+    let barColor = nota >= 80 ? '#10b981' : nota >= 60 ? '#f59e0b' : '#ef4444';
 
     let html = `<div class="prompt-evaluation">
-        <div class="eval-mini-header">
-            <span class="eval-mini-badge ${colorClass}">${nota}%</span>
-            <span class="eval-mini-label">Avaliação do Diretor de Produção</span>
+        <div class="eval-header">
+            <span class="eval-label">Diretor de Produção</span>
+            <span class="eval-score" style="color:${barColor}">${nota}/100</span>
         </div>
-        <div class="eval-mini-bars">`;
+        <div class="eval-bar"><div class="eval-bar-fill" style="width:${nota}%;background:${barColor}"></div></div>`;
+
+    if (veredito) {
+        html += `<div class="eval-veredito">${escapeHtml(veredito)}</div>`;
+    }
 
     const criterioLabels = {
         "precisao_tecnica": "Precisão Técnica",
@@ -282,53 +326,54 @@ function renderPromptEvaluation(evaluation, blockId, promptText, tipoPrompt, pro
         "valor_producao": "Valor de Produção",
     };
 
+    html += '<div class="eval-criterios">';
     for (const [key, label] of Object.entries(criterioLabels)) {
         const val = criterios[key] || 0;
-        const barColor = val >= 80 ? '#10b981' : val >= 60 ? '#f59e0b' : '#ef4444';
-        html += `<div class="eval-mini-bar-row">
-            <span class="eval-mini-bar-label">${label}</span>
-            <div class="eval-mini-bar-track"><div class="eval-mini-bar-fill" style="width:${val}%;background:${barColor}"></div></div>
-            <span class="eval-mini-bar-val">${val}</span>
+        let cColor = val >= 80 ? '#10b981' : val >= 60 ? '#f59e0b' : '#ef4444';
+        html += `<div class="eval-criterio">
+            <span class="criterio-name">${label}</span>
+            <div class="criterio-bar"><div class="criterio-bar-fill" style="width:${val}%;background:${cColor}"></div></div>
+            <span class="criterio-val">${val}</span>
         </div>`;
     }
+    html += '</div>';
 
-    html += `</div>`;
-
-    if (evaluation.melhorias && evaluation.melhorias.length) {
-        html += `<div class="eval-mini-tips">`;
-        evaluation.melhorias.forEach(m => {
-            if (m) html += `<div class="eval-mini-tip">💡 ${escapeHtml(m)}</div>`;
-        });
-        html += `</div>`;
+    if (melhorias.length) {
+        html += '<div class="eval-melhorias"><strong>Melhorias:</strong><ul>';
+        melhorias.forEach(m => { html += `<li>${escapeHtml(m)}</li>`; });
+        html += '</ul></div>';
     }
 
-    // Botão Corrigir Prompt
-    const correctBtnId = `correctPrompt_${tipoPrompt}_${idx}`;
-    html += `<button class="btn-correct btn-correct-small" id="${correctBtnId}"
-        onclick="correctPrompt('${blockId}', '${correctBtnId}', \`${escapeForAttr(promptText)}\`, '${tipoPrompt}', '${escapeForAttr(produto)}', ${idx})">
-        🔄 Corrigir Prompt
-    </button>`;
+    // Botão corrigir prompt
+    const correctPromptBtnId = `correctPromptBtn_${tipoPrompt}_${idx}`;
+    html += `<button class="btn-correct-prompt" id="${correctPromptBtnId}" onclick="correctPrompt(${idx}, '${tipoPrompt}', decodeURIComponent('${encodeURIComponent(produto)}'))">🔄 Corrigir Prompt</button>`;
 
-    html += `</div>`;
+    html += '</div>';
     return html;
 }
 
-function renderDirectorEvaluation(evaluation, parentId, idx, produto, publico, tipo, creativeData) {
-    const nota = evaluation.nota_geral || 0;
-    const colorClass = nota >= 80 ? 'rating-high' : nota >= 60 ? 'rating-mid' : 'rating-low';
-    const criterios = evaluation.criterios || {};
-    const avaliador = evaluation.avaliado_por || 'ia';
+// FIX v8.1: Sem <script> inline, dados via window[]
+function renderDirectorEvaluation(evaluation, varId, idx, produto, publico, tipo) {
+    if (!evaluation || !evaluation.nota_geral) return '';
 
-    let html = `<div class="director-evaluation" id="eval_${parentId}">
-        <div class="eval-header">
-            <div class="eval-title">
-                <span class="eval-icon">🎬</span>
-                <span>Diretor Criativo</span>
-                <span class="eval-method">${avaliador === 'hibrido_regras_ia' ? '(Híbrido: Regras + IA)' : avaliador === 'regras' ? '(Regras)' : '(IA)'}</span>
-            </div>
-            <div class="eval-rating ${colorClass}">${nota}%</div>
+    const nota = evaluation.nota_geral || 0;
+    const criterios = evaluation.criterios || {};
+    const veredito = evaluation.veredito || '';
+    const melhorias = evaluation.melhorias || [];
+    const avaliador = evaluation.avaliado_por || '';
+
+    let barColor = nota >= 80 ? '#10b981' : nota >= 60 ? '#f59e0b' : '#ef4444';
+
+    let html = `<div class="director-evaluation">
+        <div class="director-header">
+            <h5>🎬 Diretor Criativo ${avaliador ? `(${escapeHtml(avaliador)})` : ''}</h5>
+            <span class="director-score" style="color:${barColor}">${nota}/100</span>
         </div>
-        <div class="eval-criteria">`;
+        <div class="eval-bar"><div class="eval-bar-fill" style="width:${nota}%;background:${barColor}"></div></div>`;
+
+    if (veredito) {
+        html += `<div class="eval-veredito">${escapeHtml(veredito)}</div>`;
+    }
 
     const criterioLabels = {
         "hook_power": "Hook Power",
@@ -339,66 +384,50 @@ function renderDirectorEvaluation(evaluation, parentId, idx, produto, publico, t
         "originalidade": "Originalidade",
     };
 
+    html += '<div class="eval-criterios">';
     for (const [key, label] of Object.entries(criterioLabels)) {
         const val = criterios[key] || 0;
-        const barColor = val >= 80 ? '#10b981' : val >= 60 ? '#f59e0b' : '#ef4444';
-        html += `<div class="eval-bar-row">
-            <span class="eval-bar-label">${label}</span>
-            <div class="eval-bar-track"><div class="eval-bar-fill" style="width:${val}%;background:${barColor}"></div></div>
-            <span class="eval-bar-val">${val}</span>
+        let cColor = val >= 80 ? '#10b981' : val >= 60 ? '#f59e0b' : '#ef4444';
+        html += `<div class="eval-criterio">
+            <span class="criterio-name">${label}</span>
+            <div class="criterio-bar"><div class="criterio-bar-fill" style="width:${val}%;background:${cColor}"></div></div>
+            <span class="criterio-val">${val}</span>
         </div>`;
     }
+    html += '</div>';
 
-    html += `</div>`;
-
-    if (evaluation.veredito) {
-        html += `<div class="eval-verdict">${escapeHtml(evaluation.veredito)}</div>`;
+    if (melhorias.length) {
+        html += '<div class="eval-melhorias"><strong>Melhorias sugeridas:</strong><ul>';
+        melhorias.forEach(m => { html += `<li>${escapeHtml(m)}</li>`; });
+        html += '</ul></div>';
     }
 
-    if (evaluation.melhorias && evaluation.melhorias.length) {
-        html += `<div class="eval-improvements">`;
-        evaluation.melhorias.forEach(m => {
-            if (m) html += `<div class="eval-improvement">💡 ${escapeHtml(m)}</div>`;
-        });
-        html += `</div>`;
-    }
-
-    // Botão Corrigir
+    // FIX v8.1: Botão corrigir criativo — dados vêm de window[], não de inline script
     const correctBtnId = `correctBtn_${idx}`;
-    const creativeJson = JSON.stringify(creativeData);
-    const evalJson = JSON.stringify(evaluation);
-    html += `<button class="btn-correct" id="${correctBtnId}"
-        onclick='correctCreative(${idx}, "${escapeForAttr(produto)}", "${escapeForAttr(publico)}", "${tipo}")'>
-        🔄 Corrigir com base no feedback
-    </button>`;
-    html += `<div id="correctLoading_${idx}" class="correct-loading" style="display:none">
-        <div class="spinner-small"></div> Corrigindo...
-    </div>`;
-    html += `<div id="correctHistory_${idx}" class="correct-history"></div>`;
+    html += `<button class="btn-correct" id="${correctBtnId}" onclick="correctCreative(${idx}, decodeURIComponent('${encodeURIComponent(produto)}'), decodeURIComponent('${encodeURIComponent(publico)}'), '${tipo}')">🔄 Corrigir com base no feedback do Diretor</button>`;
 
-    html += `</div>`;
-
+    html += '</div>';
     return html;
 }
 
-// ============================================================
-// ABA 1 — CORREÇÃO ITERATIVA
-// ============================================================
+// ==============================================================
+// ABA 1 — CORREÇÃO ITERATIVA DE CRIATIVOS
+// ==============================================================
 async function correctCreative(idx, produto, publico, tipo) {
     const creativeData = window['creativeData_' + idx];
     const evalData = window['evalData_' + idx];
 
     if (!creativeData || !evalData) {
         console.error('Dados não encontrados para correção idx=' + idx, creativeData, evalData);
+        alert('Erro: dados de correção não encontrados. Gere os criativos novamente.');
         return;
     }
 
-    const btnId = `correctBtn_${idx}`;
-    const loadingId = `correctLoading_${idx}`;
-    const historyId = `correctHistory_${idx}`;
-
-    document.getElementById(btnId).disabled = true;
-    document.getElementById(loadingId).style.display = 'flex';
+    const btn = document.getElementById(`correctBtn_${idx}`);
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ Corrigindo...';
+    }
 
     try {
         const formData = new FormData();
@@ -413,144 +442,147 @@ async function correctCreative(idx, produto, publico, tipo) {
 
         if (!res.ok) throw new Error(data.detail || 'Erro na correção');
 
+        // Atualizar dados
         const corrected = data.creative_corrigido;
-        const newEval = data.avaliacao_diretor;
+        corrected.avaliacao_diretor = data.avaliacao_diretor;
+        if (data.avaliacao_prompt_imagem) corrected.avaliacao_prompt_imagem = data.avaliacao_prompt_imagem;
+        if (data.avaliacao_prompt_video) corrected.avaliacao_prompt_video = data.avaliacao_prompt_video;
 
-        // Atualizar dados para próxima correção
-        window[`creativeData_${idx}`] = corrected;
-        window[`evalData_${idx}`] = newEval;
+        // Atualizar window
+        window['creativeData_' + idx] = corrected;
+        window['evalData_' + idx] = data.avaliacao_diretor;
 
-        // Adicionar ao histórico
-        const historyDiv = document.getElementById(historyId);
-        const version = historyDiv.children.length + 2;
-        const oldNota = evalData.nota_geral || 0;
-        const newNota = newEval.nota_geral || 0;
-        const delta = newNota - oldNota;
-        const deltaStr = delta > 0 ? `+${delta}` : `${delta}`;
-        const deltaColor = delta > 0 ? '#10b981' : delta < 0 ? '#ef4444' : '#666';
+        // Re-renderizar card
+        const card = document.getElementById(`creative_${idx}`);
+        if (card) {
+            let html = `<div class="result-header">`;
+            html += `<h4>Variação ${corrected.variacao || idx + 1} <span class="badge badge-corrected">✅ Corrigido</span></h4>`;
+            if (corrected.framework) html += `<span class="badge badge-framework">${escapeHtml(corrected.framework)}</span>`;
+            if (corrected.angulo_criativo || corrected.angulo) html += `<span class="badge badge-angle">${escapeHtml(corrected.angulo_criativo || corrected.angulo)}</span>`;
+            html += `</div>`;
 
-        let versionHtml = `<div class="history-item">
-            <div class="history-header">
-                <span class="history-version">v${version}</span>
-                <span class="history-score ${newNota >= 80 ? 'rating-high' : newNota >= 60 ? 'rating-mid' : 'rating-low'}">${newNota}%</span>
-                <span class="history-delta" style="color:${deltaColor}">(${deltaStr})</span>
-            </div>`;
+            if (tipo === 'video') {
+                html += renderVideoCreative(corrected);
+            } else {
+                html += renderImageCreative(corrected);
+            }
 
-        // Mostrar criativo corrigido resumido
-        if (tipo === 'video' && corrected.roteiro) {
-            const hook = corrected.roteiro.hook?.texto || '';
-            const cta = corrected.roteiro.cta?.texto || '';
-            versionHtml += `<div class="history-preview">
-                <div><strong>Hook:</strong> ${escapeHtml(hook.substring(0, 100))}${hook.length > 100 ? '...' : ''}</div>
-                <div><strong>CTA:</strong> ${escapeHtml(cta.substring(0, 100))}${cta.length > 100 ? '...' : ''}</div>
-            </div>`;
-        } else if (corrected.copy) {
-            versionHtml += `<div class="history-preview">
-                <div><strong>Headline:</strong> ${escapeHtml(corrected.copy.headline || '')}</div>
-                <div><strong>CTA:</strong> ${escapeHtml(corrected.copy.cta_texto || '')}</div>
-            </div>`;
+            html += renderPromptSection(corrected, idx, produto);
+
+            if (corrected.avaliacao_diretor) {
+                html += renderDirectorEvaluation(corrected.avaliacao_diretor, `creative_${idx}`, idx, produto, publico || '', tipo);
+            }
+
+            card.innerHTML = html;
         }
-
-        // Prompts corrigidos
-        if (corrected.prompt_nano_banana) {
-            versionHtml += `<div class="history-prompt">
-                <span class="prompt-label-small">🖼️ Nano Banana:</span>
-                <span class="prompt-preview">${escapeHtml(corrected.prompt_nano_banana.substring(0, 120))}...</span>
-                <button class="btn-copy-small" onclick="copyText(\`${escapeForAttr(corrected.prompt_nano_banana)}\`)">📋</button>
-            </div>`;
-        }
-        if (corrected.prompt_veo3) {
-            versionHtml += `<div class="history-prompt">
-                <span class="prompt-label-small">🎬 Veo 3:</span>
-                <span class="prompt-preview">${escapeHtml(corrected.prompt_veo3.substring(0, 120))}...</span>
-                <button class="btn-copy-small" onclick="copyText(\`${escapeForAttr(corrected.prompt_veo3)}\`)">📋</button>
-            </div>`;
-        }
-
-        if (newEval.veredito) {
-            versionHtml += `<div class="history-verdict">${escapeHtml(newEval.veredito)}</div>`;
-        }
-
-        if (newEval.melhorias && newEval.melhorias.length) {
-            newEval.melhorias.forEach(m => {
-                if (m) versionHtml += `<div class="history-tip">💡 ${escapeHtml(m)}</div>`;
-            });
-        }
-
-        versionHtml += `</div>`;
-        historyDiv.innerHTML += versionHtml;
 
     } catch (err) {
-        showError(`correctHistory_${idx}`, `Erro na correção: ${err.message}`);
+        console.error('Erro correção:', err);
+        alert(`Erro na correção: ${err.message}`);
     } finally {
-        document.getElementById(btnId).disabled = false;
-        document.getElementById(loadingId).style.display = 'none';
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = '🔄 Corrigir com base no feedback do Diretor';
+        }
     }
 }
 
-async function correctPrompt(blockId, btnId, promptText, tipoPrompt, produto, idx) {
+// ==============================================================
+// ABA 1 — CORREÇÃO ITERATIVA DE PROMPTS
+// ==============================================================
+async function correctPrompt(idx, tipoPrompt, produto) {
+    const creativeData = window['creativeData_' + idx];
+    if (!creativeData) {
+        alert('Erro: dados não encontrados. Gere os criativos novamente.');
+        return;
+    }
+
+    const promptKey = tipoPrompt === 'image' ? 'prompt_nano_banana' : 'prompt_veo3';
     const evalKey = tipoPrompt === 'image' ? 'avaliacao_prompt_imagem' : 'avaliacao_prompt_video';
-    const creativeData = window[`creativeData_${idx}`];
-    const evaluation = creativeData ? creativeData[evalKey] : null;
+    const promptText = creativeData[promptKey];
+    const evalData = creativeData[evalKey];
 
-    if (!evaluation) return;
+    if (!promptText || !evalData) {
+        alert('Prompt ou avaliação não encontrados.');
+        return;
+    }
 
+    const btnId = `correctPromptBtn_${tipoPrompt}_${idx}`;
     const btn = document.getElementById(btnId);
-    btn.disabled = true;
-    btn.textContent = '⏳ Corrigindo...';
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ Corrigindo prompt...';
+    }
 
     try {
         const formData = new FormData();
         formData.append('prompt_text', promptText);
-        formData.append('evaluation_data', JSON.stringify(evaluation));
+        formData.append('evaluation_data', JSON.stringify(evalData));
         formData.append('tipo_prompt', tipoPrompt);
         formData.append('produto', produto);
 
         const res = await fetch(`${API_BASE}/api/v1/prompt/correct`, { method: 'POST', body: formData });
         const data = await res.json();
 
-        if (!res.ok) throw new Error(data.detail || 'Erro');
+        if (!res.ok) throw new Error(data.detail || 'Erro na correção');
 
-        // Atualizar prompt no DOM
-        const textId = blockId + '_text';
-        const textEl = document.getElementById(textId);
+        // Atualizar dados
+        creativeData[promptKey] = data.prompt_corrigido;
+        creativeData[evalKey] = data.avaliacao;
+        window['creativeData_' + idx] = creativeData;
+
+        // Atualizar texto do prompt na tela
+        const textElId = tipoPrompt === 'image' ? `prompt_img_${idx}_text` : `prompt_vid_${idx}_text`;
+        const textEl = document.getElementById(textElId);
         if (textEl) {
             textEl.textContent = data.prompt_corrigido;
         }
 
-        // Atualizar avaliação no creativeData
-        if (creativeData) {
-            if (tipoPrompt === 'image') {
-                creativeData.prompt_nano_banana = data.prompt_corrigido;
-                creativeData.avaliacao_prompt_imagem = data.avaliacao;
-            } else {
-                creativeData.prompt_veo3 = data.prompt_corrigido;
-                creativeData.avaliacao_prompt_video = data.avaliacao;
-            }
-            window[`creativeData_${idx}`] = creativeData;
+        // Re-renderizar avaliação do prompt
+        const blockId = tipoPrompt === 'image' ? `prompt_img_${idx}` : `prompt_vid_${idx}`;
+        const block = document.getElementById(blockId);
+        if (block) {
+            // Remover avaliação antiga
+            const oldEval = block.querySelector('.prompt-evaluation');
+            if (oldEval) oldEval.remove();
+            // Adicionar nova
+            const evalHtml = renderPromptEvaluation(data.avaliacao, blockId, data.prompt_corrigido, tipoPrompt, produto, idx);
+            block.insertAdjacentHTML('beforeend', evalHtml);
         }
 
-        btn.textContent = `✅ Corrigido (${data.avaliacao.nota_geral}%)`;
-        setTimeout(() => { btn.textContent = '🔄 Corrigir Prompt'; btn.disabled = false; }, 3000);
+        if (btn) btn.textContent = '✅ Prompt corrigido!';
+        setTimeout(() => {
+            if (btn) {
+                btn.textContent = '🔄 Corrigir Prompt';
+                btn.disabled = false;
+            }
+        }, 3000);
 
     } catch (err) {
-        btn.textContent = `❌ Erro`;
-        setTimeout(() => { btn.textContent = '🔄 Corrigir Prompt'; btn.disabled = false; }, 3000);
+        console.error('Erro correção prompt:', err);
+        alert(`Erro: ${err.message}`);
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = '🔄 Corrigir Prompt';
+        }
     }
 }
 
-// ============================================================
+// ==============================================================
 // ABA 2 — UPLOAD
-// ============================================================
+// ==============================================================
 async function uploadEditorFiles() {
     const files = document.getElementById('fileInput2').files;
-    if (!files.length) return;
-
-    const status = document.getElementById('uploadStatus2');
-    status.innerHTML = '<div class="spinner-small"></div> Enviando...';
+    if (!files.length) {
+        document.getElementById('uploadStatus2').innerHTML = '<div class="error-msg">Selecione pelo menos um arquivo</div>';
+        return;
+    }
 
     const formData = new FormData();
     for (const f of files) formData.append('files', f);
+
+    document.getElementById('uploadStatus2').innerHTML = '<div class="loading-inline">📤 Enviando arquivos...</div>';
+    document.getElementById('btnUpload2').disabled = true;
 
     try {
         const res = await fetch(`${API_BASE}/api/v2/editor/upload`, { method: 'POST', body: formData });
@@ -560,46 +592,61 @@ async function uploadEditorFiles() {
 
         editorSessionId = data.session_id;
 
-        let html = '<div class="pairs-list">';
+        let html = '<div class="upload-success">';
+        html += `<div class="success-header">✅ Upload concluído — Sessão: <code>${data.session_id.substring(0, 8)}...</code></div>`;
+
         if (data.pairs && data.pairs.length) {
+            html += '<div class="pairs-list">';
             data.pairs.forEach(p => {
-                const srtInfo = p.srt ? `📝 ${p.srt} (${p.segments} segs)` : '⚠️ Sem SRT';
                 html += `<div class="pair-item">
-                    <span class="pair-video">🎬 ${p.video}</span>
-                    <span class="pair-srt">${srtInfo}</span>
-                    <span class="pair-preview">${p.text_preview || ''}</span>
+                    <span>🎬 ${escapeHtml(p.video)}</span>
+                    <span>${p.srt ? '📝 ' + escapeHtml(p.srt) + ' (' + p.segments + ' segs)' : '⚠️ Sem SRT'}</span>
                 </div>`;
             });
+            html += '</div>';
         }
-        if (data.rejected && data.rejected.length) {
-            data.rejected.forEach(r => {
-                html += `<div class="pair-item pair-rejected">❌ ${r.filename}: ${r.reason}</div>`;
-            });
-        }
-        html += '</div>';
-        status.innerHTML = html;
 
+        if (data.rejected && data.rejected.length) {
+            html += '<div class="rejected-files">⚠️ Rejeitados: ';
+            html += data.rejected.map(r => escapeHtml(r.filename)).join(', ');
+            html += '</div>';
+        }
+
+        html += '</div>';
+        document.getElementById('uploadStatus2').innerHTML = html;
         document.getElementById('btnGenerate2').style.display = 'inline-flex';
+
     } catch (err) {
-        status.innerHTML = `<div class="error-msg">Erro: ${err.message}</div>`;
+        document.getElementById('uploadStatus2').innerHTML = `<div class="error-msg">Erro: ${escapeHtml(err.message)}</div>`;
+    } finally {
+        document.getElementById('btnUpload2').disabled = false;
     }
 }
 
-// ============================================================
-// ABA 2 — GERAR CORTES
-// ============================================================
+// ==============================================================
+// ABA 2 — GERAR CORTES INTELIGENTES
+// ==============================================================
 async function generateEditorCuts() {
-    if (!editorSessionId) return showError('results2', 'Envie os arquivos primeiro');
+    if (!editorSessionId) {
+        showError('results2', 'Faça upload dos arquivos primeiro');
+        return;
+    }
+
+    const duration = document.getElementById('duration2').value;
+    const variations = document.getElementById('variations2').value;
+    const mode = document.getElementById('mode2').value;
+    const produto = (document.getElementById('produto2').value || '').trim();
+    const publico = (document.getElementById('publico2').value || '').trim();
 
     const formData = new FormData();
     formData.append('session_id', editorSessionId);
-    formData.append('target_duration', document.getElementById('duration2').value);
-    formData.append('variations', document.getElementById('variations2').value);
-    formData.append('mode', document.getElementById('mode2').value);
+    formData.append('target_duration', duration);
+    formData.append('variations', variations);
+    formData.append('mode', mode);
     formData.append('subtitle_enabled', subtitleEnabled);
     formData.append('subtitle_style', subtitleStyle);
-    formData.append('produto', document.getElementById('produto2').value.trim());
-    formData.append('publico_alvo', document.getElementById('publico2').value.trim());
+    formData.append('produto', produto);
+    formData.append('publico_alvo', publico);
 
     document.getElementById('loading2').style.display = 'flex';
     document.getElementById('btnGenerate2').disabled = true;
@@ -612,7 +659,8 @@ async function generateEditorCuts() {
         if (!res.ok) throw new Error(data.detail || 'Erro na geração');
 
         editorOutputId = data.output_id;
-        renderEditorResults(data);
+        renderEditorResults(data, produto, publico);
+
     } catch (err) {
         showError('results2', `Erro: ${err.message}`);
     } finally {
@@ -621,7 +669,7 @@ async function generateEditorCuts() {
     }
 }
 
-function renderEditorResults(data) {
+function renderEditorResults(data, produto, publico) {
     const container = document.getElementById('results2');
     const results = data.results || [];
 
@@ -631,33 +679,31 @@ function renderEditorResults(data) {
     }
 
     let html = `<div class="results-header">
-        <h3>✅ ${results.length} resultado(s)</h3>
+        <h3>✅ ${results.length} corte(s) gerado(s)</h3>
+        <p>Sessão: <code>${(data.session_id || '').substring(0, 8)}...</code> | Output: <code>${(data.output_id || '').substring(0, 8)}...</code></p>
     </div>`;
 
     results.forEach((r, idx) => {
-        const cutId = `cut_${idx}`;
-        html += `<div class="result-card" id="${cutId}">`;
-        html += `<div class="result-header">
-            <h4>🎬 ${r.source_video} — Variação ${r.variation || 1}</h4>`;
-
-        if (r.planned_by) {
-            const planBadge = r.planned_by === 'ia' ? 'badge-ia' : 'badge-fallback';
-            html += `<span class="badge ${planBadge}">Planejado por: ${r.planned_by}</span>`;
-        }
+        const resultId = `editor_result_${idx}`;
+        html += `<div class="result-card" id="${resultId}">`;
+        html += `<div class="result-header">`;
+        html += `<h4>🎬 ${escapeHtml(r.source_video)} — Variação ${r.variation || idx + 1}</h4>`;
+        if (r.planned_by) html += `<span class="badge badge-${r.planned_by === 'ia' ? 'ia' : 'fallback'}">${r.planned_by === 'ia' ? '🤖 IA' : '📐 Regras'}</span>`;
         html += `</div>`;
 
         if (r.error) {
-            html += `<div class="error-msg">❌ ${r.error}</div>`;
+            html += `<div class="error-msg">⚠️ ${escapeHtml(r.error)}</div>`;
         }
 
-        // Estrutura de cortes
+        // Estrutura dos cortes
         if (r.structure && r.structure.length) {
-            html += '<div class="cut-structure">';
+            html += '<div class="cuts-structure">';
             r.structure.forEach(s => {
-                const roleClass = `segment-${(s.role || 'body').toLowerCase()}`;
-                html += `<div class="segment ${roleClass}">
-                    <div class="segment-label">${roleIcon(s.role)} ${s.role || 'BODY'} (${(s.start || 0).toFixed(1)}s - ${(s.end || 0).toFixed(1)}s)</div>
-                    <div class="segment-text">${escapeHtml(s.text || '')}</div>
+                const roleClass = (s.role || 'BODY').toLowerCase();
+                html += `<div class="cut-segment cut-${roleClass}">
+                    <span class="cut-role">${escapeHtml(s.role || 'BODY')}</span>
+                    <span class="cut-time">${(s.start || 0).toFixed(1)}s - ${(s.end || 0).toFixed(1)}s</span>
+                    <span class="cut-text">${escapeHtml((s.text || '').substring(0, 100))}</span>
                 </div>`;
             });
             html += '</div>';
@@ -666,25 +712,28 @@ function renderEditorResults(data) {
         // Info
         if (r.total_duration) {
             html += `<div class="cut-info">
-                ⏱️ ${r.total_duration}s | 📊 ${r.segment_count || 0} segmentos
-                ${r.subtitle_style && r.subtitle_style !== 'sem_legenda' ? ` | 📝 Legenda: ${r.subtitle_style}` : ''}
+                <span>⏱️ ${r.total_duration}s</span>
+                <span>✂️ ${r.segment_count || 0} cortes</span>
+                ${r.subtitle_style && r.subtitle_style !== 'sem_legenda' ? `<span>📝 Legenda: ${escapeHtml(r.subtitle_style)}</span>` : ''}
             </div>`;
         }
 
+        if (r.ai_reasoning) {
+            html += `<div class="ai-reasoning">💡 ${escapeHtml(r.ai_reasoning)}</div>`;
+        }
+
         // Download
-        if (r.filename && r.download_url) {
-            const cleanUrl = r.download_url.replace(/%20/g, '');
-            const fullUrl = cleanUrl.startsWith('http') ? cleanUrl : API_BASE + cleanUrl;
+        if (r.download_url && r.filename) {
             html += `<div class="download-section">
-                <a href="${fullUrl}" download="${r.filename}" class="btn-download" onclick="downloadFile(event, '${fullUrl}', '${r.filename}')">
-                    ⬇️ Baixar ${r.filename} (${((r.file_size || 0) / 1024 / 1024).toFixed(2)} MB)
+                <a href="${API_BASE}${r.download_url}" class="btn-download" download="${escapeHtml(r.filename)}">
+                    ⬇️ Download ${escapeHtml(r.filename)} ${r.file_size ? '(' + formatFileSize(r.file_size) + ')' : ''}
                 </a>
             </div>`;
         }
 
         // Avaliação do Diretor (Aba 2)
         if (r.avaliacao_diretor) {
-            html += renderEditorDirectorEvaluation(r.avaliacao_diretor, cutId, idx, r, data);
+            html += renderEditorDirectorEvaluation(r.avaliacao_diretor, idx, r, produto, publico);
         }
 
         html += `</div>`;
@@ -692,28 +741,34 @@ function renderEditorResults(data) {
 
     container.innerHTML = html;
 
-    // Guardar dados para correção
+    // FIX v8.1: Guardar dados para correção de cortes
     results.forEach((r, idx) => {
-        window[`editorResult_${idx}`] = r;
-        window[`editorData_${idx}`] = data;
+        window['editorResult_' + idx] = r;
+        window['editorEval_' + idx] = r.avaliacao_diretor;
     });
 }
 
-function renderEditorDirectorEvaluation(evaluation, parentId, idx, resultData, fullData) {
-    const correctBtnId = `correctCutBtn_${idx}`;
-    const nota = evaluation.nota_geral || 0;
-    const colorClass = nota >= 80 ? 'rating-high' : nota >= 60 ? 'rating-mid' : 'rating-low';
-    const criterios = evaluation.criterios || {};
+// FIX v8.1: correctBtnId declarado, sem <script> inline
+function renderEditorDirectorEvaluation(evaluation, idx, resultData, produto, publico) {
+    if (!evaluation || !evaluation.nota_geral) return '';
 
-    let html = `<div class="director-evaluation" id="editorEval_${idx}">
-        <div class="eval-header">
-            <div class="eval-title">
-                <span class="eval-icon">🎬</span>
-                <span>Diretor Criativo — Cortes</span>
-            </div>
-            <div class="eval-rating ${colorClass}">${nota}%</div>
+    const nota = evaluation.nota_geral || 0;
+    const criterios = evaluation.criterios || {};
+    const veredito = evaluation.veredito || '';
+    const melhorias = evaluation.melhorias || [];
+
+    let barColor = nota >= 80 ? '#10b981' : nota >= 60 ? '#f59e0b' : '#ef4444';
+
+    let html = `<div class="director-evaluation">
+        <div class="director-header">
+            <h5>🎬 Diretor Criativo — Cortes</h5>
+            <span class="director-score" style="color:${barColor}">${nota}/100</span>
         </div>
-        <div class="eval-criteria">`;
+        <div class="eval-bar"><div class="eval-bar-fill" style="width:${nota}%;background:${barColor}"></div></div>`;
+
+    if (veredito) {
+        html += `<div class="eval-veredito">${escapeHtml(veredito)}</div>`;
+    }
 
     const criterioLabels = {
         "hook_power": "Hook Power",
@@ -724,195 +779,136 @@ function renderEditorDirectorEvaluation(evaluation, parentId, idx, resultData, f
         "engajamento": "Engajamento",
     };
 
+    html += '<div class="eval-criterios">';
     for (const [key, label] of Object.entries(criterioLabels)) {
         const val = criterios[key] || 0;
-        const barColor = val >= 80 ? '#10b981' : val >= 60 ? '#f59e0b' : '#ef4444';
-        html += `<div class="eval-bar-row">
-            <span class="eval-bar-label">${label}</span>
-            <div class="eval-bar-track"><div class="eval-bar-fill" style="width:${val}%;background:${barColor}"></div></div>
-            <span class="eval-bar-val">${val}</span>
+        let cColor = val >= 80 ? '#10b981' : val >= 60 ? '#f59e0b' : '#ef4444';
+        html += `<div class="eval-criterio">
+            <span class="criterio-name">${label}</span>
+            <div class="criterio-bar"><div class="criterio-bar-fill" style="width:${val}%;background:${cColor}"></div></div>
+            <span class="criterio-val">${val}</span>
         </div>`;
     }
+    html += '</div>';
 
-    html += `</div>`;
-
-    if (evaluation.veredito) {
-        html += `<div class="eval-verdict">${escapeHtml(evaluation.veredito)}</div>`;
+    if (melhorias.length) {
+        html += '<div class="eval-melhorias"><strong>Melhorias:</strong><ul>';
+        melhorias.forEach(m => { html += `<li>${escapeHtml(m)}</li>`; });
+        html += '</ul></div>';
     }
 
-    if (evaluation.melhorias && evaluation.melhorias.length) {
-        html += `<div class="eval-improvements">`;
-        evaluation.melhorias.forEach(m => {
-            if (m) html += `<div class="eval-improvement">💡 ${escapeHtml(m)}</div>`;
-        });
-        html += `</div>`;
-    }
+    // FIX v8.1: correctBtnId declarado corretamente
+    const correctBtnId = `correctCutBtn_${idx}`;
+    html += `<button class="btn-correct" id="${correctBtnId}" onclick="correctEditorCuts(${idx}, decodeURIComponent('${encodeURIComponent(produto || '')}'), decodeURIComponent('${encodeURIComponent(publico || '')}'))">🔄 Corrigir cortes com base no feedback</button>`;
 
-    // Botão Corrigir Cortes
-       html += `<button class="btn-correct" id="${correctBtnId}"
-        onclick="correctCreative(${idx}, decodeURIComponent('${encodeURIComponent(produto)}'), decodeURIComponent('${encodeURIComponent(publico)}'), '${tipo}')">
-        🔄 Corrigir com base no feedback
-    </button>`;
-
-    html += `<div id="correctCutLoading_${idx}" class="correct-loading" style="display:none">
-        <div class="spinner-small"></div> Corrigindo e regenerando vídeo...
-    </div>`;
-    html += `<div id="correctCutHistory_${idx}" class="correct-history"></div>`;
-
-    html += `</div>`;
+    html += '</div>';
     return html;
 }
 
-// ============================================================
+// ==============================================================
 // ABA 2 — CORREÇÃO ITERATIVA DE CORTES
-// ============================================================
-async function correctEditorCut(idx) {
-    const resultData = window[`editorResult_${idx}`];
-    const fullData = window[`editorData_${idx}`];
-    if (!resultData || !fullData) return;
+// ==============================================================
+async function correctEditorCuts(idx, produto, publico) {
+    const resultData = window['editorResult_' + idx];
+    const evalData = window['editorEval_' + idx];
 
-    const btnId = `correctCutBtn_${idx}`;
-    const loadingId = `correctCutLoading_${idx}`;
-    const historyId = `correctCutHistory_${idx}`;
+    if (!resultData || !evalData) {
+        alert('Erro: dados de correção não encontrados. Gere os cortes novamente.');
+        return;
+    }
 
-    document.getElementById(btnId).disabled = true;
-    document.getElementById(loadingId).style.display = 'flex';
+    if (!editorSessionId) {
+        alert('Sessão não encontrada. Faça upload novamente.');
+        return;
+    }
+
+    const btn = document.getElementById(`correctCutBtn_${idx}`);
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ Corrigindo cortes...';
+    }
 
     try {
         const formData = new FormData();
-        formData.append('session_id', resultData._session_id || fullData.session_id);
-        formData.append('output_id', resultData._output_id || fullData.output_id);
-        formData.append('source_video', resultData.source_video);
+        formData.append('session_id', editorSessionId);
+        formData.append('output_id', editorOutputId || '');
+        formData.append('source_video', resultData.source_video || '');
         formData.append('structure_data', JSON.stringify(resultData.structure || []));
-        formData.append('evaluation_data', JSON.stringify(resultData.avaliacao_diretor || {}));
+        formData.append('evaluation_data', JSON.stringify(evalData));
         formData.append('segments_data', resultData._segments_json || '[]');
-        formData.append('target_duration', document.getElementById('duration2').value);
-        formData.append('produto', document.getElementById('produto2').value.trim());
-        formData.append('publico_alvo', document.getElementById('publico2').value.trim());
+        formData.append('target_duration', document.getElementById('duration2').value || '30');
+        formData.append('produto', produto);
+        formData.append('publico_alvo', publico);
         formData.append('subtitle_enabled', subtitleEnabled);
         formData.append('subtitle_style', subtitleStyle);
 
         const res = await fetch(`${API_BASE}/api/v2/editor/correct`, { method: 'POST', body: formData });
         const data = await res.json();
 
-        if (!res.ok) throw new Error(data.detail || 'Erro');
+        if (!res.ok) throw new Error(data.detail || 'Erro na correção');
 
-        // Atualizar dados para próxima correção
-        const newResult = {
-            ...resultData,
-            structure: data.structure,
-            avaliacao_diretor: data.avaliacao_diretor,
-            _session_id: data._session_id || resultData._session_id,
-            _output_id: data._output_id || resultData._output_id,
-            _segments_json: data._segments_json || resultData._segments_json,
-        };
-        if (data.filename) {
-            newResult.filename = data.filename;
-            newResult.download_url = data.download_url;
-            newResult.file_size = data.file_size;
-        }
-        window[`editorResult_${idx}`] = newResult;
+        // Atualizar dados
+        window['editorResult_' + idx] = data;
+        window['editorEval_' + idx] = data.avaliacao_diretor;
 
-        // Adicionar ao histórico
-        const historyDiv = document.getElementById(historyId);
-        const version = historyDiv.children.length + 2;
-        const oldNota = resultData.avaliacao_diretor?.nota_geral || 0;
-        const newNota = data.avaliacao_diretor?.nota_geral || 0;
-        const delta = newNota - oldNota;
-        const deltaStr = delta > 0 ? `+${delta}` : `${delta}`;
-        const deltaColor = delta > 0 ? '#10b981' : delta < 0 ? '#ef4444' : '#666';
-
-        let vHtml = `<div class="history-item">
-            <div class="history-header">
-                <span class="history-version">v${version}</span>
-                <span class="history-score ${newNota >= 80 ? 'rating-high' : newNota >= 60 ? 'rating-mid' : 'rating-low'}">${newNota}%</span>
-                <span class="history-delta" style="color:${deltaColor}">(${deltaStr})</span>
+        // Re-renderizar card
+        const card = document.getElementById(`editor_result_${idx}`);
+        if (card) {
+            let html = `<div class="result-header">
+                <h4>🎬 ${escapeHtml(resultData.source_video)} — Corrigido <span class="badge badge-corrected">✅</span></h4>
             </div>`;
 
-        // Download do vídeo corrigido
-        if (data.download_url) {
-            const cleanUrl = data.download_url.replace(/%20/g, '');
-            const fullUrl = cleanUrl.startsWith('http') ? cleanUrl : API_BASE + cleanUrl;
-            vHtml += `<div class="download-section">
-                <a href="${fullUrl}" download="${data.filename}" class="btn-download" onclick="downloadFile(event, '${fullUrl}', '${data.filename}')">
-                    ⬇️ Baixar corrigido (${((data.file_size || 0) / 1024 / 1024).toFixed(2)} MB)
-                </a>
-            </div>`;
+            if (data.error) {
+                html += `<div class="error-msg">⚠️ ${escapeHtml(data.error)}</div>`;
+            }
+
+            if (data.structure && data.structure.length) {
+                html += '<div class="cuts-structure">';
+                data.structure.forEach(s => {
+                    const roleClass = (s.role || 'BODY').toLowerCase();
+                    html += `<div class="cut-segment cut-${roleClass}">
+                        <span class="cut-role">${escapeHtml(s.role || 'BODY')}</span>
+                        <span class="cut-time">${(s.start || 0).toFixed(1)}s - ${(s.end || 0).toFixed(1)}s</span>
+                        <span class="cut-text">${escapeHtml((s.text || '').substring(0, 100))}</span>
+                    </div>`;
+                });
+                html += '</div>';
+            }
+
+            if (data.total_duration) {
+                html += `<div class="cut-info">
+                    <span>⏱️ ${data.total_duration}s</span>
+                    <span>✂️ ${data.segment_count || 0} cortes</span>
+                </div>`;
+            }
+
+            if (data.download_url && data.filename) {
+                html += `<div class="download-section">
+                    <a href="${API_BASE}${data.download_url}" class="btn-download" download="${escapeHtml(data.filename)}">
+                        ⬇️ Download ${escapeHtml(data.filename)} ${data.file_size ? '(' + formatFileSize(data.file_size) + ')' : ''}
+                    </a>
+                </div>`;
+            }
+
+            if (data.avaliacao_diretor) {
+                html += renderEditorDirectorEvaluation(data.avaliacao_diretor, idx, data, produto, publico);
+            }
+
+            card.innerHTML = html;
         }
 
-        if (data.avaliacao_diretor?.veredito) {
-            vHtml += `<div class="history-verdict">${escapeHtml(data.avaliacao_diretor.veredito)}</div>`;
+        // Atualizar output_id se mudou
+        if (data._output_id) {
+            editorOutputId = data._output_id;
         }
-
-        if (data.avaliacao_diretor?.melhorias) {
-            data.avaliacao_diretor.melhorias.forEach(m => {
-                if (m) vHtml += `<div class="history-tip">💡 ${escapeHtml(m)}</div>`;
-            });
-        }
-
-        vHtml += `</div>`;
-        historyDiv.innerHTML += vHtml;
 
     } catch (err) {
-        const historyDiv = document.getElementById(historyId);
-        historyDiv.innerHTML += `<div class="error-msg">❌ Erro: ${err.message}</div>`;
+        console.error('Erro correção cortes:', err);
+        alert(`Erro: ${err.message}`);
     } finally {
-        document.getElementById(btnId).disabled = false;
-        document.getElementById(loadingId).style.display = 'none';
-    }
-}
-
-// ============================================================
-// DOWNLOAD HELPER
-// ============================================================
-function downloadFile(event, url, filename) {
-    event.preventDefault();
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => document.body.removeChild(a), 100);
-}
-
-// ============================================================
-// UTILITIES
-// ============================================================
-function showError(containerId, msg) {
-    const el = document.getElementById(containerId);
-    if (el) el.innerHTML = `<div class="error-msg">${msg}</div>`;
-}
-
-function escapeHtml(str) {
-    if (!str) return '';
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-function escapeForAttr(str) {
-    if (!str) return '';
-    return String(str).replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
-}
-
-function roleIcon(role) {
-    const icons = { HOOK: '🎯', BODY: '📝', CTA: '🔥', FULL: '📹' };
-    return icons[(role || '').toUpperCase()] || '📎';
-}
-
-function copyToClipboard(elementId) {
-    const el = document.getElementById(elementId);
-    if (!el) return;
-    const text = el.textContent || el.innerText;
-    navigator.clipboard.writeText(text).then(() => {
-        const btn = el.parentElement?.querySelector('.btn-copy') || el.closest('.prompt-block')?.querySelector('.btn-copy');
         if (btn) {
-            const orig = btn.textContent;
-            btn.textContent = '✅ Copiado!';
-            setTimeout(() => btn.textContent = orig, 2000);
+            btn.disabled = false;
+            btn.textContent = '🔄 Corrigir cortes com base no feedback';
         }
-    });
-}
-
-function copyText(text) {
-    navigator.clipboard.writeText(text).then(() => {}).catch(() => {});
+    }
 }
