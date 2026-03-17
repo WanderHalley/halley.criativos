@@ -1,8 +1,6 @@
 /* ============================================================
-   HALLEY CRIATIVOS STUDIO — Styles v8.0
-   HALLEY CRIATIVOS STUDIO — Styles PATCH v8.1
-   Classes adicionais para compatibilidade com app.js v8.1
-   Colar no FINAL do style.css existente
+   HALLEY CRIATIVOS STUDIO — Styles v8.1
+   (v8.0 original + patch de compatibilidade app.js v8.1)
    ============================================================ */
 
 /* RESET & BASE */
@@ -143,81 +141,19 @@ body {
 .badge-angle { background: #3b1f5e; color: #c084fc; }
 .badge-fallback { background: #5c2800; color: #fb923c; }
 .badge-ia { background: #064e3b; color: #34d399; }
+.badge-corrected {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
 
 /* SEGMENTS */
 .segment {
     padding: 14px 18px; border-radius: 8px; margin-bottom: 8px;
     border-left: 4px solid #444;
-/* ---- EVAL BAR (barra geral de nota) ---- */
-.eval-bar {
-    width: 100%;
-    height: 10px;
-    background: #2a2a4a;
-    border-radius: 5px;
-    overflow: hidden;
-    margin: 12px 0 16px;
-}
-
-/* ---- CRITÉRIOS DO DIRETOR ---- */
-.eval-criterios {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 16px;
-}
-
-.eval-criterio {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.criterio-name {
-    font-size: 0.85rem;
-    color: #aaa;
-    width: 140px;
-    flex-shrink: 0;
-}
-
-.criterio-bar {
-    flex: 1;
-    height: 10px;
-    background: #2a2a4a;
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-.criterio-bar-fill {
-    height: 100%;
-    border-radius: 5px;
-    transition: width 0.8s ease;
-}
-
-.criterio-val {
-    font-size: 0.85rem;
-    color: #fff;
-    font-weight: 600;
-    width: 35px;
-    text-align: right;
-}
-
-/* ---- VEREDITO ---- */
-.eval-veredito {
-    padding: 12px 16px;
-    background: rgba(108, 43, 217, 0.1);
-    border-radius: 8px;
-    color: #c084fc;
-    font-size: 0.9rem;
-    margin: 12px 0;
-    line-height: 1.5;
-}
-
-/* ---- MELHORIAS ---- */
-.eval-melhorias {
-    margin-bottom: 16px;
-    padding: 12px 16px;
-    background: rgba(245, 158, 11, 0.06);
-    border-radius: 8px;
 }
 .segment-hook { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.08); }
 .segment-body { border-left-color: #3b82f6; background: rgba(59, 130, 246, 0.08); }
@@ -264,9 +200,19 @@ body {
     max-height: 200px; overflow-y: auto;
 }
 
-/* PROMPT EVALUATION (mini) */
+/* PROMPT EVALUATION (mini — dentro do bloco do prompt) */
 .prompt-evaluation {
     margin-top: 12px; padding-top: 10px; border-top: 1px solid #2a2a4a;
+}
+.prompt-evaluation .eval-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+}
+.prompt-evaluation .eval-label {
+    font-size: 0.8rem; color: #888; font-weight: 600;
+}
+.prompt-evaluation .eval-score {
+    font-size: 1.1rem; font-weight: 800;
 }
 .eval-mini-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .eval-mini-badge {
@@ -282,12 +228,41 @@ body {
 .eval-mini-tips { margin-top: 8px; }
 .eval-mini-tip { font-size: 0.8rem; color: #f59e0b; padding: 3px 0; }
 
-/* DIRECTOR EVALUATION */
+/* ============================================================
+   DIRECTOR EVALUATION — Avaliação principal do Diretor Criativo
+   (Aba 1: criativos  |  Aba 2: cortes)
+   ============================================================ */
 .director-evaluation {
     margin-top: 20px; padding: 20px; border-radius: 10px;
     background: linear-gradient(135deg, #1a1a30, #1e1e3a);
     border: 1px solid #3a3a5a;
 }
+
+/* Header do diretor (nome + nota) */
+.director-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #2a2a4a;
+}
+.director-header h5 {
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.director-score {
+    font-size: 1.8rem;
+    font-weight: 800;
+    padding: 4px 16px;
+    border-radius: 10px;
+}
+
+/* Header legado (usado em versões anteriores, mantido por segurança) */
 .eval-header {
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #2a2a4a;
@@ -302,33 +277,130 @@ body {
 .rating-mid { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
 .rating-low { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
 
+/* ---- BARRA GERAL DE NOTA ---- */
+.eval-bar {
+    width: 100%;
+    height: 10px;
+    background: #2a2a4a;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 12px 0 16px;
+}
+.eval-bar-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.8s ease;
+}
+
+/* ---- CRITÉRIOS (v8.1 — nomes em português) ---- */
+.eval-criterios {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+.eval-criterio {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.criterio-name {
+    font-size: 0.85rem;
+    color: #aaa;
+    width: 140px;
+    flex-shrink: 0;
+}
+.criterio-bar {
+    flex: 1;
+    height: 10px;
+    background: #2a2a4a;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.criterio-bar-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.8s ease;
+}
+.criterio-val {
+    font-size: 0.85rem;
+    color: #fff;
+    font-weight: 600;
+    width: 35px;
+    text-align: right;
+}
+
+/* Critérios legado (v8.0 — nomes em inglês) mantidos por segurança */
 .eval-criteria { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
 .eval-bar-row { display: flex; align-items: center; gap: 12px; }
 .eval-bar-label { font-size: 0.85rem; color: #aaa; width: 140px; flex-shrink: 0; }
 .eval-bar-track { flex: 1; height: 10px; background: #2a2a4a; border-radius: 5px; overflow: hidden; }
-.eval-bar-fill { height: 100%; border-radius: 5px; transition: width 0.8s ease; }
 .eval-bar-val { font-size: 0.85rem; color: #fff; font-weight: 600; width: 35px; text-align: right; }
 
+/* ---- VEREDITO ---- */
+.eval-veredito {
+    padding: 12px 16px;
+    background: rgba(108, 43, 217, 0.1);
+    border-radius: 8px;
+    color: #c084fc;
+    font-size: 0.9rem;
+    margin: 12px 0;
+    line-height: 1.5;
+}
 .eval-verdict {
     padding: 12px 16px; background: rgba(108, 43, 217, 0.1);
     border-radius: 8px; color: #c084fc; font-size: 0.9rem;
     margin-bottom: 12px; line-height: 1.5;
 }
+
+/* ---- MELHORIAS ---- */
+.eval-melhorias {
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: rgba(245, 158, 11, 0.06);
+    border-radius: 8px;
+}
+.eval-melhorias strong {
+    display: block;
+    color: #f59e0b;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+.eval-melhorias ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.eval-melhorias li {
+    padding: 5px 0;
+    color: #f59e0b;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+.eval-melhorias li::before {
+    content: "⚡ ";
+}
+
+/* Melhorias legado */
 .eval-improvements { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
 .eval-improvement {
     padding: 8px 12px; background: rgba(245, 158, 11, 0.08);
     border-radius: 6px; color: #f59e0b; font-size: 0.85rem;
 }
 
-/* CORRECT BUTTON */
+/* ============================================================
+   BOTÕES DE CORREÇÃO
+   ============================================================ */
 .btn-correct {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 10px 20px; border: 2px solid #6C2BD9; border-radius: 8px;
     background: transparent; color: #8B5CF6; cursor: pointer;
     font-size: 0.9rem; font-weight: 600; transition: all 0.2s;
+    margin-top: 12px;
 }
 .btn-correct:hover { background: rgba(108, 43, 217, 0.15); transform: translateY(-1px); }
 .btn-correct:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
 .btn-correct-small {
     display: inline-flex; align-items: center; gap: 4px;
     padding: 6px 12px; border: 1px solid #6C2BD9; border-radius: 6px;
@@ -338,9 +410,20 @@ body {
 .btn-correct-small:hover { background: rgba(108, 43, 217, 0.1); }
 .btn-correct-small:disabled { opacity: 0.5; }
 
+.btn-correct-prompt {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 12px; border: 1px solid #6C2BD9; border-radius: 6px;
+    background: transparent; color: #8B5CF6; cursor: pointer;
+    font-size: 0.8rem; font-weight: 500; margin-top: 10px; transition: all 0.2s;
+}
+.btn-correct-prompt:hover { background: rgba(108, 43, 217, 0.1); }
+.btn-correct-prompt:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .correct-loading { display: flex; align-items: center; gap: 8px; padding: 12px 0; color: #888; font-size: 0.9rem; }
 
-/* CORRECTION HISTORY */
+/* ============================================================
+   CORRECTION HISTORY
+   ============================================================ */
 .correct-history { margin-top: 12px; }
 .history-item {
     padding: 14px; margin-top: 10px; background: #12121f;
@@ -364,7 +447,9 @@ body {
 .history-verdict { font-size: 0.85rem; color: #c084fc; margin-top: 8px; }
 .history-tip { font-size: 0.8rem; color: #f59e0b; margin-top: 4px; }
 
-/* DOWNLOAD */
+/* ============================================================
+   DOWNLOAD
+   ============================================================ */
 .download-section { margin-top: 14px; }
 .btn-download {
     display: inline-flex; align-items: center; gap: 8px;
@@ -374,11 +459,82 @@ body {
 }
 .btn-download:hover { background: #065f46; transform: translateY(-1px); }
 
+/* ============================================================
+   ABA 2 — EDITOR: ESTRUTURA DE CORTES
+   ============================================================ */
+.cuts-structure {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 12px 0;
+}
+.cut-segment {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border-left: 4px solid #444;
+    background: rgba(255, 255, 255, 0.03);
+}
+.cut-segment.cut-hook {
+    border-left-color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+}
+.cut-segment.cut-body {
+    border-left-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.08);
+}
+.cut-segment.cut-cta {
+    border-left-color: #10b981;
+    background: rgba(16, 185, 129, 0.08);
+}
+.cut-role {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #aaa;
+    text-transform: uppercase;
+    width: 50px;
+    flex-shrink: 0;
+}
+.cut-time {
+    font-size: 0.8rem;
+    color: #8B5CF6;
+    font-weight: 500;
+    width: 120px;
+    flex-shrink: 0;
+    font-family: monospace;
+}
+.cut-text {
+    font-size: 0.85rem;
+    color: #ccc;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /* CUT INFO */
-.cut-info { font-size: 0.85rem; color: #888; margin-top: 12px; }
+.cut-info {
+    font-size: 0.85rem; color: #888; margin-top: 12px;
+    display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+}
 .cut-structure { margin-top: 12px; }
 
-/* PAIRS */
+/* AI REASONING */
+.ai-reasoning {
+    padding: 10px 14px;
+    background: rgba(108, 43, 217, 0.08);
+    border-radius: 8px;
+    color: #c084fc;
+    font-size: 0.85rem;
+    margin: 12px 0;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   ABA 2 — EDITOR: UPLOAD / PAIRS / STATUS
+   ============================================================ */
 .pairs-list { margin-top: 12px; }
 .pair-item {
     display: flex; flex-direction: column; gap: 4px;
@@ -389,7 +545,50 @@ body {
 .pair-preview { color: #666; font-size: 0.8rem; max-height: 40px; overflow: hidden; }
 .pair-rejected { border-left: 3px solid #ef4444; }
 
-/* SUBTITLE CONTROLS */
+.upload-success {
+    padding: 16px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 10px;
+    margin-top: 12px;
+}
+.success-header {
+    color: #10b981;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+}
+.success-header code {
+    background: #12121f;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #8B5CF6;
+}
+
+.loading-inline {
+    padding: 12px 16px;
+    background: rgba(108, 43, 217, 0.08);
+    border-radius: 8px;
+    color: #8B5CF6;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rejected-files {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: rgba(239, 68, 68, 0.08);
+    border-radius: 8px;
+    color: #ef4444;
+    font-size: 0.85rem;
+}
+
+/* ============================================================
+   SUBTITLE CONTROLS
+   ============================================================ */
 .subtitle-controls { display: flex; flex-direction: column; gap: 16px; }
 .subtitle-toggle { display: flex; align-items: center; gap: 16px; }
 .subtitle-toggle label { font-weight: 500; color: #aaa; }
@@ -406,247 +605,43 @@ body {
     display: flex; flex-direction: column; align-items: center; gap: 6px;
     padding: 12px 20px; border: 2px solid #3a3a5a; border-radius: 10px;
     background: transparent; cursor: pointer; color: #aaa; font-size: 0.8rem;
-
-.eval-melhorias strong {
-    display: block;
-    color: #f59e0b;
-    font-size: 0.85rem;
-    margin-bottom: 8px;
-}
-
-.eval-melhorias ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.eval-melhorias li {
-    padding: 5px 0;
-    color: #f59e0b;
-    font-size: 0.85rem;
-    line-height: 1.4;
-}
-
-.eval-melhorias li::before {
-    content: "⚡ ";
-}
-
-/* ---- DIRECTOR HEADER (Aba 1 e 2) ---- */
-.director-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #2a2a4a;
-}
-
-.director-header h5 {
-    color: #fff;
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-.director-score {
-    font-size: 1.8rem;
-    font-weight: 800;
-    padding: 4px 16px;
-    border-radius: 10px;
-}
-
-/* ---- PROMPT EVALUATION (dentro do bloco do prompt) ---- */
-.prompt-evaluation .eval-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.prompt-evaluation .eval-label {
-    font-size: 0.8rem;
-    color: #888;
-    font-weight: 600;
-}
-
-.prompt-evaluation .eval-score {
-    font-size: 1.1rem;
-    font-weight: 800;
-}
-
-/* ---- BOTÃO CORRIGIR PROMPT ---- */
-.btn-correct-prompt {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 6px 12px;
-    border: 1px solid #6C2BD9;
-    border-radius: 6px;
-    background: transparent;
-    color: #8B5CF6;
-    cursor: pointer;
-    font-size: 0.8rem;
-    font-weight: 500;
-    margin-top: 10px;
     transition: all 0.2s;
 }
 .style-btn.active { border-color: #6C2BD9; color: #fff; }
 .style-btn:hover { border-color: #6C2BD9; }
 .style-preview {
     padding: 4px 12px; border-radius: 4px; font-weight: 700; font-size: 0.9rem;
-
-.btn-correct-prompt:hover {
-    background: rgba(108, 43, 217, 0.1);
-}
-
-.btn-correct-prompt:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* ---- BADGE CORRIGIDO ---- */
-.badge-corrected {
-    background: rgba(16, 185, 129, 0.15);
-    color: #10b981;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
 }
 .style-branca { color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
 .style-amarela { color: #FFD700; text-shadow: 0 0 4px rgba(0,0,0,0.9); }
 .style-tiktok { color: #fff; }
 .style-tiktok .highlight-word { color: #FFD700; font-size: 1.1em; }
 
-/* ERROR */
+/* ============================================================
+   UPLOAD STATUS
+   ============================================================ */
+.upload-status { margin-top: 12px; }
+
+/* ============================================================
+   ERROR
+   ============================================================ */
 .error-msg {
     padding: 14px 18px; background: rgba(239, 68, 68, 0.1);
     border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;
     color: #ef4444; font-size: 0.9rem; margin-top: 12px;
-/* ---- ABA 2: ESTRUTURA DE CORTES ---- */
-.cuts-structure {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin: 12px 0;
 }
 
-/* UPLOAD STATUS */
-.upload-status { margin-top: 12px; }
-.cut-segment {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    border-radius: 8px;
-    border-left: 4px solid #444;
-    background: rgba(255, 255, 255, 0.03);
-}
-
-.cut-segment.cut-hook {
-    border-left-color: #ef4444;
-    background: rgba(239, 68, 68, 0.08);
-}
-
-.cut-segment.cut-body {
-    border-left-color: #3b82f6;
-    background: rgba(59, 130, 246, 0.08);
-}
-
-.cut-segment.cut-cta {
-    border-left-color: #10b981;
-    background: rgba(16, 185, 129, 0.08);
-}
-
-.cut-role {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #aaa;
-    text-transform: uppercase;
-    width: 50px;
-    flex-shrink: 0;
-}
-
-.cut-time {
-    font-size: 0.8rem;
-    color: #8B5CF6;
-    font-weight: 500;
-    width: 120px;
-    flex-shrink: 0;
-    font-family: monospace;
-}
-
-.cut-text {
-    font-size: 0.85rem;
-    color: #ccc;
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* ---- ABA 2: AI REASONING ---- */
-.ai-reasoning {
-    padding: 10px 14px;
-    background: rgba(108, 43, 217, 0.08);
-    border-radius: 8px;
-    color: #c084fc;
-    font-size: 0.85rem;
-    margin: 12px 0;
-    line-height: 1.5;
-}
-
-/* ---- ABA 2: UPLOAD SUCCESS ---- */
-.upload-success {
-    padding: 16px;
-    background: rgba(16, 185, 129, 0.08);
-    border: 1px solid rgba(16, 185, 129, 0.2);
-    border-radius: 10px;
-    margin-top: 12px;
-}
-
-.success-header {
-    color: #10b981;
-    font-weight: 600;
-    font-size: 0.95rem;
-    margin-bottom: 12px;
-}
-
-.success-header code {
-    background: #12121f;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    color: #8B5CF6;
-}
-
-/* ---- ABA 2: LOADING INLINE ---- */
-.loading-inline {
-    padding: 12px 16px;
-    background: rgba(108, 43, 217, 0.08);
-    border-radius: 8px;
-    color: #8B5CF6;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* FOOTER */
+/* ============================================================
+   FOOTER
+   ============================================================ */
 .footer {
     max-width: 1200px; margin: 40px auto 20px; padding: 0 24px;
     text-align: center; color: #555; font-size: 0.8rem;
-/* ---- ABA 2: REJECTED FILES ---- */
-.rejected-files {
-    margin-top: 10px;
-    padding: 10px 14px;
-    background: rgba(239, 68, 68, 0.08);
-    border-radius: 8px;
-    color: #ef4444;
-    font-size: 0.85rem;
 }
 
-/* RESPONSIVE */
-/* ---- RESPONSIVE PATCH ---- */
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media (max-width: 768px) {
     .header-content { flex-direction: column; gap: 8px; }
     .tabs { flex-direction: column; }
@@ -656,25 +651,14 @@ body {
     .result-header { flex-direction: column; align-items: flex-start; }
     .eval-header { flex-direction: column; align-items: flex-start; gap: 8px; }
     .prompt-header { flex-direction: column; align-items: flex-start; gap: 6px; }
-    .criterio-name {
-        width: 100px;
-        font-size: 0.75rem;
-    }
-
+    .criterio-name { width: 100px; font-size: 0.75rem; }
     .cut-segment {
         flex-direction: column;
         align-items: flex-start;
         gap: 4px;
     }
-
-    .cut-time {
-        width: auto;
-    }
-
-    .cut-text {
-        white-space: normal;
-    }
-
+    .cut-time { width: auto; }
+    .cut-text { white-space: normal; }
     .director-header {
         flex-direction: column;
         align-items: flex-start;
