@@ -2,6 +2,7 @@
  * HALLEY CRIATIVOS STUDIO — Frontend v8.2
  * v8.1 completo + Aba Conhecimento (Swipe File) + Reordenação resultados
  * Criativo → Diretor → Prompts
+ * FIX: upload zone click funciona dentro do modal
  */
 
 const API_BASE = "https://wanderhalleylee-criativo-studio-backend.hf.space";
@@ -40,10 +41,11 @@ function handleDrop(e, inputId) {
     updateFileList(inputId, listId);
 }
 
+// FIX v8.2: Removido bloqueio ".modal-overlay" para permitir click no upload do modal Conhecimento
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.upload-zone').forEach(zone => {
         zone.addEventListener('click', (e) => {
-            if (e.target.closest('.modal-overlay')) return;
+            if (e.target.closest('button') || e.target.closest('a')) return;
             const input = zone.querySelector('input[type="file"]');
             if (input) input.click();
         });
@@ -181,21 +183,17 @@ function renderCreativeResults(data, tipo) {
         if (r._fallback) html += `<span class="badge badge-fallback">Fallback</span>`;
         html += `</div>`;
 
-        // 1) CRIATIVO
         if (tipo === 'video') {
             html += renderVideoCreative(r);
         } else {
             html += renderImageCreative(r);
         }
 
-        // 2) AVALIAÇÃO DO DIRETOR (logo após o criativo)
         if (r.avaliacao_diretor) {
             html += renderDirectorEvaluation(r.avaliacao_diretor, varId, idx, data.produto, data.publico_alvo, tipo);
         }
 
-        // 3) PROMPTS (por último)
         html += renderPromptSection(r, idx, data.produto);
-
         html += `</div>`;
     });
 
@@ -714,16 +712,14 @@ function updateKnowledgeFile() {
     const size = (f.size / 1024 / 1024).toFixed(2);
     display.innerHTML = `<div class="file-items"><div class="file-item"><span>${icon} ${f.name}</span><span class="file-size">${size} MB</span></div></div>`;
 
-    // Mostrar opções de imagem se for imagem
     const isImage = ['png', 'jpg', 'jpeg', 'webp'].includes(ext);
     document.getElementById('knowledgeImageOptions').style.display = isImage ? 'block' : 'none';
 }
 
-function openKnowledgeModal(id = null) {
-    editingKnowledgeId = id;
+function openKnowledgeModal(id) {
+    editingKnowledgeId = id || null;
     document.getElementById('modalTitle').textContent = id ? '✏️ Editar Conhecimento' : '➕ Adicionar Conhecimento';
 
-    // Limpar campos
     document.getElementById('knowledgeFileInput').value = '';
     document.getElementById('knowledgeFileName').innerHTML = '';
     document.getElementById('knowledgeTextContent').value = '';
@@ -735,17 +731,25 @@ function openKnowledgeModal(id = null) {
     document.getElementById('knowledgeImageOptions').style.display = 'none';
     document.getElementById('knowledgeManualDesc').style.display = 'none';
 
-    // Se editando, preencher
+    // Reset para modo arquivo
+    knowledgeInputMode = 'file';
+    document.getElementById('knowledgeFileMode').style.display = 'block';
+    document.getElementById('knowledgeTextMode').style.display = 'none';
+    document.querySelectorAll('#knowledgeModal .toggle-group')[0]
+        .querySelectorAll('.toggle-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.value === 'file');
+        });
+
     if (id) {
         fetch(`${API_BASE}/api/v1/knowledge/${id}`)
             .then(r => r.json())
             .then(data => {
-                if (data.content) document.getElementById('knowledgeTextContent').value = data.content;
-                if (data.days_running) document.getElementById('knowledgeDays').value = data.days_running;
-                if (data.scaled_count) document.getElementById('knowledgeScaled').value = data.scaled_count;
-                if (data.niche) document.getElementById('knowledgeNiche').value = data.niche;
-                if (data.notes) document.getElementById('knowledgeNotes').value = data.notes;
-                // Forçar modo texto para edição
+                const item = data.item || data;
+                if (item.content) document.getElementById('knowledgeTextContent').value = item.content;
+                if (item.days_running) document.getElementById('knowledgeDays').value = item.days_running;
+                if (item.scaled_count) document.getElementById('knowledgeScaled').value = item.scaled_count;
+                if (item.niche) document.getElementById('knowledgeNiche').value = item.niche;
+                if (item.notes) document.getElementById('knowledgeNotes').value = item.notes;
                 knowledgeInputMode = 'text';
                 document.getElementById('knowledgeFileMode').style.display = 'none';
                 document.getElementById('knowledgeTextMode').style.display = 'block';
@@ -773,10 +777,6 @@ async function saveKnowledge() {
     try {
         const formData = new FormData();
 
-        if (editingKnowledgeId) {
-            formData.append('id', editingKnowledgeId);
-        }
-
         if (knowledgeInputMode === 'file') {
             const fileInput = document.getElementById('knowledgeFileInput');
             if (!fileInput.files.length && !editingKnowledgeId) {
@@ -786,10 +786,7 @@ async function saveKnowledge() {
             }
             if (fileInput.files.length) {
                 formData.append('file', fileInput.files[0]);
-            }
-            // Para imagens, enviar modo de extração e descrição manual se aplicável
-            const f = fileInput.files[0];
-            if (f) {
+                const f = fileInput.files[0];
                 const ext = f.name.split('.').pop().toLowerCase();
                 const isImage = ['png', 'jpg', 'jpeg', 'webp'].includes(ext);
                 if (isImage) {
@@ -815,18 +812,17 @@ async function saveKnowledge() {
             formData.append('text_content', textContent);
         }
 
+        formData.append('input_mode', knowledgeInputMode);
         formData.append('days_running', document.getElementById('knowledgeDays').value.trim());
         formData.append('scaled_count', document.getElementById('knowledgeScaled').value.trim());
         formData.append('niche', document.getElementById('knowledgeNiche').value.trim());
         formData.append('notes', document.getElementById('knowledgeNotes').value.trim());
-        formData.append('input_mode', knowledgeInputMode);
 
         const url = editingKnowledgeId
             ? `${API_BASE}/api/v1/knowledge/${editingKnowledgeId}`
             : `${API_BASE}/api/v1/knowledge`;
-        const method = 'POST';
 
-        const res = await fetch(url, { method, body: formData });
+        const res = await fetch(url, { method: 'POST', body: formData });
         const data = await res.json();
         if (!res.ok) throw new Error(data.detail || 'Erro ao salvar');
 
@@ -842,10 +838,12 @@ async function saveKnowledge() {
 }
 
 async function deleteKnowledge(id) {
-    if (!confirm('Excluir este conhecimento?')) return;
+    if (!confirm('Tem certeza que deseja excluir este conhecimento?')) return;
+
     try {
         const res = await fetch(`${API_BASE}/api/v1/knowledge/${id}`, { method: 'DELETE' });
-        if (!res.ok) throw new Error('Erro ao excluir');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Erro ao excluir');
         loadKnowledgeList();
     } catch (err) {
         alert(`Erro: ${err.message}`);
@@ -853,32 +851,37 @@ async function deleteKnowledge(id) {
 }
 
 async function loadKnowledgeList() {
-    const listEl = document.getElementById('knowledgeList');
-    const emptyEl = document.getElementById('knowledgeEmpty');
-    const loadingEl = document.getElementById('knowledgeLoading');
+    const listContainer = document.getElementById('knowledgeList');
+    const emptyContainer = document.getElementById('knowledgeEmpty');
+    const loadingContainer = document.getElementById('knowledgeLoading');
 
-    loadingEl.style.display = 'flex';
-    listEl.innerHTML = '';
-    emptyEl.style.display = 'none';
+    loadingContainer.style.display = 'flex';
+    listContainer.innerHTML = '';
+    emptyContainer.style.display = 'none';
 
     try {
         const res = await fetch(`${API_BASE}/api/v1/knowledge`);
         const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Erro ao carregar');
+
         const items = data.items || [];
 
         if (!items.length) {
-            emptyEl.style.display = 'flex';
-            loadingEl.style.display = 'none';
+            emptyContainer.style.display = 'flex';
             return;
         }
 
         let html = '';
         items.forEach(item => {
-            const preview = (item.content || '').substring(0, 200);
+            const typeLabel = item.source_type === 'srt' ? '📝 SRT'
+                : item.source_type === 'image' ? '🖼️ Imagem'
+                : item.source_type === 'text_manual' ? '📝 Texto'
+                : '📄 Texto';
+
             html += `<div class="knowledge-card">
                 <div class="knowledge-card-header">
                     <div class="knowledge-card-info">
-                        <span class="knowledge-type-badge">${item.source_type === 'image' ? '🖼️ Imagem' : item.source_type === 'srt' ? '📝 SRT' : '📄 Texto'}</span>
+                        <span class="knowledge-type-badge">${typeLabel}</span>
                         ${item.niche ? `<span class="knowledge-niche-badge">${escapeHtml(item.niche)}</span>` : ''}
                         ${item.days_running ? `<span class="knowledge-meta">⏱️ ${escapeHtml(item.days_running)}</span>` : ''}
                         ${item.scaled_count ? `<span class="knowledge-meta">📊 ${escapeHtml(item.scaled_count)}</span>` : ''}
@@ -888,17 +891,18 @@ async function loadKnowledgeList() {
                         <button class="btn-delete" onclick="deleteKnowledge('${item.id}')">🗑️ Excluir</button>
                     </div>
                 </div>
-                <div class="knowledge-card-preview">${escapeHtml(preview)}${preview.length >= 200 ? '...' : ''}</div>
-                ${item.filename ? `<div class="knowledge-card-file">📎 ${escapeHtml(item.filename)}</div>` : ''}
+                ${item.filename ? `<div class="knowledge-card-file">📁 ${escapeHtml(item.filename)}</div>` : ''}
+                <div class="knowledge-card-preview">${escapeHtml((item.content || '').substring(0, 300))}${(item.content || '').length > 300 ? '...' : ''}</div>
                 ${item.notes ? `<div class="knowledge-card-notes">💡 ${escapeHtml(item.notes)}</div>` : ''}
-                <div class="knowledge-card-date">Adicionado: ${new Date(item.created_at).toLocaleDateString('pt-BR')}</div>
+                <div class="knowledge-card-date">Adicionado: ${item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : 'N/A'}</div>
             </div>`;
         });
 
-        listEl.innerHTML = html;
+        listContainer.innerHTML = html;
+
     } catch (err) {
-        listEl.innerHTML = `<div class="error-msg">Erro ao carregar: ${escapeHtml(err.message)}</div>`;
+        listContainer.innerHTML = `<div class="error-msg">Erro ao carregar conhecimentos: ${escapeHtml(err.message)}</div>`;
     } finally {
-        loadingEl.style.display = 'none';
+        loadingContainer.style.display = 'none';
     }
 }
