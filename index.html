@@ -13,7 +13,7 @@
                 <span class="logo-icon">🚀</span>
                 Halley Criativos Studio
             </h1>
-            <span class="version-badge">v8.0</span>
+            <span class="version-badge">v8.2</span>
         </div>
     </header>
 
@@ -23,6 +23,9 @@
         </button>
         <button class="tab" data-tab="tab2" onclick="switchTab('tab2')">
             🎬 Editor Automático
+        </button>
+        <button class="tab" data-tab="tab3" onclick="switchTab('tab3')">
+            🧠 Conhecimento
         </button>
     </nav>
 
@@ -82,8 +85,8 @@
                     </div>
                 </div>
                 <p class="hint">
-                    <strong>Modo Vídeo:</strong> Gera roteiros completos (Hook → Corpo → CTA) + Prompts Nano Banana + Veo 3 + Avaliação do Diretor Criativo<br>
-                    <strong>Modo Imagem:</strong> Gera copy para formatos (Feed, Story, Banner) + Prompts Nano Banana + Veo 3 + Avaliação do Diretor
+                    <strong>Modo Vídeo:</strong> Gera roteiros completos (Hook → Corpo → CTA) + Avaliação do Diretor + Prompts Nano Banana + Veo 3<br>
+                    <strong>Modo Imagem:</strong> Gera copy para formatos (Feed, Story, Banner) + Avaliação do Diretor + Prompts Nano Banana + Veo 3
                 </p>
             </div>
 
@@ -200,10 +203,137 @@
             <div id="results2" class="results-container"></div>
         </section>
 
+        <!-- ============================================ -->
+        <!-- ABA 3 — CONHECIMENTO (Swipe File)            -->
+        <!-- ============================================ -->
+        <section id="tab3" class="tab-content">
+
+            <div class="card">
+                <div class="knowledge-header">
+                    <div>
+                        <h3>🧠 Banco de Conhecimento</h3>
+                        <p class="knowledge-desc">Adicione criativos que estão escalados para as IAs usarem como referência na geração e avaliação. Esta aba é opcional — o sistema funciona sem ela, mas com referências reais os resultados são muito melhores.</p>
+                    </div>
+                    <button class="btn-primary" id="btnAddKnowledge" onclick="openKnowledgeModal()">
+                        ➕ Adicionar Conhecimento
+                    </button>
+                </div>
+            </div>
+
+            <div id="knowledgeLoading" class="loading" style="display:none">
+                <div class="spinner"></div>
+                <p>Carregando banco de conhecimento...</p>
+            </div>
+
+            <div id="knowledgeList" class="knowledge-list"></div>
+
+            <div id="knowledgeEmpty" class="knowledge-empty" style="display:none">
+                <div class="empty-icon">📚</div>
+                <h4>Nenhum conhecimento salvo</h4>
+                <p>Adicione criativos escalados (.srt, .txt ou imagens) para que as IAs usem como referência.</p>
+            </div>
+
+        </section>
+
     </main>
 
+    <!-- ============================================ -->
+    <!-- MODAL: ADICIONAR / EDITAR CONHECIMENTO       -->
+    <!-- ============================================ -->
+    <div id="knowledgeModal" class="modal-overlay" style="display:none">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">➕ Adicionar Conhecimento</h3>
+                <button class="modal-close" onclick="closeKnowledgeModal()">✕</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Tipo de envio -->
+                <div class="form-group">
+                    <label>Como enviar o conteúdo?</label>
+                    <div class="toggle-group">
+                        <button class="toggle-btn active" data-value="file" onclick="setKnowledgeInputMode(this)">📁 Arquivo (SRT/TXT/Imagem)</button>
+                        <button class="toggle-btn" data-value="text" onclick="setKnowledgeInputMode(this)">📝 Colar descrição (TXT do GPT/Gemini)</button>
+                    </div>
+                </div>
+
+                <!-- Modo arquivo -->
+                <div id="knowledgeFileMode">
+                    <div class="form-group">
+                        <label>Arquivo do criativo escalado</label>
+                        <div class="upload-zone upload-zone-small" id="uploadZoneK"
+                             ondrop="handleKnowledgeDrop(event)"
+                             ondragover="event.preventDefault(); this.classList.add('drag-over')"
+                             ondragleave="this.classList.remove('drag-over')">
+                            <p><strong>Arraste .srt, .txt ou imagem aqui</strong></p>
+                            <p class="upload-hint">.srt, .txt, .png, .jpg, .jpeg, .webp</p>
+                            <input type="file" id="knowledgeFileInput" accept=".srt,.txt,.png,.jpg,.jpeg,.webp"
+                                   onchange="updateKnowledgeFile()" hidden>
+                        </div>
+                        <div id="knowledgeFileName" class="file-list"></div>
+                    </div>
+
+                    <!-- Opção para imagens: OCR ou descrição manual -->
+                    <div id="knowledgeImageOptions" style="display:none">
+                        <div class="form-group">
+                            <label>Como extrair o conteúdo da imagem?</label>
+                            <div class="toggle-group">
+                                <button class="toggle-btn active" data-value="ocr" onclick="setImageExtractMode(this)">🤖 OCR Automático (IA Vision)</button>
+                                <button class="toggle-btn" data-value="manual" onclick="setImageExtractMode(this)">📝 Enviar descrição em TXT</button>
+                            </div>
+                        </div>
+                        <div id="knowledgeManualDesc" style="display:none">
+                            <div class="form-group">
+                                <label>Descrição do criativo (cole aqui o texto do GPT/Gemini)</label>
+                                <textarea id="knowledgeImageDesc" class="form-textarea" rows="6"
+                                    placeholder="Cole aqui a descrição completa do criativo: headline, copy, CTA, elementos visuais..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modo texto direto -->
+                <div id="knowledgeTextMode" style="display:none">
+                    <div class="form-group">
+                        <label>Conteúdo do criativo escalado</label>
+                        <textarea id="knowledgeTextContent" class="form-textarea" rows="8"
+                            placeholder="Cole aqui o conteúdo completo do criativo: hook, corpo, CTA, texto da imagem, descrição visual... Pode ser copiado do GPT ou Gemini após descrever a imagem/vídeo."></textarea>
+                    </div>
+                </div>
+
+                <!-- Campos opcionais -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="knowledgeDays">Tempo rodando (opcional)</label>
+                        <input type="text" id="knowledgeDays" placeholder="Ex: 45 dias, 2 meses...">
+                    </div>
+                    <div class="form-group">
+                        <label for="knowledgeScaled">Qtd criativos escalados (opcional)</label>
+                        <input type="text" id="knowledgeScaled" placeholder="Ex: 12 criativos ativos">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="knowledgeNiche">Nicho / Categoria (opcional)</label>
+                    <input type="text" id="knowledgeNiche" placeholder="Ex: suplemento, curso, e-commerce, serviço...">
+                </div>
+
+                <div class="form-group">
+                    <label for="knowledgeNotes">Observações (opcional)</label>
+                    <textarea id="knowledgeNotes" class="form-textarea" rows="3"
+                        placeholder="Ex: ROAS 3.5, Meta Ads, público feminino 30-50..."></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeKnowledgeModal()">Cancelar</button>
+                <button class="btn-primary" id="btnSaveKnowledge" onclick="saveKnowledge()">💾 Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <footer class="footer">
-        <p>Halley Criativos Studio v8.0 — Motor de IA com Avaliação Híbrida e Correção Iterativa</p>
+        <p>Halley Criativos Studio v8.2 — Motor de IA com Avaliação Híbrida, Correção Iterativa e Banco de Conhecimento</p>
     </footer>
 
     <script src="js/app.js"></script>
