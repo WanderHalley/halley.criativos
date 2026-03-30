@@ -664,4 +664,217 @@ body {
         align-items: flex-start;
         gap: 8px;
     }
+   /* ============================================================
+   ABA 3 — CONHECIMENTO (SWIPE FILE) v8.2
+   ============================================================ */
+
+/* Knowledge Header */
+.knowledge-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.knowledge-header h3 { margin-bottom: 8px; }
+.knowledge-desc {
+    font-size: 0.85rem;
+    color: #888;
+    line-height: 1.5;
+    max-width: 700px;
+}
+
+/* Knowledge Empty */
+.knowledge-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 60px 24px;
+    text-align: center;
+}
+.empty-icon { font-size: 3rem; }
+.knowledge-empty h4 { color: #888; font-size: 1.1rem; }
+.knowledge-empty p { color: #666; font-size: 0.9rem; }
+
+/* Knowledge Cards */
+.knowledge-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+.knowledge-card {
+    background: #1e1e35;
+    border: 1px solid #2a2a4a;
+    border-radius: 12px;
+    padding: 18px;
+    transition: border-color 0.2s;
+}
+.knowledge-card:hover { border-color: #6C2BD9; }
+.knowledge-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.knowledge-card-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.knowledge-type-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #1e3a5f;
+    color: #60a5fa;
+}
+.knowledge-niche-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #3b1f5e;
+    color: #c084fc;
+}
+.knowledge-meta {
+    font-size: 0.8rem;
+    color: #888;
+}
+.knowledge-card-actions {
+    display: flex;
+    gap: 6px;
+}
+.btn-edit {
+    padding: 5px 12px;
+    border: 1px solid #3a3a5a;
+    border-radius: 6px;
+    background: transparent;
+    color: #8B5CF6;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+.btn-edit:hover { background: rgba(108, 43, 217, 0.1); }
+.btn-delete {
+    padding: 5px 12px;
+    border: 1px solid #3a3a5a;
+    border-radius: 6px;
+    background: transparent;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+.btn-delete:hover { background: rgba(239, 68, 68, 0.1); }
+.knowledge-card-preview {
+    font-size: 0.85rem;
+    color: #ccc;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    max-height: 80px;
+    overflow: hidden;
+}
+.knowledge-card-file {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 4px;
+}
+.knowledge-card-notes {
+    font-size: 0.8rem;
+    color: #f59e0b;
+    margin-bottom: 4px;
+}
+.knowledge-card-date {
+    font-size: 0.75rem;
+    color: #555;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+.modal-content {
+    background: #1a1a2e;
+    border: 1px solid #2a2a4a;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #2a2a4a;
+}
+.modal-header h3 { color: #fff; font-size: 1.1rem; }
+.modal-close {
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+.modal-close:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.modal-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid #2a2a4a;
+}
+
+/* Form textarea */
+.form-textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #3a3a5a;
+    background: #12121f;
+    color: #fff;
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: vertical;
+    line-height: 1.5;
+}
+.form-textarea:focus { outline: none; border-color: #6C2BD9; }
+
+/* Upload zone small (modal) */
+.upload-zone-small {
+    padding: 24px;
+}
+.upload-zone-small p { font-size: 0.9rem; }
+
+/* Responsive modal */
+@media (max-width: 768px) {
+    .modal-content { max-width: 100%; margin: 10px; }
+    .knowledge-header { flex-direction: column; }
+    .knowledge-card-header { flex-direction: column; align-items: flex-start; }
+}
 }
